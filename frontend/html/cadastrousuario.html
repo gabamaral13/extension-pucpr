@@ -6,10 +6,14 @@
   </head>
 
   <body>
-    <form onsubmit="fazerLogin(event)">
+    <form onsubmit="fazerCadastro(event)">
+      <input id="nome" type="text" placeholder="Nome" />
+      <input id="email" type="text" placeholder="E-mail" />
+      <input id="cpf" type="number" placeholder="CPF" />
       <input id="email" type="text" placeholder="E-mail" />
       <input id="senha" type="password" placeholder="Senha" />
-      <button type="submit">Entrar</button>
+      <input id="confirmsenha" type="password" placeholder="Confirmar Senha" />
+      <button type="submit">Cadastrar</button>
     </form>
   </body>
 </html>
