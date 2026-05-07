@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require('../banco');
 const autenticacao = require('../middleware/autenticacao');
 const permissao = require('../middleware/permissao');
+const calcularScore = require('../utils/calculoScore');
 
 // Criar avaliação (checklist)
 router.post('/', autenticacao, (req, res) => {
