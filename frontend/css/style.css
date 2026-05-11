@@ -1,0 +1,88 @@
+body {
+  width: 1920px;
+  height: 900px;
+  flex-shrink: 0;
+}
+
+.corpo {
+  width: 1920px;
+  height: 900px;
+
+  background: url(/frontend/css/imagens/Xtriagem.jpg) lightgray -119.892px 0px /
+    112.489% 100% no-repeat;
+  background: linear-gradient(
+    272deg,
+    rgba(10, 10, 10, 0) 0%,
+    rgba(10, 10, 10, 0.52) 100%
+  );
+}
+
+.container {
+  display: flex;
+  width: 1920px;
+  padding: 22px 38px 0 1553px;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+button {
+  width: 248px;
+  height: 93px;
+  flex-shrink: 0;
+  border-radius: 24px;
+  background: #25dbb6;
+
+  color: #fff;
+  text-align: center;
+  font-family: Inter;
+  font-size: 31px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 31.01px; /* 100.032% */
+  letter-spacing: -0.93px;
+}
+
+.botao_login {
+  display: flex;
+  width: 211px;
+  height: 58px;
+  flex-direction: column;
+  justify-content: center;
+  flex-shrink: 0;
+
+  color: #fff;
+  text-align: center;
+  font-family: Inter;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 800;
+  line-height: normal;
+  letter-spacing: 0.96px;
+  text-transform: uppercase;
+}
+
+.simbolo {
+  width: 360px;
+  height: 261px;
+  aspect-ratio: 40/29;
+
+  background: url(/frontend/css/imagens/x.png) lightgray -0.08px -68.612px /
+    99.994% 137.923% no-repeat;
+}
+
+h1 {
+  display: flex;
+  width: 869px;
+  height: 74px;
+  flex-direction: column;
+  justify-content: center;
+
+  color: #f0f0f0;
+  text-align: center;
+  font-family: Inter;
+  font-size: 128px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 40px; /* 31.25% */
+  letter-spacing: -0.93px;
+}

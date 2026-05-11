@@ -1,16 +1,23 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <link rel="stylecss" href="/frontend/css/loginstyle.css" />
+    <link rel="stylesheet" href="/frontend/css/loginstyle.css" />
     <script type="javascript" src="/frontend/javascript/index.js"></script>
   </head>
 
   <body>
-    <form onsubmit="fazerLogin(event)">
-      <h1 class="titulo">Login</h1>
-      <input id="email" type="text" placeholder="E-mail" />
-      <input id="senha" type="password" placeholder="Senha" />
-      <button type="submit" class="botoes">Entrar</button>
-    </form>
+    <div class="corpo">
+      <form onsubmit="fazerLogin(event)">
+        <h1 class="titulo">Login</h1>
+        <div class="dados">
+          <input id="email" type="text" placeholder="E-mail" />
+          <input id="senha" type="password" placeholder="Senha" />
+        </div>
+
+        <div class="botao_log">
+          <button type="submit" id="fazerLogin">Entrar</button>
+        </div>
+      </form>
+    </div>
   </body>
 </html>
