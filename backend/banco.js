@@ -1,24 +1,25 @@
 const sqlite3 = require('sqlite3').verbose();
 
-// Cria ou abre o banco
 const db = new sqlite3.Database('./banco.db', (err) => {
   if (err) {
     console.error("Erro ao conectar ao banco:", err.message);
   } else {
     console.log("Banco de dados conectado com sucesso");
+
+    // Ativa as chaves estrangeiras no SQLite
+    db.run("PRAGMA foreign_keys = ON;");
   }
 });
 
-// Criar tabelas
 db.serialize(() => {
-
-  // Usuários (admin e atendente)
+  // Usuários: admin e atendente
   db.run(`
     CREATE TABLE IF NOT EXISTS usuarios (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      username TEXT UNIQUE,
-      senha TEXT,
-      papel TEXT
+      username TEXT UNIQUE NOT NULL,
+      senha TEXT NOT NULL,
+      papel TEXT CHECK(papel IN ('admin', 'user')) NOT NULL DEFAULT 'user',
+      criado_em DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `);
 
@@ -26,29 +27,34 @@ db.serialize(() => {
   db.run(`
     CREATE TABLE IF NOT EXISTS pacientes (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      nome TEXT,
-      data_nascimento TEXT,
-      sexo TEXT,
-      responsavel TEXT
+      nome TEXT NOT NULL,
+      data_nascimento TEXT NOT NULL,
+      sexo TEXT CHECK(sexo IN ('M', 'F')) NOT NULL,
+      responsavel TEXT,
+      criado_em DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `);
 
-  // Avaliações (checklist)
+  // Avaliações
   db.run(`
     CREATE TABLE IF NOT EXISTS avaliacoes (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      paciente_id INTEGER,
-      usuario_id INTEGER,
-      respostas TEXT,
-      score REAL,
-      recomendacao TEXT,
+      paciente_id INTEGER NOT NULL,
+      usuario_id INTEGER NOT NULL,
+      respostas TEXT NOT NULL,
+      score REAL NOT NULL,
+      recomendacao TEXT NOT NULL,
       criado_em DATETIME DEFAULT CURRENT_TIMESTAMP,
 
-      FOREIGN KEY (paciente_id) REFERENCES pacientes(id),
-      FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+      FOREIGN KEY (paciente_id) REFERENCES pacientes(id) ON DELETE CASCADE,
+      FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE RESTRICT
     )
   `);
 
+  // Índices para melhorar buscas
+  db.run(`CREATE INDEX IF NOT EXISTS idx_pacientes_nome ON pacientes(nome)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_avaliacoes_paciente ON avaliacoes(paciente_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_avaliacoes_data ON avaliacoes(criado_em)`);
 });
 
 module.exports = db;
