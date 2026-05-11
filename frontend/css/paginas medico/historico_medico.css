@@ -1,0 +1,201 @@
+body {
+  width: 1920px;
+  height: 900px;
+  background: url(/frontend/css/imagens/papel\ de\ parede\ 2.jpg) lightgray
+    50% / cover no-repeat;
+}
+
+hr {
+  width: 1392.001px;
+  height: 3px;
+  background: #10146f;
+}
+
+h1 {
+  color: #fff;
+  text-align: center;
+  font-family: Inter;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 31.01px; /* 129.208% */
+  letter-spacing: -0.93px;
+}
+
+h3 {
+  color: #fff;
+  text-align: center;
+  font-family: Inter;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 31.01px; /* 129.208% */
+  letter-spacing: -0.93px;
+}
+
+h5 {
+  color: #fff;
+  text-align: center;
+  font-family: Inter;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 31.01px; /* 155.05% */
+  letter-spacing: -0.93px;
+}
+
+a {
+  width: 368px;
+  height: 83px;
+  border-radius: 10px;
+  background: #0f4a79;
+
+  color: #fff;
+  text-align: center;
+  font-family: Inter;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 31.01px; /* 129.208% */
+  letter-spacing: -0.93px;
+}
+
+p {
+  color: #fff;
+  text-align: center;
+  font-family: Inter;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 31.01px; /* 206.733% */
+  letter-spacing: -0.93px;
+}
+
+input {
+  width: 1080px;
+  height: 36px;
+  border: 1px solid #fff;
+  background: rgba(6, 3, 46, 0.24);
+
+  color: #fff;
+  text-align: center;
+  font-family: Inter;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 31.01px; /* 206.733% */
+  letter-spacing: -0.93px;
+}
+
+.container_ {
+  display: flex;
+  width: 1920px;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(
+    272deg,
+    rgba(10, 10, 10, 0) 0%,
+    rgba(10, 10, 10, 0.48) 64.42%
+  );
+}
+
+.titulo {
+  display: flex;
+  width: 755px;
+  height: 150px;
+  padding: 38px 0;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo {
+  width: 180px;
+  height: 130px;
+  aspect-ratio: 18/13;
+  background: url(/frontend/css/imagens/x.png) lightgray -0.04px -34.175px /
+    99.994% 137.923% no-repeat;
+}
+
+.navegador {
+  width: 384px;
+  height: 758px;
+  border-radius: 5px;
+  background: #09394a;
+}
+
+button {
+  width: 248px;
+  height: 93px;
+  flex-shrink: 0;
+  border-radius: 24px;
+  background: #25dbb6;
+
+  color: #fff;
+  text-align: center;
+  font-family: Inter;
+  font-size: 31px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 31.01px; /* 100.032% */
+  letter-spacing: -0.93px;
+}
+
+.botao_imprimir {
+  display: flex;
+  width: 211px;
+  height: 58px;
+  flex-direction: column;
+  justify-content: center;
+  flex-shrink: 0;
+
+  color: #fff;
+  text-align: center;
+  font-family: Inter;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 800;
+  line-height: normal;
+  letter-spacing: 0.96px;
+  text-transform: uppercase;
+}
+
+.botoes_areas {
+  width: 368px;
+  height: 83px;
+  border-radius: 10px;
+  background-color: #0f4a79;
+}
+
+.botoes_areas :hover {
+  cursor: pointer;
+  fill: #3e7cac;
+}
+
+.historico {
+  width: 1494px;
+  height: 722px;
+  border-radius: 10px;
+  background: #30719a;
+}
+
+.escolha_paciente {
+  width: 1346px;
+  height: 162px;
+  border-radius: 25.6px;
+  background: rgba(9, 6, 73, 0.19);
+}
+
+.paciente {
+  width: 1191px;
+  height: 81px;
+  border-radius: 25.6px;
+  background: rgba(9, 6, 73, 0.19);
+}
+
+.historico_avaliacao {
+  width: 941px;
+  height: 231px;
+  border-radius: 20px;
+  border: 2px solid #020632;
+  background: rgba(5, 26, 70, 0.8);
+}
