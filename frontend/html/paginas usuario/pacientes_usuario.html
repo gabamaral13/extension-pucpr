@@ -10,48 +10,53 @@
 
   <body>
     <div class="corpo">
-      <div class="topo">
+      <div class="container_">
+        <img class="logo" src="/frontend/css/imagens/x.png" />
         <h1 class="titulo">Bem vindo, user</h1>
       </div>
 
-      <div class="navegador">
-        <ul>
-          <li>
-            <a href="/frontend/html/paginas medico/dashboard_medico.html">
-              <button type="button" class="botoes_areas">Dashboard</button>
-            </a>
-          </li>
-          <li>
-            <a href="/frontend/html/paginas medico/pacientes_medico.html">
-              <button type="button" class="botoes_areas">Pacientes</button>
-            </a>
-          </li>
-          <li>
-            <a href="/frontend/html/paginas medico/relatorios_medico.html">
-              <button type="button" class="botoes_areas">Relatórios</button>
-            </a>
-          </li>
-        </ul>
+      <div class="corpo_">
+        <div class="navegador">
+          <div class="dash">
+            <h3>Navegador</h3>
+          </div>
+          <a href="/frontend/html/paginas medico/dashboard_medico.html">
+            <button class="botoes_areas" type="button">DashBoard</button> </a
+          ><br />
 
-        <div class="user_"></div>
-      </div>
+          <a href="/frontend/html/paginas medico/pacientes_medico.html">
+            <button class="botoes_areas" type="button">Pacientes</button> </a
+          ><br />
 
-      <div class="pacientes">
-        <h3>Cadastrar novos Pacientes</h3>
-        <br />
-        <p>Gerenciamento de pacientes para triagem</p>
-        <div class="botao_paciente">
-          <a
-            href="/frontend/html/paginas usuario/cadastropaciente_usuario.html"
-          >
-            <button class="botao_cadastro" type="button">Novo Paciente</button>
-          </a>
-        </div>
-        <div class="buscar_paciente">
-          <input type="text" placeholder="Buscar" />
+          <a href="/frontend/html/paginas medico/relatorios_medico.html">
+            <button class="botoes_areas" type="button">Relatórios</button> </a
+          ><br />
+
+          <div class="user_"></div>
         </div>
 
-        <div class="lista_pacientes"></div>
+        <div class="pacientes">
+          <div class="top">
+            <div class="titu">
+              <h3>Cadastrar novos Pacientes</h3>
+              <p>Gerenciamento de pacientes para triagem</p>
+            </div>
+
+            <div class="botao_cadastro">
+              <a
+                href="/frontend/html/paginas usuario/cadastropaciente_usuario.html"
+              >
+                <button type="button">Novo Paciente</button>
+              </a>
+            </div>
+          </div>
+
+          <div class="buscar_paciente">
+            <input type="text" placeholder="Buscar" />
+          </div>
+
+          <div class="lista_pacientes"></div>
+        </div>
       </div>
     </div>
   </body>

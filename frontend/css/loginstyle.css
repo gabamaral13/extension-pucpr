@@ -2,6 +2,19 @@ body {
   width: 1920px;
   height: 900px;
   flex-shrink: 0;
+
+  background: url(/frontend/css/imagens/plano_de_fundo001.png);
+}
+
+.corpo {
+  width: 1920px;
+  height: 900px;
+
+  background: linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.25) 100%,
+    rgba(0, 0, 0, 0.25) 100%
+  );
 }
 
 h1 {
@@ -19,6 +32,7 @@ button {
   height: 93px;
   flex-shrink: 0;
   border-radius: 24px;
+  border-color: #25dbb6;
   background: #25dbb6;
 
   color: #fff;
@@ -29,6 +43,24 @@ button {
   font-weight: 700;
   line-height: 31.01px; /* 100.032% */
   letter-spacing: -0.93px;
+
+  border: none;
+  box-shadow: none;
+  outline: none;
+}
+
+.botao_log {
+  display: flex;
+  width: 258.83px;
+  height: 104px;
+  justify-content: center;
+  align-items: center;
+  margin-left: 735px;
+  margin-top: 50px;
+
+  border: none;
+  box-shadow: none;
+  outline: none;
 }
 
 .dados {
@@ -36,18 +68,28 @@ button {
   height: 280px;
   border-radius: 20px;
   background-color: #f0f0f0;
+  margin-left: 610px;
+  margin-top: 85px;
+  padding-top: 25px;
 }
 
 .dados input {
   width: 372px;
   height: 61px;
   border-radius: 20px;
+  border-color: #d9d9d9;
   background: #d9d9d9;
   align-items: center;
   justify-content: center;
 
   display: flex;
   padding: 15px 0;
+  margin: 65px;
+  margin-bottom: 10px;
+  margin-top: 30px;
+  border: none;
+  box-shadow: none;
+  outline: none;
 
   color: black;
   text-align: center;
@@ -65,9 +107,10 @@ button {
   height: 74px;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
   flex-shrink: 0;
 
-  color: #f0f0f0;
+  color: #000000;
   text-align: center;
   font-family: Inter;
   font-size: 64px;
@@ -75,19 +118,6 @@ button {
   font-weight: 700;
   line-height: 45px; /* 70.313% */
   letter-spacing: -0.93px;
-}
-
-.corpo {
-  display: flex;
-  width: 1920px;
-  height: 900px;
-  padding: 93px 0 657px 0;
-  justify-content: center;
-  align-items: center;
-
-  background: url(/frontend/css/imagens/papel\ de\ parede\ 1.jpg)
-    lightgray -119.892px 0px / 112.489% 100% no-repeat;
-  background:
-    linear-gradient(0deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0.25) 100%),
-    url(<path-to-image>) lightgray 0% 0% / 50px 50px repeat;
+  padding-left: 500px;
+  padding-top: 150px;
 }

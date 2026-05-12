@@ -10,50 +10,48 @@
 
   <body>
     <div class="corpo">
-      <div class="topo">
+      <div class="container_">
+        <img class="logo" src="/frontend/css/imagens/x.png" />
         <h1 class="titulo">Bem vindo, user</h1>
       </div>
 
-      <div class="navegador">
-        <ul>
-          <li>
-            <a href="/frontend/html/paginas medico/dashboard_medico.html">
-              <button type="button" class="botoes_areas">Dashboard</button>
-            </a>
-          </li>
-          <li>
-            <a href="/frontend/html/paginas medico/pacientes_medico.html">
-              <button type="button" class="botoes_areas">Pacientes</button>
-            </a>
-          </li>
-          <li>
-            <a href="/frontend/html/paginas medico/relatorios_medico.html">
-              <button type="button" class="botoes_areas">Relatórios</button>
-            </a>
-          </li>
-        </ul>
-
-        <div class="user_"></div>
-      </div>
-
-      <div class="relatorios">
-        <h3>Relatórios do Pacientes</h3>
-        <br />
-        <p>Faça a impressão dos relatórios dos pacientes</p>
-        <br />
-        <div class="botao_imprimir">
-          <button type="button">Imprimir</button>
-        </div>
-
-        <div class="busca_paciente">
-          <input type="text" placeholder="Buscar Paciente" /><br />
-        </div>
-        <div class="lista_relatorios">
-          <div class="paciente_relatorio">
-            <p>Paciente 0101</p>
-            <br />
-            <p>Nº do paciente</p>
+      <div class="corpo_">
+        <div class="navegador">
+          <div class="dash">
+            <h3>Navegador</h3>
           </div>
+          <a href="/frontend/html/paginas medico/dashboard_medico.html">
+            <button class="botoes_areas" type="button">DashBoard</button> </a
+          ><br />
+
+          <a href="/frontend/html/paginas medico/pacientes_medico.html">
+            <button class="botoes_areas" type="button">Pacientes</button> </a
+          ><br />
+
+          <a href="/frontend/html/paginas medico/relatorios_medico.html">
+            <button class="botoes_areas" type="button">Relatórios</button> </a
+          ><br />
+
+          <div class="user_"></div>
+        </div>
+
+        <div class="relatorios">
+          <div class="top">
+            <div class="titu">
+              <h3>Relatórios do Pacientes</h3>
+              <p>Faça a impressão dos relatórios dos pacientes</p>
+            </div>
+
+            <div class="botao_imprimir">
+              <button type="button">Imprimir</button>
+            </div>
+          </div>
+
+          <div class="busca_paciente">
+            <input type="text" placeholder="Buscar Paciente" /><br />
+          </div>
+
+          <div class="lista_relatorios"></div>
         </div>
       </div>
     </div>

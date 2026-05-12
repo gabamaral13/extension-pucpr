@@ -1,15 +1,23 @@
 body {
   width: 1920px;
   height: 900px;
-  background: url(/frontend/css/imagens/papel\ de\ parede\ 2.jpg) lightgray
-    50% / cover no-repeat;
+  background: url(/frontend/css/imagens/plano_de_fundo002.png);
 }
 
 h1 {
+  display: flex;
+  width: 755px;
+  height: 150px;
+  padding: 38px 0;
+  justify-content: center;
+  align-items: center;
+  margin-right: 700px;
+  margin-left: 100px;
+
   color: #fff;
   text-align: center;
   font-family: Inter;
-  font-size: 24px;
+  font-size: 90px;
   font-style: normal;
   font-weight: 700;
   line-height: 31.01px; /* 129.208% */
@@ -18,59 +26,83 @@ h1 {
 
 h3 {
   color: #fff;
-  text-align: center;
   font-family: Inter;
-  font-size: 24px;
+  font-size: 50px;
   font-style: normal;
   font-weight: 700;
   line-height: 31.01px; /* 129.208% */
   letter-spacing: -0.93px;
+  padding-right: 1000px;
+  margin-left: 30px;
+  margin-bottom: 1px;
+  padding-right: 1px;
 }
 
 h5 {
+  height: 10px;
   color: #fff;
-  text-align: center;
   font-family: Inter;
-  font-size: 20px;
+  font-size: 25px;
   font-style: normal;
   font-weight: 700;
   line-height: 31.01px; /* 155.05% */
   letter-spacing: -0.93px;
+  padding-right: 50px;
+  padding-left: 50px;
+  margin-top: 25px;
 }
 
 a {
-  width: 368px;
+  width: 90px;
   height: 83px;
   border-radius: 10px;
-  background: #0f4a79;
 
   color: #fff;
   text-align: center;
-  font-family: Inter;
-  font-size: 24px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: 31.01px; /* 129.208% */
-  letter-spacing: -0.93px;
 }
 
 p {
   color: #fff;
-  text-align: center;
   font-family: Inter;
-  font-size: 15px;
+  font-size: 20px;
   font-style: normal;
   font-weight: 500;
   line-height: 31.01px; /* 206.733% */
   letter-spacing: -0.93px;
+  padding-right: 70px;
+  margin-left: 35px;
 }
 
-input {
-  width: 277px;
-  height: 57px;
-  border-radius: 15px;
-  border: 1px solid #fff;
-  background: #0b3b5d;
+button {
+  width: 248px;
+  height: 93px;
+  flex-shrink: 0;
+  border-radius: 24px;
+  border-color: #25dbb6;
+  background: #25dbb6;
+
+  color: #fff;
+  text-align: center;
+  font-family: Inter;
+  font-size: 31px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 31.01px; /* 100.032% */
+  letter-spacing: -0.93px;
+}
+
+.botao_imprimir {
+  display: flex;
+  width: 258.83px;
+  height: 104px;
+  justify-content: center;
+  align-items: center;
+  margin-left: 700px;
+  margin-top: 30px;
+
+  border: none;
+  box-shadow: none;
+  outline: none;
 }
 
 .container_ {
@@ -95,54 +127,32 @@ input {
 }
 
 .logo {
-  width: 180px;
-  height: 130px;
+  width: 200px;
+  height: 190px;
   aspect-ratio: 18/13;
-  background: url(/frontend/css/imagens/x.png) lightgray -0.04px -34.175px /
-    99.994% 137.923% no-repeat;
 }
 
 .navegador {
   width: 384px;
-  height: 758px;
+  height: 890px;
   border-radius: 5px;
   background: #09394a;
+  margin-top: 30px;
 }
 
-button {
-  width: 248px;
-  height: 93px;
-  flex-shrink: 0;
-  border-radius: 24px;
-  background: #25dbb6;
-
-  color: #fff;
-  text-align: center;
-  font-family: Inter;
-  font-size: 31px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: 31.01px; /* 100.032% */
-  letter-spacing: -0.93px;
+.dash {
+  width: 333px;
+  height: 112px;
+  border-radius: 5px;
+  background-color: #020632;
+  padding-top: 20px;
+  padding-left: 50px;
+  padding-bottom: 20px;
 }
 
-.botao_imprimir {
-  display: flex;
-  width: 211px;
-  height: 58px;
-  flex-direction: column;
-  justify-content: center;
-  flex-shrink: 0;
-
-  color: #fff;
-  text-align: center;
-  font-family: Inter;
-  font-size: 24px;
-  font-style: normal;
-  font-weight: 800;
-  line-height: normal;
-  letter-spacing: 0.96px;
-  text-transform: uppercase;
+.botoes_areas :hover {
+  cursor: pointer;
+  background-color: #3e7cac;
 }
 
 .botoes_areas {
@@ -150,18 +160,49 @@ button {
   height: 83px;
   border-radius: 10px;
   background-color: #0f4a79;
+
+  color: #fff;
+  font-family: Inter;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 31.01px; /* 129.208% */
+  letter-spacing: -0.93px;
+  text-align: center;
+  margin-top: 10px;
+  margin-left: 8px;
+  border: none;
+  box-shadow: none;
+  outline: none;
 }
 
-.botoes_areas :hover {
-  cursor: pointer;
-  fill: #3e7cac;
+.corpo_ {
+  display: flex;
+}
+
+.top {
+  display: flex;
 }
 
 .relatorios {
   width: 1494px;
-  height: 722px;
+  height: 890px;
   border-radius: 10px;
   background: #30719a;
+  margin-top: 30px;
+  margin-left: 20px;
+}
+
+.busca_paciente input {
+  width: 1345.78px;
+  height: 51.59px;
+  border-radius: 25.6px;
+  background: rgba(13, 39, 95, 0.69);
+  box-shadow: 0 0 0 1px #f9f9f9 inset;
+  outline: none;
+  border: none;
+  margin-left: 50px;
+  padding-left: 40px;
 }
 
 .lista_relatorios {
@@ -169,15 +210,7 @@ button {
   height: 517px;
   border-radius: 15px;
   background: rgba(2, 14, 81, 0.7);
-}
-
-.paciente_relatorio {
-  display: flex;
-  width: 1316px;
-  height: 162px;
-  justify-content: center;
-  align-items: center;
-  border-radius: 25.6px;
-  border: 1px solid #fff;
-  background: rgba(9, 6, 73, 0.61);
+  margin-left: 50px;
+  margin-top: 30px;
+  box-shadow: 0 0 0 1px #f9f9f9 inset;
 }

@@ -13,16 +13,23 @@
       <form onsubmit="fazerCadastro(event)">
         <h1 class="titulo">Cadastro de usuário</h1>
         <div class="dados">
-          <input id="nome" type="text" placeholder="Nome" />
-          <input id="email" type="text" placeholder="E-mail" />
-          <input id="cpf" type="number" placeholder="CPF" />
-          <input id="email" type="text" placeholder="E-mail" />
-          <input id="senha" type="password" placeholder="Senha" />
-          <input
-            id="confirmsenha"
-            type="password"
-            placeholder="Confirmar Senha"
-          />
+          <div class="dados_pessoais">
+            <h5>Dados Pessoais</h5>
+            <input id="nome" type="text" placeholder="Nome" />
+            <input id="email" type="text" placeholder="E-mail" />
+            <input id="cpf" type="number" placeholder="CPF" />
+            <input id="email" type="text" placeholder="E-mail" />
+          </div>
+
+          <div class="senha">
+            <h5>Criar Senha</h5>
+            <input id="senha" type="password" placeholder="Senha" />
+            <input
+              id="confirmsenha"
+              type="password"
+              placeholder="Confirmar Senha"
+            />
+          </div>
         </div>
 
         <div class="botao_cadastro">
