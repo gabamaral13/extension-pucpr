@@ -11,94 +11,88 @@
   <body>
     <div class="corpo">
       <div class="container_">
-        <h1 class="titulo">Bem-Vindo, Admin</h1>
         <img class="logo" src="/frontend/css/imagens/x.png" />
+        <h1 class="titulo">Bem-Vindo, Admin</h1>
       </div>
 
-      <div class="navegador">
-        <ul>
-          <li>
-            <a href="/frontend/html/paginas medico/dashboard_medico.html"></a>
-          </li>
-          <li>
-            <a href="/frontend/html/paginas medico/pacientes_medico.html"></a>
-          </li>
-          <li>
-            <a href="/frontend/html/paginas medico/avaliacao_medico.html"></a>
-          </li>
-          <li>
-            <a href="/frontend/html/paginas medico/historico_medico.html"></a>
-          </li>
-          <li>
-            <a href="/frontend/html/paginas medico/relatorios_medico.html"></a>
-          </li>
-          <li>
-            <a href="/frontend/html/paginas medico/usuarios_medico.html"></a>
-          </li>
-        </ul>
-
-        <div class="user_"></div>
-      </div>
-
-      <div class="areabase">
-        <div class="dashboard">
-          <h1>DashBoard</h1>
-          <br />
-          <div class="graficos">
-            <div class="pacientes">
-              <h5>Pacientes</h5>
-              <br />
-
-              <p>registrados no sistema</p>
-              <br />
-            </div>
-
-            <div class="avaliacoes">
-              <h5>Avaliações</h5>
-              <br />
-              <p>Realizadas este mês</p>
-              <br />
-            </div>
-
-            <div class="encaminhamentos">
-              <h5>Encaminhamentos</h5>
-              <br />
-              <p>Para teste genético</p>
-              <br />
-            </div>
-
-            <div class="relatorio">
-              <h5>Relatórios</h5>
-              <br />
-              <p>disponíveis para consulta</p>
-              <br />
-            </div>
+      <div class="corpo_">
+        <div class="navegador">
+          <div class="dash">
+            <h3>Navegador</h3>
           </div>
+          <a href="/frontend/html/paginas medico/dashboard_medico.html">
+            <button class="botoes_areas" type="button">DashBoard</button> </a
+          ><br />
 
-          <hr />
+          <a href="/frontend/html/paginas medico/pacientes_medico.html">
+            <button class="botoes_areas" type="button">Pacientes</button> </a
+          ><br />
 
-          <div class="acoes">
+          <a href="/frontend/html/paginas medico/avaliacao_medico.html">
+            <button class="botoes_areas" type="button">Avaliações</button> </a
+          ><br />
+
+          <a href="/frontend/html/paginas medico/historico_medico.html">
+            <button class="botoes_areas" type="button">Histórico</button> </a
+          ><br />
+
+          <a href="/frontend/html/paginas medico/relatorios_medico.html">
+            <button class="botoes_areas" type="button">Relatórios</button> </a
+          ><br />
+
+          <a href="/frontend/html/paginas medico/usuarios_medico.html">
+            <button class="botoes_areas" type="button">Usuários</button> </a
+          ><br />
+
+          <div class="user_"></div>
+        </div>
+
+        <div class="areabase">
+          <div class="dashboard">
+            <h3>DashBoard</h3>
+            <div class="graficos">
+              <div class="pacientes">
+                <h5>Pacientes</h5>
+                <p>registrados no sistema</p>
+              </div>
+
+              <div class="avaliacoes">
+                <h5>Avaliações</h5>
+                <p>Realizadas este mês</p>
+              </div>
+
+              <div class="encaminhamentos">
+                <h5>Encaminhamentos</h5>
+                <p>Para teste genético</p>
+              </div>
+
+              <div class="relatorio">
+                <h5>Relatórios</h5>
+                <p>disponíveis para consulta</p>
+              </div>
+            </div>
+            <hr />
+
             <h3>Ações Rápidas</h3>
-            <button class="novo_user" type="button">Novo usuário</button><br />
-            <button class="nova_avaliacao" type="button">Nova Avaliação</button
-            ><br />
-            <button class="novo_relatorio" type="button">Novo Relatório</button
-            ><br />
-          </div>
+            <div class="acoes">
+              <button class="novo_user" type="button">Novo usuário</button
+              ><br />
+              <button class="nova_avaliacao" type="button">
+                Nova Avaliação</button
+              ><br />
+              <button class="novo_relatorio" type="button">
+                Novo Relatório</button
+              ><br />
+            </div>
 
-          <div class="sistema">
-            <div>
-              <h4>Sobre o Sistema</h4>
-              <br />
-              <p>informações gerais</p>
-              <br />
-              <br />
-              <br />
-              <p><strong>Versão</strong>: 1.0.0</p>
-              <br />
-              <p><strong>Seu papel</strong>: Administrador</p>
-              <br />
-              <p><strong>Último acesso</strong>: Hoje</p>
+            <div class="sistema">
+              <h5>Sobre o Sistema</h5>
+              <div class="infos">
+                <p>informações gerais</p>
+                <p><strong>Versão</strong>: 1.0.0</p>
+                <p><strong>Seu papel</strong>: Administrador</p>
+                <p><strong>Último acesso</strong>: Hoje</p>
+              </div>
             </div>
           </div>
         </div>

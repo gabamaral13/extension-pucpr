@@ -1,15 +1,23 @@
 body {
   width: 1920px;
   height: 900px;
-  background: url(/frontend/css/imagens/papel\ de\ parede\ 2.jpg) lightgray
-    50% / cover no-repeat;
+  background: url(/frontend/css/imagens/plano_de_fundo002.png);
 }
 
 h1 {
+  display: flex;
+  width: 755px;
+  height: 150px;
+  padding: 38px 0;
+  justify-content: center;
+  align-items: center;
+  margin-right: 700px;
+  margin-left: 100px;
+
   color: #fff;
   text-align: center;
   font-family: Inter;
-  font-size: 24px;
+  font-size: 90px;
   font-style: normal;
   font-weight: 700;
   line-height: 31.01px; /* 129.208% */
@@ -18,24 +26,29 @@ h1 {
 
 h3 {
   color: #fff;
-  text-align: center;
   font-family: Inter;
-  font-size: 24px;
+  font-size: 50px;
   font-style: normal;
   font-weight: 700;
   line-height: 31.01px; /* 129.208% */
   letter-spacing: -0.93px;
+  padding-right: 1000px;
+  margin-left: 40px;
+  margin-bottom: 1px;
 }
 
 h5 {
+  height: 10px;
   color: #fff;
-  text-align: center;
   font-family: Inter;
-  font-size: 20px;
+  font-size: 25px;
   font-style: normal;
   font-weight: 700;
   line-height: 31.01px; /* 155.05% */
   letter-spacing: -0.93px;
+  padding-right: 50px;
+  padding-left: 50px;
+  margin-top: 25px;
 }
 
 a {
@@ -46,40 +59,19 @@ a {
 
   color: #fff;
   text-align: center;
-  font-family: Inter;
-  font-size: 24px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: 31.01px; /* 129.208% */
-  letter-spacing: -0.93px;
+  margin-left: 8px;
 }
 
 p {
   color: #fff;
-  text-align: center;
   font-family: Inter;
-  font-size: 15px;
+  font-size: 20px;
   font-style: normal;
   font-weight: 500;
   line-height: 31.01px; /* 206.733% */
   letter-spacing: -0.93px;
-}
-
-input {
-  width: 1345.78px;
-  height: 51.59px;
-  border-radius: 25.6px;
-  background: rgba(15, 34, 100, 0.63);
-  box-shadow: 0 0 0 1px #f9f9f9 inset;
-
-  color: #fff;
-  text-align: center;
-  font-family: Inter;
-  font-size: 40px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: 31.01px; /* 77.525% */
-  letter-spacing: -0.93px;
+  padding-right: 70px;
+  margin-left: 50px;
 }
 
 .container_ {
@@ -104,18 +96,32 @@ input {
 }
 
 .logo {
-  width: 180px;
-  height: 130px;
+  width: 200px;
+  height: 190px;
   aspect-ratio: 18/13;
-  background: url(/frontend/css/imagens/x.png) lightgray -0.04px -34.175px /
-    99.994% 137.923% no-repeat;
 }
 
 .navegador {
   width: 384px;
-  height: 758px;
+  height: 890px;
   border-radius: 5px;
   background: #09394a;
+  margin-top: 30px;
+}
+
+.dash {
+  width: 333px;
+  height: 112px;
+  border-radius: 5px;
+  background-color: #020632;
+  padding-top: 20px;
+  padding-left: 50px;
+  padding-bottom: 20px;
+}
+
+.botoes_areas :hover {
+  cursor: pointer;
+  background-color: #3e7cac;
 }
 
 .botoes_areas {
@@ -123,24 +129,55 @@ input {
   height: 83px;
   border-radius: 10px;
   background-color: #0f4a79;
+
+  color: #fff;
+  font-family: Inter;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 31.01px; /* 129.208% */
+  letter-spacing: -0.93px;
+  text-align: center;
+  margin-top: 10px;
+  border: none;
+  box-shadow: none;
+  outline: none;
 }
 
-.botoes_areas :hover {
-  cursor: pointer;
-  fill: #3e7cac;
+.corpo_ {
+  display: flex;
 }
 
 .paciente {
   width: 1494px;
-  height: 722px;
+  height: 890px;
   border-radius: 10px;
   background: #30719a;
+  margin-top: 30px;
+  margin-left: 20px;
+}
+
+.buscar_paciente input {
+  width: 1345.78px;
+  height: 51.59px;
+  border-radius: 25.6px;
+  background: rgba(15, 34, 100, 0.63);
+  box-shadow: 0 0 0 1px #f9f9f9 inset;
+  margin-left: 60px;
+  padding-left: 40px;
+  color: #fff;
+  border: none;
+  outline: none;
+  text-decoration: white;
+  text-decoration-color: #fff;
 }
 
 .lista_pacientes {
   width: 1346px;
   height: 162px;
   border-radius: 25.6px;
-  background: rgba(255, 255, 255, 0);
+  background: rgba(9, 6, 73, 0.52);
+  margin-top: 40px;
+  margin-left: 58px;
   box-shadow: 0 0 0 1px #f9f9f9 inset;
 }
