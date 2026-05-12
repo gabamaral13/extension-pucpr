@@ -73,6 +73,11 @@ button {
   border: none;
   box-shadow: none;
   outline: none;
+  cursor: pointer;
+}
+
+.botao_cadastro:hover {
+  background: rgb(8, 102, 102);
 }
 
 .dados {

@@ -32,7 +32,6 @@ button {
   height: 93px;
   flex-shrink: 0;
   border-radius: 24px;
-  border-color: #25dbb6;
   background: #25dbb6;
 
   color: #fff;
@@ -47,6 +46,7 @@ button {
   border: none;
   box-shadow: none;
   outline: none;
+  cursor: pointer;
 }
 
 .botao_log {
@@ -61,6 +61,10 @@ button {
   border: none;
   box-shadow: none;
   outline: none;
+}
+
+.botao_log:hover {
+  background: #06846b;
 }
 
 .dados {

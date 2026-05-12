@@ -161,16 +161,12 @@ button {
   padding-bottom: 20px;
 }
 
-.botoes_areas :hover {
-  cursor: pointer;
-  background-color: #3e7cac;
-}
-
 .botoes_areas {
   width: 368px;
   height: 83px;
   border-radius: 10px;
   background-color: #0f4a79;
+  cursor: pointer;
 
   color: #fff;
   font-family: Inter;
@@ -184,6 +180,10 @@ button {
   border: none;
   box-shadow: none;
   outline: none;
+}
+
+.botoes_areas:hover {
+  background-color: #3e7cac;
 }
 
 .corpo_ {
