@@ -27,8 +27,8 @@ h1 {
 
   color: #fff;
   text-align: center;
-  font-family: Inter;
-  font-size: 90px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 80px;
   font-style: normal;
   font-weight: 700;
   line-height: 31.01px; /* 129.208% */
@@ -37,20 +37,20 @@ h1 {
 
 h3 {
   color: #fff;
-  font-family: Inter;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 50px;
   font-style: normal;
   font-weight: 700;
   line-height: 31.01px; /* 129.208% */
   letter-spacing: -0.93px;
   padding-right: 1000px;
-  margin-left: 50px;
+  margin-left: 27px;
 }
 
 h5 {
   height: 10px;
   color: #fff;
-  font-family: Inter;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 25px;
   font-style: normal;
   font-weight: 700;
@@ -73,7 +73,7 @@ a {
 
 p {
   color: #fff;
-  font-family: Inter;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 20px;
   font-style: normal;
   font-weight: 500;
@@ -138,7 +138,7 @@ p {
   cursor: pointer;
 
   color: #fff;
-  font-family: Inter;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 24px;
   font-style: normal;
   font-weight: 700;
@@ -228,13 +228,18 @@ p {
 
   color: #fff;
   text-align: center;
-  font-family: Inter;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 24px;
   font-style: normal;
   font-weight: 700;
   line-height: 31.01px; /* 129.208% */
   letter-spacing: -0.93px;
   margin-left: 50px;
+  cursor: pointer;
+}
+
+.novo_user:hover {
+  background: #10146f;
 }
 
 .nova_avaliacao {
@@ -247,13 +252,18 @@ p {
 
   color: #fff;
   text-align: center;
-  font-family: Inter;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 24px;
   font-style: normal;
   font-weight: 700;
   line-height: 31.01px; /* 129.208% */
   letter-spacing: -0.93px;
-  margin-left: 80px;
+  margin-left: 100px;
+  cursor: pointer;
+}
+
+.nova_avaliacao:hover {
+  background: #10146f;
 }
 
 .novo_relatorio {
@@ -266,13 +276,18 @@ p {
 
   color: #fff;
   text-align: center;
-  font-family: Inter;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 24px;
   font-style: normal;
   font-weight: 700;
   line-height: 31.01px; /* 129.208% */
   letter-spacing: -0.93px;
-  margin-left: 80px;
+  margin-left: 170px;
+  cursor: pointer;
+}
+
+.novo_relatorio:hover {
+  background: #10146f;
 }
 
 .sistema {

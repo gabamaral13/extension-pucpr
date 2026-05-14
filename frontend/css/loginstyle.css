@@ -25,6 +25,7 @@ h1 {
   justify-content: flex-end;
   align-items: center;
   flex-shrink: 0;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 button {
@@ -36,7 +37,7 @@ button {
 
   color: #fff;
   text-align: center;
-  font-family: Inter;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 31px;
   font-style: normal;
   font-weight: 700;
@@ -97,7 +98,7 @@ button {
 
   color: black;
   text-align: center;
-  font-family: Inter;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 20px;
   font-style: normal;
   font-weight: 700;
@@ -116,7 +117,7 @@ button {
 
   color: #000000;
   text-align: center;
-  font-family: Inter;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 64px;
   font-style: normal;
   font-weight: 700;
