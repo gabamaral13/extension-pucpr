@@ -16,7 +16,7 @@ h1 {
 
   color: #fff;
   text-align: center;
-  font-family: Inter;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 90px;
   font-style: normal;
   font-weight: 700;
@@ -26,7 +26,7 @@ h1 {
 
 h3 {
   color: #fff;
-  font-family: Inter;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 50px;
   font-style: normal;
   font-weight: 700;
@@ -41,7 +41,7 @@ h3 {
 h5 {
   height: 10px;
   color: #fff;
-  font-family: Inter;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 25px;
   font-style: normal;
   font-weight: 700;
@@ -63,7 +63,7 @@ a {
 
 p {
   color: #fff;
-  font-family: Inter;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 20px;
   font-style: normal;
   font-weight: 500;
@@ -83,7 +83,7 @@ button {
 
   color: #fff;
   text-align: center;
-  font-family: Inter;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 31px;
   font-style: normal;
   font-weight: 700;
@@ -97,12 +97,17 @@ button {
   height: 104px;
   justify-content: center;
   align-items: center;
-  margin-left: 700px;
+  margin-left: 555px;
   margin-top: 30px;
 
   border: none;
   box-shadow: none;
   outline: none;
+  cursor: pointer;
+}
+
+.botao_imprimir:hover {
+  background: #077962;
 }
 
 .container_ {
@@ -150,19 +155,15 @@ button {
   padding-bottom: 20px;
 }
 
-.botoes_areas :hover {
-  cursor: pointer;
-  background-color: #3e7cac;
-}
-
 .botoes_areas {
   width: 368px;
   height: 83px;
   border-radius: 10px;
   background-color: #0f4a79;
+  cursor: pointer;
 
   color: #fff;
-  font-family: Inter;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 24px;
   font-style: normal;
   font-weight: 700;
@@ -174,6 +175,10 @@ button {
   border: none;
   box-shadow: none;
   outline: none;
+}
+
+.botoes_areas:hover {
+  background-color: #3e7cac;
 }
 
 .corpo_ {
