@@ -10,162 +10,46 @@ const db = new sqlite3.Database('./banco.db', (err) => {
 });
 
 db.serialize(() => {
-
-  // ==================================================
-  // TABELA: USUARIOS
-  // ==================================================
   db.run(`
     CREATE TABLE IF NOT EXISTS usuarios (
-      id_usuario INTEGER PRIMARY KEY AUTOINCREMENT,
-
-      nome_usuario TEXT NOT NULL UNIQUE,
-
-      email TEXT NOT NULL UNIQUE,
-
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      username TEXT UNIQUE NOT NULL,
       senha TEXT NOT NULL,
-
-      tipo_acesso TEXT NOT NULL
-      CHECK (tipo_acesso IN ('admin', 'user'))
-      DEFAULT 'user',
-
-      data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP
+      papel TEXT CHECK(papel IN ('admin', 'user')) NOT NULL DEFAULT 'user',
+      criado_em DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `);
 
-  // ==================================================
-  // TABELA: PACIENTES
-  // ==================================================
   db.run(`
     CREATE TABLE IF NOT EXISTS pacientes (
-      id_paciente INTEGER PRIMARY KEY AUTOINCREMENT,
-
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
       nome TEXT NOT NULL,
-
-      data_nascimento DATE NOT NULL,
-
-      sexo TEXT NOT NULL
-      CHECK (sexo IN ('M', 'F')),
-
-      cpf TEXT UNIQUE,
-
-      nome_responsavel TEXT,
-
-      data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP
+      data_nascimento TEXT NOT NULL,
+      sexo TEXT CHECK(sexo IN ('M', 'F')) NOT NULL,
+      responsavel TEXT,
+      criado_em DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `);
 
-  // ==================================================
-  // TABELA: SINTOMAS
-  // ==================================================
-  db.run(`
-    CREATE TABLE IF NOT EXISTS sintomas (
-      id_sintoma INTEGER PRIMARY KEY AUTOINCREMENT,
-
-      nome TEXT NOT NULL,
-
-      descricao TEXT,
-
-      peso_masculino REAL NOT NULL,
-
-      peso_feminino REAL NOT NULL
-    )
-  `);
-
-  // ==================================================
-  // TABELA: AVALIACOES
-  // ==================================================
   db.run(`
     CREATE TABLE IF NOT EXISTS avaliacoes (
-      id_avaliacao INTEGER PRIMARY KEY AUTOINCREMENT,
-
-      id_paciente INTEGER NOT NULL,
-
-      id_usuario INTEGER NOT NULL,
-
-      score_final REAL NOT NULL,
-
-      ponto_corte REAL NOT NULL,
-
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      paciente_id INTEGER NOT NULL,
+      usuario_id INTEGER NOT NULL,
+      respostas TEXT NOT NULL,
+      score REAL NOT NULL,
       recomendacao TEXT NOT NULL,
+      criado_em DATETIME DEFAULT CURRENT_TIMESTAMP,
 
-      data_avaliacao DATETIME DEFAULT CURRENT_TIMESTAMP,
-
-      FOREIGN KEY (id_paciente)
-      REFERENCES pacientes(id_paciente)
-      ON DELETE CASCADE,
-
-      FOREIGN KEY (id_usuario)
-      REFERENCES usuarios(id_usuario)
-      ON DELETE RESTRICT
+      FOREIGN KEY (paciente_id) REFERENCES pacientes(id) ON DELETE CASCADE,
+      FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE RESTRICT
     )
   `);
 
-  // ==================================================
-  // TABELA: RESPOSTAS_AVALIACAO
-  // ==================================================
-  db.run(`
-    CREATE TABLE IF NOT EXISTS respostas_avaliacao (
-      id_resposta INTEGER PRIMARY KEY AUTOINCREMENT,
-
-      id_avaliacao INTEGER NOT NULL,
-
-      id_sintoma INTEGER NOT NULL,
-
-      presente INTEGER NOT NULL
-      CHECK (presente IN (0,1)),
-
-      peso_utilizado REAL NOT NULL,
-
-      FOREIGN KEY (id_avaliacao)
-      REFERENCES avaliacoes(id_avaliacao)
-      ON DELETE CASCADE,
-
-      FOREIGN KEY (id_sintoma)
-      REFERENCES sintomas(id_sintoma)
-      ON DELETE RESTRICT
-    )
-  `);
-
-  // ==================================================
-  // ÍNDICES
-  // ==================================================
-
-  // Pacientes
-  db.run(`
-    CREATE INDEX IF NOT EXISTS idx_pacientes_nome
-    ON pacientes(nome)
-  `);
-
-  // Avaliações por paciente
-  db.run(`
-    CREATE INDEX IF NOT EXISTS idx_avaliacoes_paciente
-    ON avaliacoes(id_paciente)
-  `);
-
-  // Avaliações por usuário
-  db.run(`
-    CREATE INDEX IF NOT EXISTS idx_avaliacoes_usuario
-    ON avaliacoes(id_usuario)
-  `);
-
-  // Avaliações por data
-  db.run(`
-    CREATE INDEX IF NOT EXISTS idx_avaliacoes_data
-    ON avaliacoes(data_avaliacao)
-  `);
-
-  // Respostas por avaliação
-  db.run(`
-    CREATE INDEX IF NOT EXISTS idx_respostas_avaliacao
-    ON respostas_avaliacao(id_avaliacao)
-  `);
-
-  // Respostas por sintoma
-  db.run(`
-    CREATE INDEX IF NOT EXISTS idx_respostas_sintoma
-    ON respostas_avaliacao(id_sintoma)
-  `);
-
+  db.run(`CREATE INDEX IF NOT EXISTS idx_pacientes_nome ON pacientes(nome)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_avaliacoes_paciente ON avaliacoes(paciente_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_avaliacoes_usuario ON avaliacoes(usuario_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_avaliacoes_data ON avaliacoes(criado_em)`);
 });
 
 module.exports = db;
