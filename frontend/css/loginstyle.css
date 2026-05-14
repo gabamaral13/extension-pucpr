@@ -1,14 +1,14 @@
 body {
-  width: 1920px;
-  height: 900px;
+  width: 100%;
+  height: 100%;
   flex-shrink: 0;
 
   background: url(/frontend/css/imagens/plano_de_fundo001.png);
 }
 
 .corpo {
-  width: 1920px;
-  height: 900px;
+  width: 100%;
+  height: 100%;
 
   background: linear-gradient(
     0deg,
@@ -124,5 +124,5 @@ button {
   line-height: 45px; /* 70.313% */
   letter-spacing: -0.93px;
   padding-left: 500px;
-  padding-top: 150px;
+  padding-top: 100px;
 }
