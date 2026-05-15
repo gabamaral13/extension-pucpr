@@ -1,20 +1,22 @@
 body {
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   flex-shrink: 0;
+  margin: 0%;
+  padding: 0%;
 
-  background: url(/frontend/css/imagens/plano_de_fundo001.png);
+  background:
+    linear-gradient(0deg, rgba(0, 0, 0, 0.25) 100%, rgba(0, 0, 0, 0.25) 100%),
+    url(./imagens/plano_de_fundo001.png);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  overflow: hidden;
 }
 
 .corpo {
   width: 100%;
   height: 100%;
-
-  background: linear-gradient(
-    0deg,
-    rgba(0, 0, 0, 0.25) 100%,
-    rgba(0, 0, 0, 0.25) 100%
-  );
 }
 
 h1 {
@@ -29,11 +31,14 @@ h1 {
 }
 
 button {
-  width: 248px;
+  width: 220px;
   height: 93px;
   flex-shrink: 0;
   border-radius: 24px;
+  border: none;
   background: #25dbb6;
+  box-shadow: none;
+  outline: none;
 
   color: #fff;
   text-align: center;
@@ -44,19 +49,16 @@ button {
   line-height: 31.01px; /* 100.032% */
   letter-spacing: -0.93px;
 
-  border: none;
-  box-shadow: none;
-  outline: none;
   cursor: pointer;
 }
 
 .botao_log {
   display: flex;
-  width: 258.83px;
+  width: 170px;
   height: 104px;
   justify-content: center;
   align-items: center;
-  margin-left: 735px;
+  margin-left: 690px;
   margin-top: 50px;
 
   border: none;
@@ -69,12 +71,12 @@ button {
 }
 
 .dados {
-  width: 509px;
-  height: 280px;
+  width: 450px;
+  height: 250px;
   border-radius: 20px;
   background-color: #f0f0f0;
-  margin-left: 610px;
-  margin-top: 85px;
+  margin-left: 555px;
+  margin-top: 75px;
   padding-top: 25px;
 }
 
@@ -88,9 +90,8 @@ button {
   justify-content: center;
 
   display: flex;
-  padding: 15px 0;
-  margin: 65px;
   margin-bottom: 10px;
+  margin-left: 40px;
   margin-top: 30px;
   border: none;
   box-shadow: none;
@@ -118,11 +119,11 @@ button {
   color: #000000;
   text-align: center;
   font-family: Arial, Helvetica, sans-serif;
-  font-size: 64px;
+  font-size: 40px;
   font-style: normal;
   font-weight: 700;
   line-height: 45px; /* 70.313% */
   letter-spacing: -0.93px;
-  padding-left: 500px;
+  padding-left: 350px;
   padding-top: 100px;
 }
