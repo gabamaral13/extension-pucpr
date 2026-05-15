@@ -1,12 +1,19 @@
 body {
-  width: 1920px;
-  height: 900px;
-  background: url(/frontend/css/imagens/plano_de_fundo002.png);
+  width: 100vw;
+  height: 100vh;
+  padding: 0%;
+  margin: 0%;
+  background: url(./../imagens/plano_de_fundo002.png);
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  overflow: hidden;
 }
 
 h1 {
   display: flex;
-  width: 755px;
+  width: 600px;
   height: 150px;
   padding: 38px 0;
   justify-content: center;
@@ -17,7 +24,7 @@ h1 {
   color: #fff;
   text-align: center;
   font-family: Arial, Helvetica, sans-serif;
-  font-size: 80px;
+  font-size: 50px;
   font-style: normal;
   font-weight: 700;
   line-height: 31.01px; /* 129.208% */
@@ -25,16 +32,15 @@ h1 {
 }
 
 h3 {
+  width: 230px;
+  height: 10px;
   color: #fff;
   font-family: Arial, Helvetica, sans-serif;
-  font-size: 50px;
+  font-size: 30px;
   font-style: normal;
   font-weight: 700;
   line-height: 31.01px; /* 129.208% */
   letter-spacing: -0.93px;
-  padding-right: 1000px;
-  margin-left: 30px;
-  margin-bottom: 1px;
 }
 
 h5 {
@@ -52,10 +58,9 @@ h5 {
 }
 
 a {
-  width: 368px;
-  height: 83px;
+  width: 100px;
+  height: 63px;
   border-radius: 10px;
-  background: #0f4a79;
 
   color: #fff;
   text-align: center;
@@ -65,7 +70,7 @@ a {
 p {
   color: #fff;
   font-family: Arial, Helvetica, sans-serif;
-  font-size: 20px;
+  font-size: 15px;
   font-style: normal;
   font-weight: 500;
   line-height: 31.01px; /* 206.733% */
@@ -76,7 +81,8 @@ p {
 
 .container_ {
   display: flex;
-  width: 1920px;
+  width: 100vw;
+  height: 120px;
   justify-content: center;
   align-items: center;
   background: linear-gradient(
@@ -88,31 +94,40 @@ p {
 
 .titulo {
   display: flex;
-  width: 755px;
-  height: 150px;
+  width: 500px;
+  height: 100px;
   padding: 38px 0;
   justify-content: center;
   align-items: center;
 }
 
+.titu1 {
+  padding-left: 30px;
+}
+
 .logo {
-  width: 200px;
-  height: 190px;
+  width: 100px;
+  height: 110px;
+  margin-left: 100px;
   aspect-ratio: 18/13;
 }
 
 .navegador {
-  width: 384px;
-  height: 890px;
+  width: 330px;
+  height: 570px;
   border-radius: 5px;
   background: #09394a;
   margin-top: 30px;
+  margin-left: 10px;
 }
 
 .dash {
-  width: 333px;
-  height: 112px;
+  width: 280px;
+  height: 50px;
   border-radius: 5px;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
   background-color: #020632;
   padding-top: 20px;
   padding-left: 50px;
@@ -120,8 +135,8 @@ p {
 }
 
 .botoes_areas {
-  width: 368px;
-  height: 83px;
+  width: 300px;
+  height: 53px;
   border-radius: 10px;
   background-color: #0f4a79;
   cursor: pointer;
@@ -134,6 +149,7 @@ p {
   line-height: 31.01px; /* 129.208% */
   letter-spacing: -0.93px;
   text-align: center;
+  margin-left: 8px;
   margin-top: 10px;
   border: none;
   box-shadow: none;
@@ -149,8 +165,8 @@ p {
 }
 
 .avaliacao {
-  width: 1494px;
-  height: 890px;
+  width: 1150px;
+  height: 570px;
   border-radius: 10px;
   background: #30719a;
   margin-top: 30px;
@@ -158,17 +174,17 @@ p {
 }
 
 .escolha_paciente {
-  width: 1346px;
+  width: 1080px;
   height: 230px;
   border-radius: 25.6px;
   background: rgba(9, 6, 73, 0.19);
   box-shadow: 0 0 0 1px #f9f9f9 inset;
-  margin-left: 70px;
+  margin-left: 30px;
   padding-top: 10px;
 }
 
 .paciente {
-  width: 1191px;
+  width: 940px;
   height: 135px;
   border-radius: 25.6px;
   background: rgba(9, 6, 73, 0.19);
@@ -179,7 +195,7 @@ p {
 }
 
 .paciente input {
-  width: 1080px;
+  width: 830px;
   height: 36px;
   border: 1px solid #fff;
   background: rgba(6, 3, 46, 0.24);

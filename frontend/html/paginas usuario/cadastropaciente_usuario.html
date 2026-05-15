@@ -5,13 +5,13 @@
       rel="stylesheet"
       href="./../../css/paginas usuario/cadastropaciente_usuario.css"
     />
-    <script type="javascript" src="/frontend/javascript/index.js"></script>
+    <script type="javascript" src="../../javascript/index.js"></script>
   </head>
 
   <body>
     <div class="corpo">
       <div class="container_">
-        <img class="logo" src="/frontend/css/imagens/x.png" />
+        <img class="logo" src="./../../css/imagens/x.png" />
         <h1 class="titulo">Bem vindo, user</h1>
       </div>
 
@@ -20,15 +20,15 @@
           <div class="dash">
             <h3>Navegador</h3>
           </div>
-          <a href="/frontend/html/paginas medico/dashboard_medico.html">
+          <a href="./dashboard_usuario.html">
             <button class="botoes_areas" type="button">DashBoard</button> </a
           ><br />
 
-          <a href="/frontend/html/paginas medico/pacientes_medico.html">
+          <a href="./pacientes_usuario.html">
             <button class="botoes_areas" type="button">Pacientes</button> </a
           ><br />
 
-          <a href="/frontend/html/paginas medico/relatorios_medico.html">
+          <a href="./relatorio_usuario.html">
             <button class="botoes_areas" type="button">Relatórios</button> </a
           ><br />
 
@@ -36,7 +36,7 @@
         </div>
 
         <div class="cadastro_pacientes">
-          <h3>Informações do Paciente</h3>
+          <h3 class="titu1">Informações do Paciente</h3>
 
           <div class="geral">
             <div class="dados">
@@ -48,12 +48,14 @@
                   placeholder="Nome Completo"
                 /><br />
                 <input id="cpf" type="number" placeholder="CPF" /><br />
-                <input
-                  id="data"
-                  type="date"
-                  placeholder="Data de Nascimento"
-                /><br />
-                <input id="sexo" type="text" placeholder="Sexo" /><br />
+                <div class="dados_">
+                  <input
+                    id="data"
+                    type="date"
+                    placeholder="Data de Nascimento"
+                  />
+                  <input id="sexo" type="text" placeholder="Sexo" />
+                </div>
               </div>
               <hr />
               <div class="endereco_paciente">

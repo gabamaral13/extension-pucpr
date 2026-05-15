@@ -1,14 +1,22 @@
 body {
-  width: 1920px;
-  height: 900px;
-  background: url(/frontend/css/imagens/plano_de_fundo002.png);
+  width: 100vw;
+  height: 100vh;
+  padding: 0%;
+  margin: 0%;
+  background: url(./../imagens/plano_de_fundo002.png);
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  overflow: hidden;
 }
 
 hr {
-  width: 1392.001px;
+  width: 1050px;
   height: 3px;
   background: #10146f;
   margin-left: 50;
+  margin-top: 50px;
 
   border: none;
   box-shadow: none;
@@ -17,7 +25,7 @@ hr {
 
 h1 {
   display: flex;
-  width: 755px;
+  width: 600px;
   height: 150px;
   padding: 38px 0;
   justify-content: center;
@@ -28,7 +36,7 @@ h1 {
   color: #fff;
   text-align: center;
   font-family: Arial, Helvetica, sans-serif;
-  font-size: 80px;
+  font-size: 50px;
   font-style: normal;
   font-weight: 700;
   line-height: 31.01px; /* 129.208% */
@@ -36,34 +44,33 @@ h1 {
 }
 
 h3 {
+  width: 230px;
+  height: 10px;
   color: #fff;
   font-family: Arial, Helvetica, sans-serif;
-  font-size: 50px;
+  font-size: 30px;
   font-style: normal;
   font-weight: 700;
   line-height: 31.01px; /* 129.208% */
   letter-spacing: -0.93px;
-  padding-right: 1000px;
-  margin-left: 27px;
 }
 
 h5 {
   height: 10px;
   color: #fff;
   font-family: Arial, Helvetica, sans-serif;
-  font-size: 25px;
+  font-size: 15px;
   font-style: normal;
   font-weight: 700;
-  line-height: 31.01px; /* 155.05% */
-  letter-spacing: -0.93px;
+  line-height: 31.01px;
   padding-right: 50px;
-  padding-left: 50px;
-  margin-top: 25px;
+  padding-left: 30px;
+  margin-top: 10px;
 }
 
 a {
-  width: 368px;
-  height: 83px;
+  width: 100px;
+  height: 63px;
   border-radius: 10px;
 
   color: #fff;
@@ -74,20 +81,20 @@ a {
 p {
   color: #fff;
   font-family: Arial, Helvetica, sans-serif;
-  font-size: 20px;
+  font-size: 15px;
   font-style: normal;
   font-weight: 500;
   line-height: 31.01px; /* 206.733% */
   letter-spacing: -0.93px;
-  padding-right: 70px;
   margin: 1px;
-  margin-left: 50px;
+  margin-left: 30px;
   padding-top: 1px;
 }
 
 .container_ {
   display: flex;
-  width: 1920px;
+  width: 100vw;
+  height: 120px;
   justify-content: center;
   align-items: center;
   background: linear-gradient(
@@ -99,31 +106,45 @@ p {
 
 .titulo {
   display: flex;
-  width: 755px;
-  height: 150px;
+  width: 500px;
+  height: 100px;
   padding: 38px 0;
   justify-content: center;
   align-items: center;
 }
 
+.titu1 {
+  padding-left: 30px;
+}
+
+.titu2 {
+  width: 300px;
+  padding-left: 30px;
+}
+
 .logo {
-  width: 200px;
-  height: 190px;
+  width: 100px;
+  height: 110px;
+  margin-left: 100px;
   aspect-ratio: 18/13;
 }
 
 .navegador {
-  width: 384px;
-  height: 890px;
+  width: 330px;
+  height: 570px;
   border-radius: 5px;
   background: #09394a;
   margin-top: 30px;
+  margin-left: 10px;
 }
 
 .dash {
-  width: 333px;
-  height: 112px;
+  width: 280px;
+  height: 50px;
   border-radius: 5px;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
   background-color: #020632;
   padding-top: 20px;
   padding-left: 50px;
@@ -131,8 +152,8 @@ p {
 }
 
 .botoes_areas {
-  width: 368px;
-  height: 83px;
+  width: 300px;
+  height: 53px;
   border-radius: 10px;
   background-color: #0f4a79;
   cursor: pointer;
@@ -145,6 +166,7 @@ p {
   line-height: 31.01px; /* 129.208% */
   letter-spacing: -0.93px;
   text-align: center;
+  margin-left: 8px;
   margin-top: 10px;
   border: none;
   box-shadow: none;
@@ -160,8 +182,8 @@ p {
 }
 
 .areabase {
-  width: 1494px;
-  height: 890px;
+  width: 1150px;
+  height: 570px;
   border-radius: 10px;
   background: #30719a;
   margin-top: 30px;
@@ -169,58 +191,58 @@ p {
 }
 
 .dashboard {
-  width: 1442px;
-  height: 274px;
+  width: 400px;
+  height: 94px;
 }
 
 .graficos {
   display: flex;
-  padding-left: 85px;
-  width: 1442px;
-  height: 210px;
+  padding-left: 95px;
+  width: 1000px;
+  height: 100px;
 }
 
 .pacientes {
-  width: 296px;
-  height: 164px;
+  width: 200px;
+  height: 135px;
   border-radius: 5px;
   background: #1c446f;
 }
 
 .avaliacoes {
-  width: 296px;
-  height: 164px;
+  width: 200px;
+  height: 135px;
   border-radius: 5px;
   background: #1c446f;
   margin-left: 50px;
 }
 
 .encaminhamentos {
-  width: 296px;
-  height: 164px;
+  width: 200px;
+  height: 135px;
   border-radius: 5px;
   background: #1c446f;
   margin-left: 50px;
 }
 
 .relatorio {
-  width: 296px;
-  height: 164px;
+  width: 200px;
+  height: 135px;
   border-radius: 5px;
   background: #1c446f;
   margin-left: 50px;
 }
 
 .acoes {
-  width: 1441px;
-  height: 160px;
+  width: 1100px;
+  height: 90px;
   display: flex;
   margin-left: 50px;
 }
 
 .novo_user {
-  width: 368px;
-  height: 83px;
+  width: 250px;
+  height: 60px;
   background-color: #0f4a79;
   border: none;
   box-shadow: none;
@@ -234,17 +256,17 @@ p {
   font-weight: 700;
   line-height: 31.01px; /* 129.208% */
   letter-spacing: -0.93px;
-  margin-left: 50px;
+  margin-left: 40px;
   cursor: pointer;
 }
 
 .novo_user:hover {
-  background: #10146f;
+  background-color: #10146f;
 }
 
 .nova_avaliacao {
-  width: 368px;
-  height: 83px;
+  width: 250px;
+  height: 60px;
   background-color: #0f4a79;
   border: none;
   box-shadow: none;
@@ -258,7 +280,7 @@ p {
   font-weight: 700;
   line-height: 31.01px; /* 129.208% */
   letter-spacing: -0.93px;
-  margin-left: 100px;
+  margin-left: 280px;
   cursor: pointer;
 }
 
@@ -267,8 +289,8 @@ p {
 }
 
 .novo_relatorio {
-  width: 368px;
-  height: 83px;
+  width: 250px;
+  height: 60px;
   background-color: #0f4a79;
   border: none;
   box-shadow: none;
@@ -282,7 +304,7 @@ p {
   font-weight: 700;
   line-height: 31.01px; /* 129.208% */
   letter-spacing: -0.93px;
-  margin-left: 170px;
+  margin-left: 520px;
   cursor: pointer;
 }
 
@@ -291,16 +313,13 @@ p {
 }
 
 .sistema {
-  width: 1387px;
-  height: 230px;
+  width: 1030px;
+  height: 170px;
   border-radius: 20px;
   border: 2px solid #020632;
   background: rgba(97, 133, 152, 0.59);
   margin-left: 50px;
-  padding-top: 1;
-}
 
-.infos {
   align-items: center;
   justify-content: center;
 }
