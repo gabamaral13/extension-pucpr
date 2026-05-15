@@ -1,18 +1,24 @@
-<html>
+<!DOCTYPE html>
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Cadastrar Paciente - X-Triagem</title>
+
     <link
       rel="stylesheet"
-      href="./../../css/paginas usuario/cadastropaciente_usuario.css"
+      href="../../css/paginas usuario/cadastropaciente_usuario.css"
     />
-    <script src="../../javascript/index.js"></script>
+
+    <script src="../../javascript/index.js" defer></script>
   </head>
 
   <body>
     <div class="corpo">
       <div class="container_">
-        <img class="logo" src="./../../css/imagens/x.png" />
-        <h1 class="titulo">Bem vindo, user</h1>
+        <img class="logo" src="../../css/imagens/x.png" alt="Logo X-Triagem" />
+        <h1 class="titulo">Bem-vindo, user</h1>
       </div>
 
       <div class="corpo_">
@@ -20,17 +26,21 @@
           <div class="dash">
             <h3>Navegador</h3>
           </div>
+
           <a href="./dashboard_usuario.html">
-            <button class="botoes_areas" type="button">DashBoard</button> </a
-          ><br />
+            <button class="botoes_areas" type="button">Dashboard</button>
+          </a>
+          <br />
 
           <a href="./pacientes_usuario.html">
-            <button class="botoes_areas" type="button">Pacientes</button> </a
-          ><br />
+            <button class="botoes_areas" type="button">Pacientes</button>
+          </a>
+          <br />
 
           <a href="./relatorio_usuario.html">
-            <button class="botoes_areas" type="button">Relatórios</button> </a
-          ><br />
+            <button class="botoes_areas" type="button">Relatórios</button>
+          </a>
+          <br />
 
           <div class="user_"></div>
         </div>
@@ -42,29 +52,69 @@
             <div class="dados">
               <div class="dados_pessoais">
                 <h5>Dados pessoais</h5>
+
                 <input
                   id="nome"
                   type="text"
                   placeholder="Nome Completo"
-                /><br />
-                <input id="cpf" type="number" placeholder="CPF" /><br />
+                  required
+                />
+                <br />
+
+                <input
+                  id="cpf"
+                  type="text"
+                  placeholder="CPF"
+                />
+                <br />
+
                 <div class="dados_">
                   <input
                     id="data"
                     type="date"
                     placeholder="Data de Nascimento"
+                    required
                   />
-                  <input id="sexo" type="text" placeholder="Sexo" />
+
+                  <select id="sexo" required>
+                    <option value="">Sexo</option>
+                    <option value="M">Masculino</option>
+                    <option value="F">Feminino</option>
+                  </select>
                 </div>
               </div>
+
               <hr />
+
               <div class="endereco_paciente">
                 <h5>Endereço do Paciente</h5>
-                <input id="enderco" type="text" placeholder="Endereço" /><br />
-                <input id="cidade" type="text" placeholder="Cidade" /><br />
+
+                <input
+                  id="endereco"
+                  type="text"
+                  placeholder="Endereço"
+                />
+                <br />
+
+                <input
+                  id="cidade"
+                  type="text"
+                  placeholder="Cidade"
+                />
+                <br />
+
                 <div class="pais">
-                  <input id="cep" type="number" placeholder="CEP" />
-                  <input id="estado" type="text" placeholder="Estado" />
+                  <input
+                    id="cep"
+                    type="text"
+                    placeholder="CEP"
+                  />
+
+                  <input
+                    id="estado"
+                    type="text"
+                    placeholder="Estado"
+                  />
                 </div>
               </div>
             </div>
@@ -76,8 +126,12 @@
             <div class="info">
               <h5>Informações do Paciente</h5>
               <br />
+
               <div class="infor_paciente">
-                <input type="text" placeholder="Informações" />
+                <input
+                  type="text"
+                  placeholder="Responsável ou informações adicionais"
+                />
               </div>
             </div>
           </div>

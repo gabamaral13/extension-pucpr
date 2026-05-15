@@ -1,18 +1,24 @@
-<html>
+<!DOCTYPE html>
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Dashboard Admin - X-Triagem</title>
+
     <link
       rel="stylesheet"
-      href="./../../css/paginas medico/dashboard_medico.css"
+      href="../../css/paginas medico/dashboard_medico.css"
     />
-    <script src="../../javascript/index.js"></script>
+
+    <script src="../../javascript/index.js" defer></script>
   </head>
 
   <body>
     <div class="corpo">
       <div class="container_">
-        <img class="logo" src="./../../css/imagens/x.png" />
-        <h1 class="titulo">Bem-Vindo, Admin</h1>
+        <img class="logo" src="../../css/imagens/x.png" alt="Logo X-Triagem" />
+        <h1 class="titulo">Bem-vindo, Admin</h1>
       </div>
 
       <div class="corpo_">
@@ -20,36 +26,44 @@
           <div class="dash">
             <h3>Navegador</h3>
           </div>
+
           <a href="./dashboard_medico.html">
-            <button class="botoes_areas" type="button">DashBoard</button> </a
-          ><br />
+            <button class="botoes_areas" type="button">Dashboard</button>
+          </a>
+          <br />
 
           <a href="./pacientes_medico.html">
-            <button class="botoes_areas" type="button">Pacientes</button> </a
-          ><br />
+            <button class="botoes_areas" type="button">Pacientes</button>
+          </a>
+          <br />
 
           <a href="./avaliacao_medico.html">
-            <button class="botoes_areas" type="button">Avaliações</button> </a
-          ><br />
+            <button class="botoes_areas" type="button">Avaliações</button>
+          </a>
+          <br />
 
           <a href="./historico_medico.html">
-            <button class="botoes_areas" type="button">Histórico</button> </a
-          ><br />
+            <button class="botoes_areas" type="button">Histórico</button>
+          </a>
+          <br />
 
           <a href="./relatorios_medico.html">
-            <button class="botoes_areas" type="button">Relatórios</button> </a
-          ><br />
+            <button class="botoes_areas" type="button">Relatórios</button>
+          </a>
+          <br />
 
           <a href="./usuarios_medico.html">
-            <button class="botoes_areas" type="button">Usuários</button> </a
-          ><br />
+            <button class="botoes_areas" type="button">Usuários</button>
+          </a>
+          <br />
 
           <div class="user_"></div>
         </div>
 
         <div class="areabase">
           <div class="dashboard">
-            <h3 class="titu1">DashBoard</h3>
+            <h3 class="titu1">Dashboard</h3>
+
             <div class="graficos">
               <div class="pacientes">
                 <h5>Pacientes</h5>
@@ -71,31 +85,39 @@
                 <p>disponíveis para consulta</p>
               </div>
             </div>
+
             <hr />
 
             <h3 class="titu2">Ações Rápidas</h3>
+
             <div class="acoes">
               <a href="./cadastrousuario.html">
                 <button class="novo_user" type="button">
                   Novo usuário
-                </button> </a
-              ><br />
+                </button>
+              </a>
+              <br />
+
               <a href="./avaliacao_medico.html">
                 <button class="nova_avaliacao" type="button">
                   Nova Avaliação
-                </button> </a
-              ><br />
+                </button>
+              </a>
+              <br />
+
               <a href="./relatorios_medico.html">
                 <button class="novo_relatorio" type="button">
                   Novo Relatório
-                </button> </a
-              ><br />
+                </button>
+              </a>
+              <br />
             </div>
 
             <div class="sistema">
               <h5>Sobre o Sistema</h5>
+
               <p>
-                informações gerais<br />
+                Informações gerais<br />
                 <strong>Versão</strong>: 1.0.0<br />
                 <strong>Seu papel</strong>: Administrador<br />
                 <strong>Último acesso</strong>: Hoje

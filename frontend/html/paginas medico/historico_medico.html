@@ -1,15 +1,24 @@
-<html>
+<!DOCTYPE html>
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <link rel="stylesheet" href="./../../css/paginas medico/historico_medico.css" />
-    <script src="../../javascript/index.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Histórico - X-Triagem</title>
+
+    <link
+      rel="stylesheet"
+      href="../../css/paginas medico/historico_medico.css"
+    />
+
+    <script src="../../javascript/index.js" defer></script>
   </head>
 
   <body>
     <div class="corpo">
       <div class="container_">
-        <img class="logo" src="./../../css/imagens/x.png" />
-        <h1 class="titulo">Bem-Vindo, Admin</h1>
+        <img class="logo" src="../../css/imagens/x.png" alt="Logo X-Triagem" />
+        <h1 class="titulo">Bem-vindo, Admin</h1>
       </div>
 
       <div class="corpo_">
@@ -17,38 +26,45 @@
           <div class="dash">
             <h3>Navegador</h3>
           </div>
+
           <a href="./dashboard_medico.html">
-            <button class="botoes_areas" type="button">DashBoard</button> </a
-          ><br />
+            <button class="botoes_areas" type="button">Dashboard</button>
+          </a>
+          <br />
 
           <a href="./pacientes_medico.html">
-            <button class="botoes_areas" type="button">Pacientes</button> </a
-          ><br />
+            <button class="botoes_areas" type="button">Pacientes</button>
+          </a>
+          <br />
 
           <a href="./avaliacao_medico.html">
-            <button class="botoes_areas" type="button">Avaliações</button> </a
-          ><br />
+            <button class="botoes_areas" type="button">Avaliações</button>
+          </a>
+          <br />
 
           <a href="./historico_medico.html">
-            <button class="botoes_areas" type="button">Histórico</button> </a
-          ><br />
+            <button class="botoes_areas" type="button">Histórico</button>
+          </a>
+          <br />
 
           <a href="./relatorios_medico.html">
-            <button class="botoes_areas" type="butt on">Relatórios</button> </a
-          ><br />
+            <button class="botoes_areas" type="button">Relatórios</button>
+          </a>
+          <br />
 
           <a href="./usuarios_medico.html">
-            <button class="botoes_areas" type="button">Usuários</button> </a
-          ><br />
+            <button class="botoes_areas" type="button">Usuários</button>
+          </a>
+          <br />
 
           <div class="user_"></div>
         </div>
 
         <div class="historico">
           <div class="topo_">
-            <div class="titu"> 
+            <div class="titu">
               <h3 class="titu1">Histórico de Avaliações</h3>
-              <p>Visualize e imprime avaliações anteriores</p>
+              <p>Visualize e imprima avaliações anteriores</p>
             </div>
 
             <div>
@@ -56,23 +72,22 @@
             </div>
           </div>
 
-          <hr><br>
+          <hr />
+          <br />
 
           <div class="corp">
             <div class="selecionar_paciente">
               <h5>Selecionar Paciente</h5>
+
               <div class="paciente">
                 <p>Paciente</p>
-                <input type="text" placeholder="Selecionar Paciente"/>
+                <input type="text" placeholder="Selecionar paciente" />
               </div>
             </div>
 
             <div class="historico_avaliacao"></div>
-          
           </div>
         </div>
-      </div>
-  
       </div>
     </div>
   </body>

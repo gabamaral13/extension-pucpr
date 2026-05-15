@@ -1,36 +1,72 @@
-<html>
+<!DOCTYPE html>
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <link rel="stylesheet" href="./../../css/paginas medico/cadastrouser.css" />
-    <script src="../../javascript/index.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Cadastro de Usuário - X-Triagem</title>
+
+    <link
+      rel="stylesheet"
+      href="../../css/paginas medico/cadastrouser.css"
+    />
+
+    <script src="../../javascript/index.js" defer></script>
   </head>
 
   <body>
     <div class="corpo">
-      <form onsubmit="fazerCadastro(event)">
+      <form class="formulario_cadastro" onsubmit="fazerCadastro(event)">
         <h1 class="titulo">Cadastro de usuário</h1>
+
         <div class="dados">
           <div class="dados_pessoais">
             <h5>Dados Pessoais</h5>
-            <input id="nome" type="text" placeholder="Nome" />
-            <input id="email" type="text" placeholder="E-mail" />
-            <input id="cpf" type="number" placeholder="CPF" />
-            <input id="email" type="text" placeholder="E-mail" />
+
+            <input
+              id="nome"
+              type="text"
+              placeholder="Nome"
+              required
+            />
+
+            <input
+              id="email"
+              type="email"
+              placeholder="E-mail"
+              required
+            />
+
+            <input
+              id="cpf"
+              type="text"
+              placeholder="CPF"
+            />
           </div>
 
           <div class="senha">
             <h5>Criar Senha</h5>
-            <input id="senha" type="password" placeholder="Senha" />
+
+            <input
+              id="senha"
+              type="password"
+              placeholder="Senha"
+              required
+            />
+
             <input
               id="confirmsenha"
               type="password"
-              placeholder="Confirmar Senha"
+              placeholder="Confirmar senha"
+              required
             />
           </div>
         </div>
 
         <div>
-          <button class="botao_cadastro" type="submit">Cadastrar</button>
+          <button class="botao_cadastro" type="submit">
+            Cadastrar
+          </button>
         </div>
       </form>
     </div>
