@@ -10,7 +10,30 @@ const db = new sqlite3.Database(path.join(__dirname, 'banco.db'), (err) => {
   }
 });
 
+// Adiciona coluna sem quebrar se ela já existir
+function adicionarColuna(tabela, coluna, definicao) {
+  db.run(
+    `ALTER TABLE ${tabela} ADD COLUMN ${coluna} ${definicao}`,
+    (err) => {
+      if (err) {
+        if (err.message.includes('duplicate column name')) {
+          // Coluna já existe, então está tudo certo
+          return;
+        }
+
+        console.error(`Erro ao adicionar coluna ${coluna}:`, err.message);
+        return;
+      }
+
+      console.log(`Coluna ${coluna} adicionada na tabela ${tabela}`);
+    }
+  );
+}
+
 db.serialize(() => {
+  // ==================================================
+  // TABELA: USUARIOS
+  // ==================================================
   db.run(`
     CREATE TABLE IF NOT EXISTS usuarios (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -21,17 +44,36 @@ db.serialize(() => {
     )
   `);
 
+  // ==================================================
+  // TABELA: PACIENTES
+  // ==================================================
   db.run(`
     CREATE TABLE IF NOT EXISTS pacientes (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
+
       nome TEXT NOT NULL,
       data_nascimento TEXT NOT NULL,
       sexo TEXT CHECK(sexo IN ('M', 'F')) NOT NULL,
+
+      cep TEXT,
+      estado TEXT,
+      cidade TEXT,
       responsavel TEXT,
+
       criado_em DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `);
 
+  // Migração para bancos antigos
+  // Se a tabela já existia sem essas colunas, elas serão adicionadas.
+  adicionarColuna('pacientes', 'cep', 'TEXT');
+  adicionarColuna('pacientes', 'estado', 'TEXT');
+  adicionarColuna('pacientes', 'cidade', 'TEXT');
+  adicionarColuna('pacientes', 'responsavel', 'TEXT');
+
+  // ==================================================
+  // TABELA: AVALIACOES
+  // ==================================================
   db.run(`
     CREATE TABLE IF NOT EXISTS avaliacoes (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -47,6 +89,9 @@ db.serialize(() => {
     )
   `);
 
+  // ==================================================
+  // ÍNDICES
+  // ==================================================
   db.run(`CREATE INDEX IF NOT EXISTS idx_pacientes_nome ON pacientes(nome)`);
   db.run(`CREATE INDEX IF NOT EXISTS idx_avaliacoes_paciente ON avaliacoes(paciente_id)`);
   db.run(`CREATE INDEX IF NOT EXISTS idx_avaliacoes_usuario ON avaliacoes(usuario_id)`);

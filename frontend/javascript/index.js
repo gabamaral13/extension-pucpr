@@ -1,4 +1,3 @@
-
 // Integração Frontend <-> Backend
 
 const API_URL =
@@ -237,7 +236,11 @@ async function cadastrarPaciente() {
   const nome = document.getElementById('nome')?.value.trim();
   const data_nascimento = document.getElementById('data')?.value;
   const sexo = normalizarSexo(document.getElementById('sexo')?.value);
-  const responsavel = document.querySelector('.infor_paciente input')?.value.trim() || null;
+
+  const cep = document.getElementById('cep')?.value.trim() || null;
+  const estado = document.getElementById('estado')?.value.trim() || null;
+  const cidade = document.getElementById('cidade')?.value.trim() || null;
+  const responsavel = document.getElementById('responsavel')?.value.trim() || null;
 
   if (!nome || !data_nascimento || !sexo) {
     alert('Preencha nome, data de nascimento e sexo.');
@@ -253,7 +256,15 @@ async function cadastrarPaciente() {
     await apiFetch('/pacientes', {
       method: 'POST',
       headers: authHeaders(),
-      body: JSON.stringify({ nome, data_nascimento, sexo, responsavel })
+      body: JSON.stringify({
+        nome,
+        data_nascimento,
+        sexo,
+        cep,
+        estado,
+        cidade,
+        responsavel
+      })
     });
 
     alert('Paciente cadastrado com sucesso!');
@@ -269,7 +280,11 @@ function cardPaciente(paciente) {
       <strong>${escaparHTML(paciente.nome)}</strong><br>
       <span>ID: ${paciente.id}</span><br>
       <span>Nascimento: ${escaparHTML(paciente.data_nascimento)}</span><br>
-      <span>Sexo: ${escaparHTML(paciente.sexo)}</span>
+      <span>Sexo: ${escaparHTML(paciente.sexo)}</span><br>
+      <span>CEP: ${escaparHTML(paciente.cep || 'Não informado')}</span><br>
+      <span>Estado: ${escaparHTML(paciente.estado || 'Não informado')}</span><br>
+      <span>Cidade: ${escaparHTML(paciente.cidade || 'Não informado')}</span><br>
+      <span>Pais/Responsável: ${escaparHTML(paciente.responsavel || 'Não informado')}</span>
     </div>
   `;
 }
@@ -293,7 +308,10 @@ async function carregarPacientes() {
 
     return pacientes;
   } catch (erro) {
-    if (lista) lista.innerHTML = `<p>Erro ao carregar pacientes: ${escaparHTML(erro.message)}</p>`;
+    if (lista) {
+      lista.innerHTML = `<p>Erro ao carregar pacientes: ${escaparHTML(erro.message)}</p>`;
+    }
+
     return [];
   }
 }
@@ -569,9 +587,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (pagina === 'dashboard_medico.html') carregarResumoAdmin();
 
-  if (
-    pagina === 'usuarios_medico.html'
-  ) {
+  if (pagina === 'usuarios_medico.html') {
     carregarUsuarios();
   }
 
