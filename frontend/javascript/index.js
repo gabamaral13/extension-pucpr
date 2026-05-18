@@ -321,18 +321,18 @@ async function carregarPacientes() {
 // =========================
 
 const perguntasChecklist = [
-  'Atraso no desenvolvimento da fala',
-  'Dificuldade de aprendizagem',
-  'Déficit de atenção ou hiperatividade',
-  'Ansiedade ou timidez excessiva',
-  'Comportamentos repetitivos',
-  'Sensibilidade a sons, luzes ou toque',
-  'Histórico familiar relacionado',
-  'Face alongada ou orelhas proeminentes',
-  'Dificuldade de contato visual',
-  'Atraso motor',
-  'Convulsões ou alterações neurológicas',
-  'Alterações comportamentais importantes'
+  'Deficiência intelectual',
+  'Face alongada/orelhas',
+  'Macroorquidismo',
+  'Hipermobilidade articular',
+  'Dificuldades de aprendizagem',
+  'Déficit de atenção',
+  'Movimentos repetitivos',
+  'Atraso na fala',
+  'Hiperatividade',
+  'Evita contato visual',
+  'Evita contato físico',
+  'Agressividade'
 ];
 
 function opcoesPacientes(pacientes) {
