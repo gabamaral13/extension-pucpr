@@ -111,6 +111,11 @@ button {
   border: none;
   box-shadow: none;
   outline: none;
+  cursor: pointer;
+}
+
+.botao_aplicar:hover {
+  background: #085d4c;
 }
 
 .container_ {
