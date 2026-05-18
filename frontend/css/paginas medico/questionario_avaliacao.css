@@ -64,7 +64,6 @@ a {
 
   color: #fff;
   text-align: center;
-  text-decoration-line: none;
   margin-left: 8px;
 }
 
@@ -78,43 +77,6 @@ p {
   letter-spacing: -0.93px;
   padding-right: 70px;
   margin-left: 30px;
-}
-
-button {
-  width: 200px;
-  height: 93px;
-  flex-shrink: 0;
-  border-radius: 24px;
-  border-color: #25dbb6;
-  background: #25dbb6;
-
-  color: #fff;
-  text-align: center;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 20px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: 31.01px; /* 100.032% */
-  letter-spacing: -0.93px;
-}
-
-.botao_avaliacao {
-  display: flex;
-  width: 200px;
-  height: 90px;
-  justify-content: center;
-  align-items: center;
-  margin-left: 350px;
-  margin-top: 30px;
-
-  border: none;
-  box-shadow: none;
-  outline: none;
-  cursor: pointer;
-}
-
-.botao_avaliacao:hover {
-  background: #0a6452;
 }
 
 .container_ {
@@ -140,6 +102,7 @@ button {
 }
 
 .titu1 {
+  width: 500px;
   padding-left: 30px;
 }
 
@@ -202,7 +165,7 @@ button {
   display: flex;
 }
 
-.avaliacao {
+.Questionario_paciente {
   width: 1150px;
   height: 570px;
   border-radius: 10px;
@@ -211,9 +174,9 @@ button {
   margin-left: 20px;
 }
 
-.escolha_paciente {
+.questionario {
   width: 1080px;
-  height: 230px;
+  height: 480px;
   border-radius: 25.6px;
   background: rgba(9, 6, 73, 0.19);
   box-shadow: 0 0 0 1px #f9f9f9 inset;
@@ -232,13 +195,14 @@ button {
   padding-left: 20px;
 }
 
-.paciente input {
-  width: 830px;
+.questionario input {
+  width: 100px;
   height: 36px;
+  border-radius: 20px;
   border: 1px solid #fff;
   background: rgba(6, 3, 46, 0.24);
   margin-left: 40px;
-  padding-left: 40px;
+  padding-left: 10px;
   color: #fff;
   box-shadow: none;
   outline: none;

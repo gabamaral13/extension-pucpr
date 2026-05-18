@@ -91,13 +91,13 @@ button {
   border-radius: 20px;
   background-color: #f0f0f0;
   margin-left: 270px;
-  padding-top: 10px;
+  padding-top: 30px;
   display: flex;
 }
 
 .dados input {
   width: 370px;
-  height: 40px;
+  height: 50px;
   border-radius: 20px;
   border-color: #d9d9d9;
   background: #d9d9d9;

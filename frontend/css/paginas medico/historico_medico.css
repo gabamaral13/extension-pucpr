@@ -121,6 +121,11 @@ button {
   border: none;
   box-shadow: none;
   outline: none;
+  cursor: pointer;
+}
+
+.botao_imprimir:hover {
+  background: #0a6452;
 }
 
 .container_ {

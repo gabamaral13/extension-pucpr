@@ -2,7 +2,7 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="stylesheet" href="./../../css/paginas medico/cadastrouser.css" />
-    <script type="javascript" src="../../javascript/index.js"></script>
+    <script src="./../../javascript/index.js"></script>
   </head>
 
   <body>
@@ -14,15 +14,14 @@
             <h5>Dados Pessoais</h5>
             <input id="nome" type="text" placeholder="Nome" />
             <input id="email" type="text" placeholder="E-mail" />
-            <input id="cpf" type="number" placeholder="CPF" />
-            <input id="email" type="text" placeholder="E-mail" />
+            <input id="CPF" type="number" placeholder="CPF" />
           </div>
 
           <div class="senha">
             <h5>Criar Senha</h5>
             <input id="senha" type="password" placeholder="Senha" />
             <input
-              id="confirmsenha"
+              id="confirmasenha"
               type="password"
               placeholder="Confirmar Senha"
             />
@@ -30,7 +29,9 @@
         </div>
 
         <div>
-          <button class="botao_cadastro" type="submit">Cadastrar</button>
+          <button id="fazerCadastro" class="botao_cadastro" type="submit">
+            Cadastrar
+          </button>
         </div>
       </form>
     </div>
