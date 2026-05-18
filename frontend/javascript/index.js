@@ -1,17 +1,15 @@
 // Integração Frontend <-> Backend
 
 const API_URL =
-  window.location.origin &&
-  window.location.origin !== "null" &&
-  window.location.origin.includes("3000")
+  window.location.origin && window.location.origin !== 'null' && window.location.origin.includes('3000')
     ? window.location.origin
-    : "http://localhost:3000";
+    : 'http://localhost:3000';
 
 function aplicarEstilosIntegracao() {
-  if (document.getElementById("estilos-integracao-api")) return;
+  if (document.getElementById('estilos-integracao-api')) return;
 
-  const style = document.createElement("style");
-  style.id = "estilos-integracao-api";
+  const style = document.createElement('style');
+  style.id = 'estilos-integracao-api';
   style.textContent = `
     .card_api {
       background: rgba(255, 255, 255, 0.92);
@@ -41,12 +39,12 @@ function aplicarEstilosIntegracao() {
 }
 
 function token() {
-  return localStorage.getItem("token");
+  return localStorage.getItem('token');
 }
 
 function usuarioLogado() {
   try {
-    return JSON.parse(localStorage.getItem("usuario"));
+    return JSON.parse(localStorage.getItem('usuario'));
   } catch (e) {
     return null;
   }
@@ -54,8 +52,8 @@ function usuarioLogado() {
 
 function decodeJwtPayload(jwt) {
   try {
-    const payload = jwt.split(".")[1];
-    return JSON.parse(atob(payload.replace(/-/g, "+").replace(/_/g, "/")));
+    const payload = jwt.split('.')[1];
+    return JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
   } catch (e) {
     return null;
   }
@@ -63,18 +61,18 @@ function decodeJwtPayload(jwt) {
 
 function authHeaders() {
   return {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${token()}`,
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${token()}`
   };
 }
 
 function escaparHTML(valor) {
-  return String(valor ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
+  return String(valor ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
 }
 
 async function apiFetch(caminho, opcoes = {}) {
@@ -83,27 +81,25 @@ async function apiFetch(caminho, opcoes = {}) {
   const dados = texto ? JSON.parse(texto) : {};
 
   if (!resposta.ok) {
-    throw new Error(dados.erro || dados.mensagem || "Erro na requisição");
+    throw new Error(dados.erro || dados.mensagem || 'Erro na requisição');
   }
 
   return dados;
 }
 
 function caminhoLogin() {
-  return window.location.pathname.includes("paginas")
-    ? "../login.html"
-    : "login.html";
+  return window.location.pathname.includes('paginas') ? '../login.html' : 'login.html';
 }
 
 function sair() {
-  localStorage.removeItem("token");
-  localStorage.removeItem("usuario");
+  localStorage.removeItem('token');
+  localStorage.removeItem('usuario');
   window.location.href = caminhoLogin();
 }
 
 function protegerPagina() {
-  const pagina = window.location.pathname.split("/").pop();
-  const paginasLivres = ["index.html", "login.html", ""];
+  const pagina = window.location.pathname.split('/').pop();
+  const paginasLivres = ['index.html', 'login.html', ''];
 
   if (!paginasLivres.includes(pagina) && !token()) {
     window.location.href = caminhoLogin();
@@ -112,18 +108,18 @@ function protegerPagina() {
 
 function atualizarBoasVindas() {
   const usuario = usuarioLogado();
-  const titulo = document.querySelector(".container_ .titulo");
+  const titulo = document.querySelector('.container_ .titulo');
 
   if (titulo && usuario) {
-    const papel = usuario.papel === "admin" ? "Admin" : "Usuário";
+    const papel = usuario.papel === 'admin' ? 'Admin' : 'Usuário';
     titulo.textContent = `Bem-vindo, ${papel}`;
   }
 
-  const userArea = document.querySelector(".user_");
+  const userArea = document.querySelector('.user_');
 
   if (userArea && usuario) {
     userArea.innerHTML = `
-      <p style="font-size: 13px; margin-top: 20px;">${escaparHTML(usuario.username || "Usuário")}</p>
+      <p style="font-size: 13px; margin-top: 20px;">${escaparHTML(usuario.username || 'Usuário')}</p>
       <button type="button" onclick="sair()">Sair</button>
     `;
   }
@@ -136,30 +132,30 @@ function atualizarBoasVindas() {
 async function fazerLogin(event) {
   event.preventDefault();
 
-  const username = document.getElementById("email")?.value.trim();
-  const senha = document.getElementById("senha")?.value;
+  const username = document.getElementById('email')?.value.trim();
+  const senha = document.getElementById('senha')?.value;
 
   if (!username || !senha) {
-    alert("Preencha usuário/e-mail e senha.");
+    alert('Preencha usuário/e-mail e senha.');
     return;
   }
 
   try {
-    const dados = await apiFetch("/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, senha }),
+    const dados = await apiFetch('/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, senha })
     });
 
     const usuario = dados.usuario || decodeJwtPayload(dados.token);
 
-    localStorage.setItem("token", dados.token);
-    localStorage.setItem("usuario", JSON.stringify(usuario));
+    localStorage.setItem('token', dados.token);
+    localStorage.setItem('usuario', JSON.stringify(usuario));
 
-    if (usuario?.papel === "admin") {
-      window.location.href = "paginas medico/dashboard_medico.html";
+    if (usuario?.papel === 'admin') {
+      window.location.href = 'paginas medico/dashboard_medico.html';
     } else {
-      window.location.href = "paginas usuario/dashboard_usuario.html";
+      window.location.href = 'paginas usuario/dashboard_usuario.html';
     }
   } catch (erro) {
     alert(`Erro ao fazer login: ${erro.message}`);
@@ -173,56 +169,51 @@ async function fazerLogin(event) {
 async function fazerCadastro(event) {
   event.preventDefault();
 
-  const nome = document.getElementById("nome")?.value.trim();
-  const emails = document.querySelectorAll("#email");
+  const nome = document.getElementById('nome')?.value.trim();
+  const emails = document.querySelectorAll('#email');
   const email = emails[0]?.value.trim();
-  const senha = document.getElementById("senha")?.value;
-  const confirmaSenha = document.getElementById("confirmsenha")?.value;
+  const senha = document.getElementById('senha')?.value;
+  const confirmaSenha = document.getElementById('confirmsenha')?.value;
 
   const username = email || nome;
 
   if (!username || !senha) {
-    alert("Preencha e-mail/usuário e senha.");
+    alert('Preencha e-mail/usuário e senha.');
     return;
   }
 
   if (senha !== confirmaSenha) {
-    alert("As senhas não conferem.");
+    alert('As senhas não conferem.');
     return;
   }
 
   try {
-    await apiFetch("/usuarios", {
-      method: "POST",
+    await apiFetch('/usuarios', {
+      method: 'POST',
       headers: authHeaders(),
-      body: JSON.stringify({ username, senha, papel: "user" }),
+      body: JSON.stringify({ username, senha, papel: 'user' })
     });
 
-    alert("Usuário cadastrado com sucesso!");
-    window.location.href = "usuarios_medico.html";
+    alert('Usuário cadastrado com sucesso!');
+    window.location.href = 'usuarios_medico.html';
   } catch (erro) {
     alert(`Erro ao cadastrar usuário: ${erro.message}`);
   }
 }
 
 async function carregarUsuarios() {
-  const container = document.querySelector(".usuarios_");
+  const container = document.querySelector('.usuarios_');
   if (!container) return;
 
   try {
-    const usuarios = await apiFetch("/usuarios", { headers: authHeaders() });
+    const usuarios = await apiFetch('/usuarios', { headers: authHeaders() });
 
-    container.innerHTML =
-      usuarios
-        .map(
-          (usuario) => `
+    container.innerHTML = usuarios.map((usuario) => `
       <div class="card_api">
         <strong>${escaparHTML(usuario.username)}</strong><br>
         <span>Perfil: ${escaparHTML(usuario.papel)}</span>
       </div>
-    `,
-        )
-        .join("") || "<p>Nenhum usuário cadastrado.</p>";
+    `).join('') || '<p>Nenhum usuário cadastrado.</p>';
   } catch (erro) {
     container.innerHTML = `<p>Erro ao carregar usuários: ${escaparHTML(erro.message)}</p>`;
   }
@@ -233,40 +224,37 @@ async function carregarUsuarios() {
 // =========================
 
 function normalizarSexo(valor) {
-  const sexo = String(valor || "")
-    .trim()
-    .toUpperCase();
+  const sexo = String(valor || '').trim().toUpperCase();
 
-  if (sexo === "M" || sexo.startsWith("MASC")) return "M";
-  if (sexo === "F" || sexo.startsWith("FEM")) return "F";
+  if (sexo === 'M' || sexo.startsWith('MASC')) return 'M';
+  if (sexo === 'F' || sexo.startsWith('FEM')) return 'F';
 
   return sexo;
 }
 
 async function cadastrarPaciente() {
-  const nome = document.getElementById("nome")?.value.trim();
-  const data_nascimento = document.getElementById("data")?.value;
-  const sexo = normalizarSexo(document.getElementById("sexo")?.value);
+  const nome = document.getElementById('nome')?.value.trim();
+  const data_nascimento = document.getElementById('data')?.value;
+  const sexo = normalizarSexo(document.getElementById('sexo')?.value);
 
-  const cep = document.getElementById("cep")?.value.trim() || null;
-  const estado = document.getElementById("estado")?.value.trim() || null;
-  const cidade = document.getElementById("cidade")?.value.trim() || null;
-  const responsavel =
-    document.getElementById("responsavel")?.value.trim() || null;
+  const cep = document.getElementById('cep')?.value.trim() || null;
+  const estado = document.getElementById('estado')?.value.trim() || null;
+  const cidade = document.getElementById('cidade')?.value.trim() || null;
+  const responsavel = document.getElementById('responsavel')?.value.trim() || null;
 
   if (!nome || !data_nascimento || !sexo) {
-    alert("Preencha nome, data de nascimento e sexo.");
+    alert('Preencha nome, data de nascimento e sexo.');
     return;
   }
 
-  if (!["M", "F"].includes(sexo)) {
-    alert("Sexo deve ser M ou F.");
+  if (!['M', 'F'].includes(sexo)) {
+    alert('Sexo deve ser M ou F.');
     return;
   }
 
   try {
-    await apiFetch("/pacientes", {
-      method: "POST",
+    await apiFetch('/pacientes', {
+      method: 'POST',
       headers: authHeaders(),
       body: JSON.stringify({
         nome,
@@ -275,12 +263,12 @@ async function cadastrarPaciente() {
         cep,
         estado,
         cidade,
-        responsavel,
-      }),
+        responsavel
+      })
     });
 
-    alert("Paciente cadastrado com sucesso!");
-    window.location.href = "pacientes_usuario.html";
+    alert('Paciente cadastrado com sucesso!');
+    window.location.href = 'pacientes_usuario.html';
   } catch (erro) {
     alert(`Erro ao cadastrar paciente: ${erro.message}`);
   }
@@ -293,27 +281,25 @@ function cardPaciente(paciente) {
       <span>ID: ${paciente.id}</span><br>
       <span>Nascimento: ${escaparHTML(paciente.data_nascimento)}</span><br>
       <span>Sexo: ${escaparHTML(paciente.sexo)}</span><br>
-      <span>CEP: ${escaparHTML(paciente.cep || "Não informado")}</span><br>
-      <span>Estado: ${escaparHTML(paciente.estado || "Não informado")}</span><br>
-      <span>Cidade: ${escaparHTML(paciente.cidade || "Não informado")}</span><br>
-      <span>Pais/Responsável: ${escaparHTML(paciente.responsavel || "Não informado")}</span>
+      <span>CEP: ${escaparHTML(paciente.cep || 'Não informado')}</span><br>
+      <span>Estado: ${escaparHTML(paciente.estado || 'Não informado')}</span><br>
+      <span>Cidade: ${escaparHTML(paciente.cidade || 'Não informado')}</span><br>
+      <span>Pais/Responsável: ${escaparHTML(paciente.responsavel || 'Não informado')}</span>
     </div>
   `;
 }
 
 async function carregarPacientes() {
-  const lista = document.querySelector(".lista_pacientes");
-  const contador = document.querySelector(".pacientes_registrados");
+  const lista = document.querySelector('.lista_pacientes');
+  const contador = document.querySelector('.pacientes_registrados');
 
   if (!lista && !contador) return [];
 
   try {
-    const pacientes = await apiFetch("/pacientes", { headers: authHeaders() });
+    const pacientes = await apiFetch('/pacientes', { headers: authHeaders() });
 
     if (lista) {
-      lista.innerHTML =
-        pacientes.map(cardPaciente).join("") ||
-        "<p>Nenhum paciente cadastrado.</p>";
+      lista.innerHTML = pacientes.map(cardPaciente).join('') || '<p>Nenhum paciente cadastrado.</p>';
     }
 
     if (contador) {
@@ -335,42 +321,37 @@ async function carregarPacientes() {
 // =========================
 
 const perguntasChecklist = [
-  "Deficiência intelectual",
-  "Face alongada/orelhas",
-  "Macroorquidismo",
-  "Hipermobilidade articular",
-  "Dificuldades de aprendizagem",
-  "Déficit de atenção",
-  "Movimentos repetitivos",
-  "Atraso na fala",
-  "Hiperatividade",
-  "Evita contato visual",
-  "Evita contato físico",
-  "Agressividade",
+  'Deficiência intelectual',
+  'Face alongada/orelhas',
+  'Macroorquidismo',
+  'Hipermobilidade articular',
+  'Dificuldades de aprendizagem',
+  'Déficit de atenção',
+  'Movimentos repetitivos',
+  'Atraso na fala',
+  'Hiperatividade',
+  'Evita contato visual',
+  'Evita contato físico',
+  'Agressividade'
 ];
 
 function opcoesPacientes(pacientes) {
-  return pacientes
-    .map(
-      (paciente) => `
+  return pacientes.map((paciente) => `
     <option value="${paciente.id}">${escaparHTML(paciente.nome)} - ID ${paciente.id}</option>
-  `,
-    )
-    .join("");
+  `).join('');
 }
 
 async function prepararAvaliacao() {
-  const areaAvaliacao = document.querySelector(".avaliacao_paciente");
-  const areaPaciente = document.querySelector(".escolha_paciente .paciente");
+  const areaAvaliacao = document.querySelector('.avaliacao_paciente');
+  const areaPaciente = document.querySelector('.escolha_paciente .paciente');
 
   if (!areaAvaliacao || !areaPaciente) return;
 
   try {
-    const pacientes = await apiFetch("/pacientes", { headers: authHeaders() });
+    const pacientes = await apiFetch('/pacientes', { headers: authHeaders() });
 
     if (!pacientes.length) {
-      areaAvaliacao.innerHTML =
-        "<p>Cadastre um paciente antes de criar uma avaliação.</p>";
+      areaAvaliacao.innerHTML = '<p>Cadastre um paciente antes de criar uma avaliação.</p>';
       return;
     }
 
@@ -381,16 +362,12 @@ async function prepararAvaliacao() {
 
     areaAvaliacao.innerHTML = `
       <form id="formAvaliacao">
-        ${perguntasChecklist
-          .map(
-            (pergunta, index) => `
+        ${perguntasChecklist.map((pergunta, index) => `
           <label style="display:block; margin: 8px 0;">
             <input type="checkbox" name="resposta" value="${index}">
             ${index + 1}. ${escaparHTML(pergunta)}
           </label>
-        `,
-          )
-          .join("")}
+        `).join('')}
 
         <button type="submit">Salvar avaliação</button>
       </form>
@@ -398,9 +375,7 @@ async function prepararAvaliacao() {
       <div id="resultadoAvaliacao"></div>
     `;
 
-    document
-      .getElementById("formAvaliacao")
-      .addEventListener("submit", salvarAvaliacao);
+    document.getElementById('formAvaliacao').addEventListener('submit', salvarAvaliacao);
   } catch (erro) {
     areaAvaliacao.innerHTML = `<p>Erro ao preparar avaliação: ${escaparHTML(erro.message)}</p>`;
   }
@@ -409,30 +384,26 @@ async function prepararAvaliacao() {
 async function salvarAvaliacao(event) {
   event.preventDefault();
 
-  const paciente_id = Number(
-    document.getElementById("pacienteAvaliacao")?.value,
-  );
+  const paciente_id = Number(document.getElementById('pacienteAvaliacao')?.value);
   const respostas = Array(12).fill(0);
 
-  document
-    .querySelectorAll('input[name="resposta"]:checked')
-    .forEach((input) => {
-      respostas[Number(input.value)] = 1;
-    });
+  document.querySelectorAll('input[name="resposta"]:checked').forEach((input) => {
+    respostas[Number(input.value)] = 1;
+  });
 
   try {
-    const dados = await apiFetch("/avaliacoes", {
-      method: "POST",
+    const dados = await apiFetch('/avaliacoes', {
+      method: 'POST',
       headers: authHeaders(),
-      body: JSON.stringify({ paciente_id, respostas }),
+      body: JSON.stringify({ paciente_id, respostas })
     });
 
-    document.getElementById("resultadoAvaliacao").innerHTML = `
+    document.getElementById('resultadoAvaliacao').innerHTML = `
       <p><strong>Score:</strong> ${dados.score}</p>
       <p><strong>Recomendação:</strong> ${escaparHTML(dados.recomendacao)}</p>
     `;
 
-    alert("Avaliação salva com sucesso!");
+    alert('Avaliação salva com sucesso!');
   } catch (erro) {
     alert(`Erro ao salvar avaliação: ${erro.message}`);
   }
@@ -445,9 +416,9 @@ async function salvarAvaliacao(event) {
 function cardAvaliacao(avaliacao) {
   const respostas = (() => {
     try {
-      return JSON.parse(avaliacao.respostas || "[]").filter(Boolean).length;
+      return JSON.parse(avaliacao.respostas || '[]').filter(Boolean).length;
     } catch (e) {
-      return "-";
+      return '-';
     }
   })();
 
@@ -463,13 +434,13 @@ function cardAvaliacao(avaliacao) {
 }
 
 async function prepararHistorico() {
-  const area = document.querySelector(".historico_avaliacao");
-  const seletorArea = document.querySelector(".selecionar_paciente .paciente");
+  const area = document.querySelector('.historico_avaliacao');
+  const seletorArea = document.querySelector('.selecionar_paciente .paciente');
 
   if (!area || !seletorArea) return;
 
   try {
-    const pacientes = await apiFetch("/pacientes", { headers: authHeaders() });
+    const pacientes = await apiFetch('/pacientes', { headers: authHeaders() });
 
     seletorArea.innerHTML = `
       <p>Paciente</p>
@@ -479,35 +450,29 @@ async function prepararHistorico() {
       </select>
     `;
 
-    document
-      .getElementById("pacienteHistorico")
-      .addEventListener("change", carregarHistoricoPaciente);
+    document.getElementById('pacienteHistorico').addEventListener('change', carregarHistoricoPaciente);
   } catch (erro) {
     area.innerHTML = `<p>Erro ao carregar pacientes: ${escaparHTML(erro.message)}</p>`;
   }
 }
 
 async function carregarHistoricoPaciente() {
-  const pacienteId = document.getElementById("pacienteHistorico")?.value;
-  const area = document.querySelector(".historico_avaliacao");
+  const pacienteId = document.getElementById('pacienteHistorico')?.value;
+  const area = document.querySelector('.historico_avaliacao');
 
   if (!pacienteId || !area) return;
 
   try {
-    const avaliacoes = await apiFetch(`/avaliacoes/${pacienteId}`, {
-      headers: authHeaders(),
-    });
+    const avaliacoes = await apiFetch(`/avaliacoes/${pacienteId}`, { headers: authHeaders() });
 
-    area.innerHTML =
-      avaliacoes.map(cardAvaliacao).join("") ||
-      "<p>Esse paciente ainda não possui avaliações.</p>";
+    area.innerHTML = avaliacoes.map(cardAvaliacao).join('') || '<p>Esse paciente ainda não possui avaliações.</p>';
   } catch (erro) {
     area.innerHTML = `<p>Erro ao carregar histórico: ${escaparHTML(erro.message)}</p>`;
   }
 }
 
 async function carregarRelatorios() {
-  const lista = document.querySelector(".lista_relatorios");
+  const lista = document.querySelector('.lista_relatorios');
 
   if (!lista) return;
 
@@ -515,32 +480,27 @@ async function carregarRelatorios() {
     const usuario = usuarioLogado();
     const params = new URLSearchParams();
 
-    const inputs = document.querySelectorAll(
-      ".filtros input, .busca_paciente input",
-    );
-    const inicio = inputs[0]?.type === "date" ? inputs[0].value : "";
-    const fim = inputs[1]?.type === "date" ? inputs[1].value : "";
-    const paciente =
-      inputs[2]?.value || (inputs[0]?.type !== "date" ? inputs[0]?.value : "");
+    const inputs = document.querySelectorAll('.filtros input, .busca_paciente input');
+    const inicio = inputs[0]?.type === 'date' ? inputs[0].value : '';
+    const fim = inputs[1]?.type === 'date' ? inputs[1].value : '';
+    const paciente = inputs[2]?.value || (inputs[0]?.type !== 'date' ? inputs[0]?.value : '');
 
     if (inicio && fim) {
-      params.set("inicio", `${inicio} 00:00:00`);
-      params.set("fim", `${fim} 23:59:59`);
+      params.set('inicio', `${inicio} 00:00:00`);
+      params.set('fim', `${fim} 23:59:59`);
     }
 
     if (paciente) {
-      params.set("paciente", paciente);
+      params.set('paciente', paciente);
     }
 
     const avaliacoes = await apiFetch(`/avaliacoes?${params.toString()}`, {
-      headers: authHeaders(),
+      headers: authHeaders()
     });
 
-    lista.innerHTML =
-      avaliacoes.map(cardAvaliacao).join("") ||
-      "<p>Nenhum relatório encontrado.</p>";
+    lista.innerHTML = avaliacoes.map(cardAvaliacao).join('') || '<p>Nenhum relatório encontrado.</p>';
 
-    if (usuario?.papel === "admin") {
+    if (usuario?.papel === 'admin') {
       carregarResumoAdmin();
     }
   } catch (erro) {
@@ -549,29 +509,20 @@ async function carregarRelatorios() {
 }
 
 async function carregarResumoAdmin() {
-  const pagina = window.location.pathname.split("/").pop();
+  const pagina = window.location.pathname.split('/').pop();
 
-  if (pagina !== "dashboard_medico.html" && pagina !== "relatorios_medico.html")
-    return;
+  if (pagina !== 'dashboard_medico.html' && pagina !== 'relatorios_medico.html') return;
 
   try {
     const [resumo, pacientes] = await Promise.all([
-      apiFetch("/relatorios?dias=30", { headers: authHeaders() }),
-      apiFetch("/pacientes", { headers: authHeaders() }),
+      apiFetch('/relatorios?dias=30', { headers: authHeaders() }),
+      apiFetch('/pacientes', { headers: authHeaders() })
     ]);
 
-    const cardPacientes = document.querySelector(
-      ".dashboard .pacientes p, .graficos .pacientes p",
-    );
-    const cardAvaliacoes = document.querySelector(
-      ".dashboard .avaliacoes p, .graficos .avaliacoes p",
-    );
-    const cardEncaminhamentos = document.querySelector(
-      ".dashboard .encaminhamentos p, .graficos .encaminhamentos p",
-    );
-    const cardRelatorio = document.querySelector(
-      ".dashboard .relatorio p, .graficos .relatorio p",
-    );
+    const cardPacientes = document.querySelector('.dashboard .pacientes p, .graficos .pacientes p');
+    const cardAvaliacoes = document.querySelector('.dashboard .avaliacoes p, .graficos .avaliacoes p');
+    const cardEncaminhamentos = document.querySelector('.dashboard .encaminhamentos p, .graficos .encaminhamentos p');
+    const cardRelatorio = document.querySelector('.dashboard .relatorio p, .graficos .relatorio p');
 
     if (cardPacientes) {
       cardPacientes.innerHTML = `<strong>${pacientes.length}</strong> registrados no sistema`;
@@ -589,7 +540,7 @@ async function carregarResumoAdmin() {
       cardRelatorio.innerHTML = `<strong>${resumo.avaliacoesPorUsuario?.length || 0}</strong> usuários com avaliações`;
     }
   } catch (erro) {
-    console.error("Erro ao carregar dashboard admin:", erro);
+    console.error('Erro ao carregar dashboard admin:', erro);
   }
 }
 
@@ -597,64 +548,64 @@ async function carregarResumoAdmin() {
 // INICIALIZAÇÃO
 // =========================
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener('DOMContentLoaded', () => {
   aplicarEstilosIntegracao();
   protegerPagina();
   atualizarBoasVindas();
 
-  const pagina = window.location.pathname.split("/").pop() || "index.html";
+  const pagina = window.location.pathname.split('/').pop() || 'index.html';
 
-  const botaoLoginHome = document.getElementById("login");
+  const botaoLoginHome = document.getElementById('login');
 
   if (botaoLoginHome) {
-    botaoLoginHome.addEventListener("click", () => {
-      window.location.href = "login.html";
+    botaoLoginHome.addEventListener('click', () => {
+      window.location.href = 'login.html';
     });
   }
 
-  const botaoCadastrarPaciente = document.querySelector(".botao_cadastrar");
+  const botaoCadastrarPaciente = document.querySelector('.botao_cadastrar');
 
-  if (pagina === "cadastropaciente_usuario.html" && botaoCadastrarPaciente) {
-    botaoCadastrarPaciente.addEventListener("click", cadastrarPaciente);
+  if (pagina === 'cadastropaciente_usuario.html' && botaoCadastrarPaciente) {
+    botaoCadastrarPaciente.addEventListener('click', cadastrarPaciente);
   }
 
-  const botaoCadastroUsuario = document.querySelector(".botao_user_");
+  const botaoCadastroUsuario = document.querySelector('.botao_user_');
 
-  if (pagina === "usuarios_medico.html" && botaoCadastroUsuario) {
-    botaoCadastroUsuario.addEventListener("click", () => {
-      window.location.href = "cadastrousuario.html";
+  if (pagina === 'usuarios_medico.html' && botaoCadastroUsuario) {
+    botaoCadastroUsuario.addEventListener('click', () => {
+      window.location.href = 'cadastrousuario.html';
     });
   }
 
-  document.querySelectorAll(".botao_imprimir").forEach((botao) => {
-    botao.addEventListener("click", () => window.print());
+  document.querySelectorAll('.botao_imprimir').forEach((botao) => {
+    botao.addEventListener('click', () => window.print());
   });
 
-  document.querySelectorAll(".filtros button").forEach((botao) => {
-    botao.addEventListener("click", carregarRelatorios);
+  document.querySelectorAll('.filtros button').forEach((botao) => {
+    botao.addEventListener('click', carregarRelatorios);
   });
 
-  if (pagina === "dashboard_medico.html") carregarResumoAdmin();
+  if (pagina === 'dashboard_medico.html') carregarResumoAdmin();
 
-  if (pagina === "usuarios_medico.html") {
+  if (pagina === 'usuarios_medico.html') {
     carregarUsuarios();
   }
 
   if (
-    pagina === "pacientes_medico.html" ||
-    pagina === "pacientes_usuario.html" ||
-    pagina === "dashboard_usuario.html"
+    pagina === 'pacientes_medico.html' ||
+    pagina === 'pacientes_usuario.html' ||
+    pagina === 'dashboard_usuario.html'
   ) {
     carregarPacientes();
   }
 
-  if (pagina === "avaliacao_medico.html") prepararAvaliacao();
+  if (pagina === 'avaliacao_medico.html') prepararAvaliacao();
 
-  if (pagina === "historico_medico.html") prepararHistorico();
+  if (pagina === 'historico_medico.html') prepararHistorico();
 
   if (
-    pagina === "relatorios_medico.html" ||
-    pagina === "relatorio_usuario.html"
+    pagina === 'relatorios_medico.html' ||
+    pagina === 'relatorio_usuario.html'
   ) {
     carregarRelatorios();
   }

@@ -1,12 +1,12 @@
-const bcrypt = require("bcrypt");
-const db = require("./banco");
+const bcrypt = require('bcrypt');
+const db = require('./banco');
 
 (async () => {
-  const senhaHash = await bcrypt.hash("admin123", 10);
+  const senhaHash = await bcrypt.hash('admin123', 10);
 
   db.run(
     "INSERT INTO usuarios (username, senha, papel) VALUES (?, ?, ?)",
-    ["admin", senhaHash, "admin"],
+    ['admin', senhaHash, 'admin'],
     (err) => {
       if (err) {
         console.log("Erro:", err.message);
@@ -15,6 +15,6 @@ const db = require("./banco");
       }
 
       process.exit();
-    },
+    }
   );
 })();
