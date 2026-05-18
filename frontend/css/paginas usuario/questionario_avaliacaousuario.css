@@ -1,0 +1,260 @@
+body {
+  width: 100vw;
+  height: 100vh;
+  padding: 0%;
+  margin: 0%;
+  background: url(./../imagens/plano_de_fundo002.png);
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  overflow: hidden;
+}
+
+h1 {
+  display: flex;
+  width: 600px;
+  height: 150px;
+  padding: 38px 0;
+  justify-content: center;
+  align-items: center;
+  margin-right: 700px;
+  margin-left: 100px;
+
+  color: #fff;
+  text-align: center;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 50px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 31.01px; /* 129.208% */
+  letter-spacing: -0.93px;
+}
+
+h3 {
+  width: 230px;
+  height: 10px;
+  color: #fff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 30px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 31.01px; /* 129.208% */
+  letter-spacing: -0.93px;
+}
+
+h5 {
+  height: 10px;
+  color: #fff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 25px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 31.01px; /* 155.05% */
+  letter-spacing: -0.93px;
+  padding-right: 50px;
+  padding-left: 50px;
+  margin-top: 25px;
+}
+
+a {
+  width: 100px;
+  height: 63px;
+  border-radius: 10px;
+
+  color: #fff;
+  text-align: center;
+  margin-left: 8px;
+}
+
+p {
+  width: 190px;
+  color: #fff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 31.01px; /* 206.733% */
+  letter-spacing: -0.93px;
+  padding-right: 70px;
+  margin-left: 30px;
+}
+
+span {
+  color: #fff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 31.01px; /* 206.733% */
+  letter-spacing: -0.93px;
+}
+
+button {
+  width: 200px;
+  height: 93px;
+  flex-shrink: 0;
+  border-radius: 24px;
+  border-color: #25dbb6;
+  background: #25dbb6;
+
+  color: #fff;
+  text-align: center;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 31.01px; /* 100.032% */
+  letter-spacing: -0.93px;
+}
+
+.botao_avaliacao {
+  display: flex;
+  width: 200px;
+  height: 90px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 200px;
+
+  border: none;
+  box-shadow: none;
+  outline: none;
+  cursor: pointer;
+}
+
+.botao_avaliacao:hover {
+  background: #0a6452;
+}
+
+.container_ {
+  display: flex;
+  width: 100vw;
+  height: 120px;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(
+    272deg,
+    rgba(10, 10, 10, 0) 0%,
+    rgba(10, 10, 10, 0.48) 64.42%
+  );
+}
+
+.titulo {
+  display: flex;
+  width: 500px;
+  height: 100px;
+  padding: 38px 0;
+  justify-content: center;
+  align-items: center;
+}
+
+.titu1 {
+  width: 500px;
+  padding-left: 30px;
+}
+
+.logo {
+  width: 100px;
+  height: 110px;
+  margin-left: 100px;
+  aspect-ratio: 18/13;
+}
+
+.navegador {
+  width: 330px;
+  height: 570px;
+  border-radius: 5px;
+  background: #09394a;
+  margin-top: 30px;
+  margin-left: 10px;
+}
+
+.dash {
+  width: 280px;
+  height: 50px;
+  border-radius: 5px;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background-color: #020632;
+  padding-top: 20px;
+  padding-left: 50px;
+  padding-bottom: 20px;
+}
+
+.botoes_areas {
+  width: 300px;
+  height: 53px;
+  border-radius: 10px;
+  background-color: #0f4a79;
+  cursor: pointer;
+
+  color: #fff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 31.01px; /* 129.208% */
+  letter-spacing: -0.93px;
+  text-align: center;
+  margin-left: 8px;
+  margin-top: 10px;
+  border: none;
+  box-shadow: none;
+  outline: none;
+}
+
+.botoes_areas:hover {
+  background-color: #3e7cac;
+}
+
+.corpo_ {
+  display: flex;
+}
+
+.Questionario_paciente {
+  width: 1150px;
+  height: 570px;
+  border-radius: 10px;
+  background: #30719a;
+  margin-top: 30px;
+  margin-left: 20px;
+}
+
+.questionario {
+  display: flex;
+  width: 1080px;
+  height: 480px;
+  border-radius: 25.6px;
+  background: rgba(9, 6, 73, 0.19);
+  box-shadow: 0 0 0 1px #f9f9f9 inset;
+  margin-left: 30px;
+  padding-left: 10px;
+  padding-top: 10px;
+}
+
+.part1 {
+  padding-left: 2px;
+}
+
+.part2 {
+}
+
+.part3 {
+}
+
+.pergunta {
+  padding-top: 5px;
+}
+
+.questionario input {
+  width: 70px;
+  height: 28px;
+  border-radius: 20px;
+  border: 1px solid #fff;
+  background: rgba(6, 3, 46, 0.24);
+  padding-left: 10px;
+  color: #fff;
+  box-shadow: none;
+  outline: none;
+}
