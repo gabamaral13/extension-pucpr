@@ -252,7 +252,7 @@ O sistema utiliza um checklist com 12 sintomas relacionados à triagem clínica.
 ✅ Integração inicial entre frontend e backend  
 ✅ Cadastro e listagem de pacientes  
 ✅ Cadastro e listagem de usuários  
-✅ Avaliações e relatórios integrados  
+✅ Avaliações e relatórios integrados
 
 ---
 
