@@ -1,11 +1,6 @@
 // Integração Frontend <-> Backend
 
-const API_URL =
-  window.location.origin &&
-  window.location.origin !== "null" &&
-  window.location.origin.includes("3000")
-    ? window.location.origin
-    : "http://localhost:3000";
+const API_URL = window.location.origin;
 
 function aplicarEstilosIntegracao() {
   if (document.getElementById("estilos-integracao-api")) return;
@@ -80,7 +75,14 @@ function escaparHTML(valor) {
 async function apiFetch(caminho, opcoes = {}) {
   const resposta = await fetch(`${API_URL}${caminho}`, opcoes);
   const texto = await resposta.text();
-  const dados = texto ? JSON.parse(texto) : {};
+
+  let dados = {};
+
+  try {
+    dados = texto ? JSON.parse(texto) : {};
+  } catch (e) {
+    dados = { mensagem: texto };
+  }
 
   if (!resposta.ok) {
     throw new Error(dados.erro || dados.mensagem || "Erro na requisição");
@@ -243,7 +245,9 @@ function normalizarSexo(valor) {
   return sexo;
 }
 
-async function cadastrarPaciente() {
+async function cadastrarPaciente(event) {
+  if (event) event.preventDefault();
+
   const nome = document.getElementById("nome")?.value.trim();
   const data_nascimento = document.getElementById("data")?.value;
   const sexo = normalizarSexo(document.getElementById("sexo")?.value);
