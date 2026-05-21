@@ -1,11 +1,6 @@
 // Integração Frontend <-> Backend
 
-const API_URL =
-  window.location.origin &&
-  window.location.origin !== "null" &&
-  window.location.origin.includes("3000")
-    ? window.location.origin
-    : "http://localhost:3000";
+const API_URL = window.location.origin;
 
 function aplicarEstilosIntegracao() {
   if (document.getElementById("estilos-integracao-api")) return;
@@ -13,21 +8,99 @@ function aplicarEstilosIntegracao() {
   const style = document.createElement("style");
   style.id = "estilos-integracao-api";
   style.textContent = `
-    .card_api {
-      background: rgba(255, 255, 255, 0.92);
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      border-radius: 10px;
-      padding: 12px;
-      margin: 10px 0;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-      color: #111;
+
+    .user_ {
+      width: 330px;
+      height: 90px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
     }
 
+    button.botao_user {
+      width: 110px;
+      height: 60px;
+      background: #25dbb6;
+      margin-top: 30px;
+
+      color: #fff;
+      text-align: center;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 20px;
+      font-style: normal;
+      font-weight: 700;
+      line-height: 31.01px; /* 100.032% */
+      letter-spacing: -0.93px;
+
+      
+      border-radius: 24px;
+      border: none;
+      box-shadow: none;
+      outline: none;
+      cursor:pointer;
+    }
+
+    button.botao_user :hover {
+      background: #087b64;
+    }
+
+    .card_api {
+      width: 100%;
+      max-width: 900px;
+
+      margin: 0 auto 16px auto;
+
+      background: rgba(9, 6, 73, 0.52); 
+      border: 1px solid rgba(255, 255, 255, 0.6); 
+      border-radius: 16px;          
+      padding: 16px 20px; 
+      color: #ffffff; 
+      font-family: Arial, Helvetica, sans-serif;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+
+      box-sizing: border-box;
+    }
+
+    .card_api .card_header {
+      font-size: 16px;
+      color: #ffffff;
+      font-weight: bold;
+      margin-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+      padding-bottom: 6px;
+    }
+
+
+    .card_api .card_body {
+      display: flex;
+      flex-wrap: wrap;            
+      gap: 10px 24px;            
+    }
+
+    .card_api .dado_item {
+      font-size: 14px;            
+      color: #e0e0e0;
+      min-width: 140px;            
+    }
+
+    .card_api .dado_item strong {
+      color: #25dbb6;             
+      font-size: 14px;
+      margin: 0;
+      display: inline;
+    }
+
+
     select {
+      border-radius: 25.6px;
+      background: rgba(9, 6, 73, 0.52);
+      color: #ffffff;
       padding: 10px;
       border-radius: 8px;
       border: 1px solid #ccc;
-      width: 100%;
+      width: 300px;
+      margin-top: 20px;
+      margin-left: 30px;
       max-width: 420px;
     }
 
@@ -80,7 +153,14 @@ function escaparHTML(valor) {
 async function apiFetch(caminho, opcoes = {}) {
   const resposta = await fetch(`${API_URL}${caminho}`, opcoes);
   const texto = await resposta.text();
-  const dados = texto ? JSON.parse(texto) : {};
+
+  let dados = {};
+
+  try {
+    dados = texto ? JSON.parse(texto) : {};
+  } catch (e) {
+    dados = { mensagem: texto };
+  }
 
   if (!resposta.ok) {
     throw new Error(dados.erro || dados.mensagem || "Erro na requisição");
@@ -90,9 +170,7 @@ async function apiFetch(caminho, opcoes = {}) {
 }
 
 function caminhoLogin() {
-  return window.location.pathname.includes("paginas")
-    ? "../login.html"
-    : "login.html";
+  return "/html/login.html";
 }
 
 function sair() {
@@ -123,8 +201,10 @@ function atualizarBoasVindas() {
 
   if (userArea && usuario) {
     userArea.innerHTML = `
-      <p style="font-size: 13px; margin-top: 20px;">${escaparHTML(usuario.username || "Usuário")}</p>
-      <button type="button" onclick="sair()">Sair</button>
+      <div class="user_">
+        <p style="font-size: 20px; margin-top: 50px; margin-left:10px;">${escaparHTML(usuario.username || "Usuário")}</p>
+        <button class="botao_user" type="button" onclick="sair()">Sair</button>
+      </div>
     `;
   }
 }
@@ -157,9 +237,9 @@ async function fazerLogin(event) {
     localStorage.setItem("usuario", JSON.stringify(usuario));
 
     if (usuario?.papel === "admin") {
-      window.location.href = "paginas medico/dashboard_medico.html";
+      window.location.href = "/html/paginas medico/dashboard_medico.html";
     } else {
-      window.location.href = "paginas usuario/dashboard_usuario.html";
+      window.location.href = "/html/paginas usuario/dashboard_usuario.html";
     }
   } catch (erro) {
     alert(`Erro ao fazer login: ${erro.message}`);
@@ -199,7 +279,7 @@ async function fazerCadastro(event) {
     });
 
     alert("Usuário cadastrado com sucesso!");
-    window.location.href = "usuarios_medico.html";
+    window.location.href = "/html/paginas medico/usuarios_medico.html";
   } catch (erro) {
     alert(`Erro ao cadastrar usuário: ${erro.message}`);
   }
@@ -216,13 +296,14 @@ async function carregarUsuarios() {
       usuarios
         .map(
           (usuario) => `
-      <div class="card_api">
+      <div style="margin-top: 30px;" class="card_api">
         <strong>${escaparHTML(usuario.username)}</strong><br>
         <span>Perfil: ${escaparHTML(usuario.papel)}</span>
       </div>
     `,
         )
-        .join("") || "<p>Nenhum usuário cadastrado.</p>";
+        .join("") ||
+      "<p style='justify-content: center; align-items: center; text-align: center; padding-top: 60px;'>Nenhum usuário cadastrado.</p>";
   } catch (erro) {
     container.innerHTML = `<p>Erro ao carregar usuários: ${escaparHTML(erro.message)}</p>`;
   }
@@ -243,7 +324,9 @@ function normalizarSexo(valor) {
   return sexo;
 }
 
-async function cadastrarPaciente() {
+async function cadastrarPaciente(event) {
+  if (event) event.preventDefault();
+
   const nome = document.getElementById("nome")?.value.trim();
   const data_nascimento = document.getElementById("data")?.value;
   const sexo = normalizarSexo(document.getElementById("sexo")?.value);
@@ -280,7 +363,7 @@ async function cadastrarPaciente() {
     });
 
     alert("Paciente cadastrado com sucesso!");
-    window.location.href = "pacientes_usuario.html";
+    window.location.href = "/html/paginas usuario/pacientes_usuario.html";
   } catch (erro) {
     alert(`Erro ao cadastrar paciente: ${erro.message}`);
   }
@@ -289,14 +372,16 @@ async function cadastrarPaciente() {
 function cardPaciente(paciente) {
   return `
     <div class="card_api">
-      <strong>${escaparHTML(paciente.nome)}</strong><br>
-      <span>ID: ${paciente.id}</span><br>
-      <span>Nascimento: ${escaparHTML(paciente.data_nascimento)}</span><br>
-      <span>Sexo: ${escaparHTML(paciente.sexo)}</span><br>
-      <span>CEP: ${escaparHTML(paciente.cep || "Não informado")}</span><br>
-      <span>Estado: ${escaparHTML(paciente.estado || "Não informado")}</span><br>
-      <span>Cidade: ${escaparHTML(paciente.cidade || "Não informado")}</span><br>
-      <span>Pais/Responsável: ${escaparHTML(paciente.responsavel || "Não informado")}</span>
+      <div class="card_header">${escaparHTML(paciente.nome)}</div>
+      <div class="card_body">
+        <div class="dado_item"><strong>ID:</strong> ${paciente.id}</div>
+        <div class="dado_item"><strong>Sexo:</strong> ${escaparHTML(paciente.sexo)}</div>
+        <div class="dado_item"><strong>Nascimento:</strong> ${escaparHTML(paciente.data_nascimento)}</div>
+        <div class="dado_item"><strong>CEP:</strong> ${escaparHTML(paciente.cep || "Não informado")}</div>
+        <div class="dado_item"><strong>Estado:</strong> ${escaparHTML(paciente.estado || "Não informado")}</div>
+        <div class="dado_item"><strong>Cidade:</strong> ${escaparHTML(paciente.cidade || "Não informado")}</div>
+        <div class="dado_item" style="min-width: 100%;"><strong>Pais/Responsável:</strong> ${escaparHTML(paciente.responsavel || "Não informado")}</div>
+      </div>
     </div>
   `;
 }
@@ -313,11 +398,11 @@ async function carregarPacientes() {
     if (lista) {
       lista.innerHTML =
         pacientes.map(cardPaciente).join("") ||
-        "<p>Nenhum paciente cadastrado.</p>";
+        "<p style='justify-content: center; align-items: center; text-align: center; padding-top: 60px'>Nenhum paciente cadastrado.</p>";
     }
 
     if (contador) {
-      contador.innerHTML = `<h2>${pacientes.length}</h2>`;
+      contador.innerHTML = `<h2 style="color: #ffffff; font-family: Arial, sans-serif; font-size: 48px; font-weight: 700; margin-top: 15px; margin-left: 40px;text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);">${pacientes.length}</h2>`;
     }
 
     return pacientes;
@@ -538,7 +623,7 @@ async function carregarRelatorios() {
 
     lista.innerHTML =
       avaliacoes.map(cardAvaliacao).join("") ||
-      "<p>Nenhum relatório encontrado.</p>";
+      "<p style='justify-content: center; align-items: center; text-align: center; margin-top: 20px; padding-top: 60px'>Nenhum relatório encontrado.</p>";
 
     if (usuario?.papel === "admin") {
       carregarResumoAdmin();
@@ -608,7 +693,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (botaoLoginHome) {
     botaoLoginHome.addEventListener("click", () => {
-      window.location.href = "login.html";
+      window.location.href = "/html/login.html";
     });
   }
 
@@ -622,7 +707,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (pagina === "usuarios_medico.html" && botaoCadastroUsuario) {
     botaoCadastroUsuario.addEventListener("click", () => {
-      window.location.href = "cadastrousuario.html";
+      window.location.href = "/html/paginas medico/cadastrousuario.html";
     });
   }
 

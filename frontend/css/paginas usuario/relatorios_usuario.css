@@ -175,6 +175,10 @@ button {
   padding-bottom: 20px;
 }
 
+.espaco {
+  height: 360px;
+}
+
 .botoes_areas {
   width: 300px;
   height: 53px;
@@ -211,10 +215,10 @@ button {
 
 .relatorios {
   width: 1150px;
-  height: 570px;
+  height: 590px;
   border-radius: 10px;
   background: #30719a;
-  margin-top: 30px;
+  margin-top: 20px;
   margin-left: 20px;
 }
 
@@ -232,7 +236,7 @@ button {
 }
 
 .lista_relatorios {
-  width: 1000px;
+  width: 1040px;
   height: 300px;
   border-radius: 15px;
   background: rgba(2, 14, 81, 0.7);

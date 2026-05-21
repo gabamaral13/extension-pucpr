@@ -10,20 +10,104 @@ const db = new sqlite3.Database(path.join(__dirname, "banco.db"), (err) => {
   }
 });
 
+// ==================================================
+// FUNÇÕES AUXILIARES
+// ==================================================
+
 // Adiciona coluna sem quebrar se ela já existir
 function adicionarColuna(tabela, coluna, definicao) {
   db.run(`ALTER TABLE ${tabela} ADD COLUMN ${coluna} ${definicao}`, (err) => {
     if (err) {
       if (err.message.includes("duplicate column name")) {
-        // Coluna já existe, então está tudo certo
         return;
       }
 
-      console.error(`Erro ao adicionar coluna ${coluna}:`, err.message);
+      console.error(
+        `Erro ao adicionar coluna ${coluna} na tabela ${tabela}:`,
+        err.message,
+      );
       return;
     }
 
     console.log(`Coluna ${coluna} adicionada na tabela ${tabela}`);
+  });
+}
+
+// Migração para corrigir bancos antigos que tinham nome_usuario/tipo_acesso
+function migrarTabelaUsuarios() {
+  db.all("PRAGMA table_info(usuarios)", (err, colunas) => {
+    if (err) {
+      console.error("Erro ao verificar tabela usuarios:", err.message);
+      return;
+    }
+
+    const nomesColunas = colunas.map((coluna) => coluna.name);
+
+    const temUsername = nomesColunas.includes("username");
+    const temPapel = nomesColunas.includes("papel");
+    const temNomeUsuario = nomesColunas.includes("nome_usuario");
+    const temTipoAcesso = nomesColunas.includes("tipo_acesso");
+
+    if (!temUsername) {
+      adicionarColuna("usuarios", "username", "TEXT");
+    }
+
+    if (!temPapel) {
+      adicionarColuna("usuarios", "papel", "TEXT DEFAULT 'user'");
+    }
+
+    // Copia nome_usuario para username em bancos antigos
+    if (!temUsername && temNomeUsuario) {
+      db.run(
+        `
+        UPDATE usuarios
+        SET username = nome_usuario
+        WHERE username IS NULL
+      `,
+        (err) => {
+          if (err) {
+            console.error(
+              "Erro ao migrar nome_usuario para username:",
+              err.message,
+            );
+          } else {
+            console.log(
+              "Migração usuarios: nome_usuario -> username concluída",
+            );
+          }
+        },
+      );
+    }
+
+    // Copia tipo_acesso para papel em bancos antigos
+    if (!temPapel && temTipoAcesso) {
+      db.run(
+        `
+        UPDATE usuarios
+        SET papel = tipo_acesso
+        WHERE papel IS NULL
+      `,
+        (err) => {
+          if (err) {
+            console.error(
+              "Erro ao migrar tipo_acesso para papel:",
+              err.message,
+            );
+          } else {
+            console.log("Migração usuarios: tipo_acesso -> papel concluída");
+          }
+        },
+      );
+    }
+
+    // Garante que usuários sem papel fiquem como user
+    db.run(
+      `
+      UPDATE usuarios
+      SET papel = 'user'
+      WHERE papel IS NULL OR papel NOT IN ('admin', 'user')
+    `,
+    );
   });
 }
 
@@ -34,12 +118,15 @@ db.serialize(() => {
   db.run(`
     CREATE TABLE IF NOT EXISTS usuarios (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      nome_usuario TEXT UNIQUE NOT NULL,
+      username TEXT UNIQUE NOT NULL,
       senha TEXT NOT NULL,
-      tipo_acesso TEXT CHECK(papel IN ('admin', 'user')) NOT NULL DEFAULT 'user',
+      papel TEXT CHECK(papel IN ('admin', 'user')) NOT NULL DEFAULT 'user',
       criado_em DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `);
+
+  // Corrige bancos antigos que tinham nome_usuario/tipo_acesso
+  migrarTabelaUsuarios();
 
   // ==================================================
   // TABELA: PACIENTES
@@ -62,7 +149,6 @@ db.serialize(() => {
   `);
 
   // Migração para bancos antigos
-  // Se a tabela já existia sem essas colunas, elas serão adicionadas.
   adicionarColuna("pacientes", "cep", "TEXT");
   adicionarColuna("pacientes", "estado", "TEXT");
   adicionarColuna("pacientes", "cidade", "TEXT");

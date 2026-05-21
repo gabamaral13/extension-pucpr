@@ -101,11 +101,11 @@ button {
 
 .botao_aplicar {
   display: flex;
-  width: 200px;
+  width: 180px;
   height: 90px;
   justify-content: center;
   align-items: center;
-  margin-left: 80px;
+  margin-left: 30px;
   margin-top: 20px;
 
   border: none;
@@ -210,10 +210,10 @@ button {
 
 .relatorios {
   width: 1150px;
-  height: 570px;
+  height: 590px;
   border-radius: 10px;
   background: #30719a;
-  margin-top: 30px;
+  margin-top: 20px;
   margin-left: 20px;
 }
 

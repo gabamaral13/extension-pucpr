@@ -175,6 +175,10 @@ button {
   padding-bottom: 20px;
 }
 
+.espaco {
+  height: 360px;
+}
+
 .botoes_areas {
   width: 300px;
   height: 53px;
@@ -211,15 +215,15 @@ button {
 
 .pacientes {
   width: 1150px;
-  height: 570px;
+  height: 590px;
   border-radius: 10px;
   background: #30719a;
-  margin-top: 30px;
+  margin-top: 20px;
   margin-left: 20px;
 }
 
 .buscar_paciente input {
-  width: 1070px;
+  width: 1030px;
   height: 51.59px;
   border-radius: 25.6px;
   background: rgba(15, 34, 100, 0.63);
@@ -236,10 +240,10 @@ button {
 
 .lista_pacientes {
   width: 1070px;
-  height: 162px;
+  height: 350px;
   border-radius: 25.6px;
   background: rgba(9, 6, 73, 0.52);
   box-shadow: 0 0 0 1px #f9f9f9 inset;
   margin-left: 40px;
-  margin-top: 30px;
+  margin-top: 10px;
 }
