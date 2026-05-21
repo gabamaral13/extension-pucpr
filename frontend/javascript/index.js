@@ -92,9 +92,7 @@ async function apiFetch(caminho, opcoes = {}) {
 }
 
 function caminhoLogin() {
-  return window.location.pathname.includes("paginas")
-    ? "../login.html"
-    : "login.html";
+  return "/html/login.html";
 }
 
 function sair() {
@@ -159,9 +157,9 @@ async function fazerLogin(event) {
     localStorage.setItem("usuario", JSON.stringify(usuario));
 
     if (usuario?.papel === "admin") {
-      window.location.href = "paginas medico/dashboard_medico.html";
+      window.location.href = "/html/paginas medico/dashboard_medico.html";
     } else {
-      window.location.href = "paginas usuario/dashboard_usuario.html";
+      window.location.href = "/html/paginas usuario/dashboard_usuario.html";
     }
   } catch (erro) {
     alert(`Erro ao fazer login: ${erro.message}`);
@@ -201,7 +199,7 @@ async function fazerCadastro(event) {
     });
 
     alert("Usuário cadastrado com sucesso!");
-    window.location.href = "usuarios_medico.html";
+    window.location.href = "/html/paginas medico/usuarios_medico.html";
   } catch (erro) {
     alert(`Erro ao cadastrar usuário: ${erro.message}`);
   }
@@ -284,7 +282,7 @@ async function cadastrarPaciente(event) {
     });
 
     alert("Paciente cadastrado com sucesso!");
-    window.location.href = "pacientes_usuario.html";
+    window.location.href = "/html/paginas usuario/pacientes_usuario.html";
   } catch (erro) {
     alert(`Erro ao cadastrar paciente: ${erro.message}`);
   }
@@ -612,7 +610,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (botaoLoginHome) {
     botaoLoginHome.addEventListener("click", () => {
-      window.location.href = "login.html";
+      window.location.href = "/html/login.html";
     });
   }
 
@@ -626,7 +624,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (pagina === "usuarios_medico.html" && botaoCadastroUsuario) {
     botaoCadastroUsuario.addEventListener("click", () => {
-      window.location.href = "cadastrousuario.html";
+      window.location.href = "/html/paginas medico/cadastrousuario.html";
     });
   }
 
