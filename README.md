@@ -13,6 +13,7 @@ O sistema permite que profissionais autorizados cadastrem pacientes, realizem av
   - **Admin**: médico/diretor
   - **User**: atendente
 - 🧑‍⚕️ Cadastro de pacientes
+- 👥 Cadastro e listagem de usuários
 - 📋 Checklist clínico com 12 sintomas
 - 🧮 Cálculo automático de score
 - 📊 Geração de recomendação clínica
@@ -20,6 +21,7 @@ O sistema permite que profissionais autorizados cadastrem pacientes, realizem av
 - 📄 Relatórios com filtros
 - 🖨️ Opção de impressão de relatórios e históricos
 - 🌐 Integração entre frontend e backend
+- 🌍 Possibilidade de teste externo usando LocalTunnel
 
 ---
 
@@ -59,6 +61,7 @@ extension-pucpr/
 │   ├── utils/
 │   │   └── calculoScore.js
 │   ├── banco.js
+│   ├── banco.db
 │   ├── criarAdmin.js
 │   ├── servidor.js
 │   └── package.json
@@ -78,7 +81,7 @@ extension-pucpr/
 
 ---
 
-## ▶️ Como executar o projeto
+## ▶️ Como executar o projeto localmente
 
 Primeiro, acesse a pasta do backend:
 
@@ -92,7 +95,7 @@ Instale as dependências:
 npm install
 ```
 
-Crie o usuário administrador, caso ainda não exista:
+Crie ou atualize o usuário administrador:
 
 ```bash
 node criarAdmin.js
@@ -104,6 +107,12 @@ Depois inicie o servidor:
 npm start
 ```
 
+ou:
+
+```bash
+node servidor.js
+```
+
 O servidor será iniciado em:
 
 ```txt
@@ -113,13 +122,37 @@ http://localhost:3000
 Para acessar o sistema, abra no navegador:
 
 ```txt
+http://localhost:3000
+```
+
+ou:
+
+```txt
 http://localhost:3000/html/index.html
 ```
 
-Ou direto pela tela de login:
+Também é possível acessar direto pela tela de login:
 
 ```txt
 http://localhost:3000/html/login.html
+```
+
+---
+
+## 🔎 Teste rápido da API
+
+Com o servidor rodando, acesse:
+
+```txt
+http://localhost:3000/api/status
+```
+
+Resposta esperada:
+
+```json
+{
+  "mensagem": "API do sistema hospitalar rodando 🚀"
+}
 ```
 
 ---
@@ -131,13 +164,102 @@ Usuário: admin
 Senha: admin123
 ```
 
-Caso o administrador já exista no banco, o comando abaixo pode retornar erro de usuário duplicado:
+O comando abaixo cria o administrador caso ele ainda não exista:
 
 ```bash
 node criarAdmin.js
 ```
 
-Isso significa apenas que o usuário admin já foi criado.
+Caso o administrador já exista, o script atualiza/reseta a senha do admin para:
+
+```txt
+admin123
+```
+
+---
+
+## 🌐 Acesso pela rede local
+
+O servidor está configurado para aceitar conexões externas na rede local usando:
+
+```js
+0.0.0.0
+```
+
+Ao iniciar o servidor, serão exibidos links parecidos com:
+
+```txt
+http://192.168.x.x:3000
+http://172.x.x.x:3000
+```
+
+Esses links podem ser usados por outros dispositivos conectados na mesma rede.
+
+Exemplo:
+
+```txt
+http://SEU-IP:3000
+```
+
+ou:
+
+```txt
+http://SEU-IP:3000/api/status
+```
+
+Observação: em redes de faculdade, empresa ou alguns hotspots de celular, pode existir bloqueio entre dispositivos. Nesse caso, mesmo estando na mesma rede, outro computador pode não conseguir acessar o servidor local.
+
+---
+
+## 🌍 Teste externo com LocalTunnel
+
+Quando a rede local bloquear o acesso entre computadores, é possível usar o LocalTunnel para criar um link público temporário.
+
+Primeiro, deixe o servidor rodando:
+
+```bash
+npm start
+```
+
+Depois, em outro terminal, execute:
+
+```bash
+npx localtunnel --port 3000 --local-host 127.0.0.1
+```
+
+O terminal irá gerar um link parecido com:
+
+```txt
+https://exemplo.loca.lt
+```
+
+Esse link pode ser enviado para outra pessoa testar o sistema.
+
+Para testar a API pelo LocalTunnel:
+
+```txt
+https://exemplo.loca.lt/api/status
+```
+
+Para acessar o sistema:
+
+```txt
+https://exemplo.loca.lt
+```
+
+ou:
+
+```txt
+https://exemplo.loca.lt/html/index.html
+```
+
+Importante:
+
+- O terminal do `npm start` precisa continuar aberto.
+- O terminal do `localtunnel` também precisa continuar aberto.
+- Se qualquer um dos dois for fechado, o link para de funcionar.
+- Tudo que for cadastrado pelo link do LocalTunnel será salvo no `banco.db` local da máquina que está rodando o servidor.
+- O LocalTunnel pode exibir uma tela de segurança pedindo o IP mostrado na própria página antes de liberar o acesso.
 
 ---
 
@@ -166,6 +288,16 @@ O usuário comum possui acesso às funções operacionais:
 ---
 
 ## 🔗 Principais rotas da API
+
+### Status da API
+
+```http
+GET /api/status
+```
+
+Verifica se a API está rodando corretamente.
+
+---
 
 ### Autenticação
 
@@ -225,12 +357,24 @@ Rota utilizada para geração de dados resumidos e relatórios.
 
 ## 📋 Checklist clínico
 
-O sistema utiliza um checklist com 12 sintomas relacionados à triagem clínica. Cada avaliação gera automaticamente:
+O sistema utiliza um checklist com 12 sintomas relacionados à triagem clínica da Síndrome do X-Frágil.
+
+Cada avaliação gera automaticamente:
 
 - Score da avaliação
 - Quantidade de sintomas marcados
 - Recomendação clínica
 - Registro no histórico do paciente
+
+---
+
+## 🧮 Cálculo do score
+
+O score é calculado com base nas respostas marcadas no checklist clínico.
+
+Cada sintoma possui um peso específico, e o sistema calcula automaticamente a pontuação final da avaliação.
+
+A recomendação clínica é gerada de acordo com o score obtido e os critérios definidos no backend.
 
 ---
 
@@ -241,6 +385,8 @@ O sistema utiliza um checklist com 12 sintomas relacionados à triagem clínica.
 - Apenas usuários autorizados podem acessar as funcionalidades.
 - Os resultados servem como apoio à triagem e não substituem diagnóstico médico.
 - Os relatórios e históricos podem ser visualizados e impressos pelos profissionais.
+- O banco de dados utilizado é SQLite e fica salvo localmente no arquivo `banco.db`.
+- Ao testar com LocalTunnel, os dados cadastrados por outros usuários são salvos no banco local da máquina que está executando o servidor.
 
 ---
 
@@ -249,13 +395,72 @@ O sistema utiliza um checklist com 12 sintomas relacionados à triagem clínica.
 ✅ Backend estruturado  
 ✅ Banco de dados SQLite configurado  
 ✅ Login com JWT funcionando  
-✅ Integração inicial entre frontend e backend  
+✅ Controle de acesso por perfil  
+✅ Integração entre frontend e backend  
 ✅ Cadastro e listagem de pacientes  
 ✅ Cadastro e listagem de usuários  
-✅ Avaliações e relatórios integrados
+✅ Avaliações integradas  
+✅ Histórico de avaliações  
+✅ Relatórios integrados  
+✅ Impressão de relatórios e históricos  
+✅ Acesso externo temporário via LocalTunnel testado  
+
+---
+
+## 🧑‍💻 Comandos úteis
+
+### Entrar na pasta do backend
+
+```bash
+cd backend
+```
+
+### Instalar dependências
+
+```bash
+npm install
+```
+
+### Criar/resetar admin
+
+```bash
+node criarAdmin.js
+```
+
+### Rodar servidor
+
+```bash
+npm start
+```
+
+ou:
+
+```bash
+node servidor.js
+```
+
+### Testar API localmente
+
+```txt
+http://localhost:3000/api/status
+```
+
+### Gerar link público temporário
+
+```bash
+npx localtunnel --port 3000 --local-host 127.0.0.1
+```
+
+---
+
+## 🧑‍🏫 Contexto acadêmico
+
+Projeto desenvolvido para fins acadêmicos na disciplina de Experiência Criativa.
+
+O objetivo é demonstrar a construção de um sistema web com frontend, backend, banco de dados, autenticação, controle de acesso e integração entre as camadas da aplicação.
 
 ---
 
 ## 👨‍💻 Desenvolvido por
 
-Projeto desenvolvido para fins acadêmicos na disciplina de Experiência Criativa.
+Projeto desenvolvido para fins acadêmicos na PUCPR.
