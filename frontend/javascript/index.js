@@ -99,7 +99,7 @@ function aplicarEstilosIntegracao() {
       border-radius: 8px;
       border: 1px solid #ccc;
       width: 300px;
-      margin-top: 20px;
+      margin-top: 5px;
       margin-left: 30px;
       max-width: 420px;
     }

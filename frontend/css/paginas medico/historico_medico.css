@@ -233,7 +233,7 @@ button {
 
 .selecionar_paciente {
   width: 410px;
-  height: 240px;
+  height: 220px;
   border-radius: 25.6px;
   background: rgba(9, 6, 73, 0.19);
   box-shadow: 0 0 0 1px #f9f9f9 inset;
@@ -243,7 +243,7 @@ button {
 
 .paciente {
   width: 357px;
-  height: 140px;
+  height: 120px;
   border-radius: 25.6px;
   background: rgba(9, 6, 73, 0.19);
   box-shadow: 0 0 0 1px #f9f9f9 inset;
