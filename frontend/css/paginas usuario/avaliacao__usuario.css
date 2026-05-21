@@ -47,13 +47,14 @@ h5 {
   height: 10px;
   color: #fff;
   font-family: Arial, Helvetica, sans-serif;
-  font-size: 15px;
+  font-size: 25px;
   font-style: normal;
   font-weight: 700;
-  line-height: 31.01px;
+  line-height: 31.01px; /* 155.05% */
+  letter-spacing: -0.93px;
   padding-right: 50px;
-  padding-left: 30px;
-  margin-top: 10px;
+  padding-left: 50px;
+  margin-top: 25px;
 }
 
 a {
@@ -75,9 +76,8 @@ p {
   font-weight: 500;
   line-height: 31.01px; /* 206.733% */
   letter-spacing: -0.93px;
-  margin: 1px;
+  padding-right: 70px;
   margin-left: 30px;
-  padding-top: 1px;
 }
 
 button {
@@ -85,10 +85,8 @@ button {
   height: 93px;
   flex-shrink: 0;
   border-radius: 24px;
-  border: none;
+  border-color: #25dbb6;
   background: #25dbb6;
-  box-shadow: none;
-  outline: none;
 
   color: #fff;
   text-align: center;
@@ -100,14 +98,14 @@ button {
   letter-spacing: -0.93px;
 }
 
-.botao_cadastro {
+.botao_avaliacao {
   display: flex;
   width: 200px;
   height: 90px;
   justify-content: center;
   align-items: center;
   margin-left: 350px;
-  margin-top: 20px;
+  margin-top: 30px;
 
   border: none;
   box-shadow: none;
@@ -115,8 +113,8 @@ button {
   cursor: pointer;
 }
 
-.botao_cadastro:hover {
-  background: #09715d;
+.botao_avaliacao:hover {
+  background: #0a6452;
 }
 
 .container_ {
@@ -142,7 +140,6 @@ button {
 }
 
 .titu1 {
-  width: 500px;
   padding-left: 30px;
 }
 
@@ -209,11 +206,7 @@ button {
   display: flex;
 }
 
-.top {
-  display: flex;
-}
-
-.pacientes {
+.avaliacao {
   width: 1150px;
   height: 590px;
   border-radius: 10px;
@@ -222,28 +215,35 @@ button {
   margin-left: 20px;
 }
 
-.buscar_paciente input {
-  width: 1030px;
-  height: 51.59px;
+.escolha_paciente {
+  width: 1080px;
+  height: 230px;
   border-radius: 25.6px;
-  background: rgba(15, 34, 100, 0.63);
+  background: rgba(9, 6, 73, 0.19);
   box-shadow: 0 0 0 1px #f9f9f9 inset;
-  margin-top: 20px;
+  margin-left: 30px;
+  padding-top: 10px;
+}
+
+.paciente {
+  width: 940px;
+  height: 135px;
+  border-radius: 25.6px;
+  background: rgba(9, 6, 73, 0.19);
+  box-shadow: 0 0 0 1px #f9f9f9 inset;
+  margin-left: 60px;
+  padding-top: 1px;
+  padding-left: 20px;
+}
+
+.paciente input {
+  width: 830px;
+  height: 36px;
+  border: 1px solid #fff;
+  background: rgba(6, 3, 46, 0.24);
   margin-left: 40px;
   padding-left: 40px;
   color: #fff;
-  border: none;
+  box-shadow: none;
   outline: none;
-  text-decoration: white;
-  text-decoration-color: #fff;
-}
-
-.lista_pacientes {
-  width: 1070px;
-  height: 350px;
-  border-radius: 25.6px;
-  background: rgba(9, 6, 73, 0.52);
-  box-shadow: 0 0 0 1px #f9f9f9 inset;
-  margin-left: 40px;
-  margin-top: 10px;
 }

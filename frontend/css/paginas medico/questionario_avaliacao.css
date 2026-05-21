@@ -214,10 +214,10 @@ button {
 
 .Questionario_paciente {
   width: 1150px;
-  height: 570px;
+  height: 590px;
   border-radius: 10px;
   background: #30719a;
-  margin-top: 30px;
+  margin-top: 20px;
   margin-left: 20px;
 }
 
@@ -235,12 +235,6 @@ button {
 
 .part1 {
   padding-left: 2px;
-}
-
-.part2 {
-}
-
-.part3 {
 }
 
 .pergunta {

@@ -22,9 +22,6 @@ function adicionarColuna(tabela, coluna, definicao) {
         return;
       }
 
-      console.error(`Erro ao adicionar coluna ${coluna} na tabela ${tabela}:`, err.message);
-      return;
-    }
 
     console.log(`Coluna ${coluna} adicionada na tabela ${tabela}`);
   });
@@ -63,11 +60,6 @@ function migrarTabelaUsuarios() {
       `,
         (err) => {
           if (err) {
-            console.error("Erro ao migrar nome_usuario para username:", err.message);
-          } else {
-            console.log("Migração usuarios: nome_usuario -> username concluída");
-          }
-        }
       );
     }
 
@@ -81,11 +73,6 @@ function migrarTabelaUsuarios() {
       `,
         (err) => {
           if (err) {
-            console.error("Erro ao migrar tipo_acesso para papel:", err.message);
-          } else {
-            console.log("Migração usuarios: tipo_acesso -> papel concluída");
-          }
-        }
       );
     }
 
@@ -95,7 +82,6 @@ function migrarTabelaUsuarios() {
       UPDATE usuarios
       SET papel = 'user'
       WHERE papel IS NULL OR papel NOT IN ('admin', 'user')
-    `
     );
   });
 }

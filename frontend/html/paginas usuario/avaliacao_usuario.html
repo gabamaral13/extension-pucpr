@@ -4,13 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Pacientes - X-Triagem</title>
+    <title>Avaliação - X-Triagem</title>
 
     <link
       rel="stylesheet"
-      href="../../css/paginas usuario/pacientes_usuario.css"
+      href="../../css/paginas usuario/avaliacao_usuario.css"
     />
-    <link rel="icon" href="../css/imagens/x.png" />
+    <link rel="icon" href="../../css/imagens/x.png" />
 
     <script src="../../javascript/index.js" defer></script>
   </head>
@@ -19,7 +19,7 @@
     <div class="corpo">
       <div class="container_">
         <img class="logo" src="../../css/imagens/x.png" alt="Logo X-Triagem" />
-        <h1 class="titulo">Bem-vindo, user</h1>
+        <h1 class="titulo">Bem-vindo, Admin</h1>
       </div>
 
       <div class="corpo_">
@@ -29,21 +29,22 @@
           </div>
 
           <div class="espaco">
-            <a href="./dashboard_usuario.html">
+            <a href="./dashboard_medico.html">
               <button class="botoes_areas" type="button">Dashboard</button>
             </a>
             <br />
 
-            <a href="./pacientes_usuario.html">
+            <a href="./pacientes_medico.html">
               <button class="botoes_areas" type="button">Pacientes</button>
             </a>
             <br />
 
             <a href="./avaliacao_medico.html">
-              <button class="botoes_areas" type="button">Avaliações</button> </a
-            ><br />
+              <button class="botoes_areas" type="button">Avaliações</button>
+            </a>
+            <br />
 
-            <a href="./relatorio_usuario.html">
+            <a href="./relatorios_medico.html">
               <button class="botoes_areas" type="button">Relatórios</button>
             </a>
           </div>
@@ -51,27 +52,20 @@
           <div class="user_"></div>
         </div>
 
-        <div class="pacientes">
-          <div class="top">
-            <div class="titu">
-              <h3 class="titu1">Cadastrar novos Pacientes</h3>
-              <p>Gerenciamento de pacientes para triagem</p>
-            </div>
+        <div class="avaliacao">
+          <h3 class="titu1">Avaliação</h3>
+          <p>Checklist clínico para a Síndrome do X-frágil</p>
 
-            <div>
-              <a href="./cadastropaciente_usuario.html">
-                <button class="botao_cadastro" type="button">
-                  Novo Paciente
-                </button>
-              </a>
+          <div class="escolha_paciente">
+            <h5>Selecionar paciente</h5>
+
+            <div class="paciente">
+              <p>Paciente</p>
+              <input type="text" placeholder="Selecionar paciente" />
             </div>
           </div>
 
-          <div class="buscar_paciente">
-            <input type="text" placeholder="Buscar paciente" />
-          </div>
-
-          <div class="lista_pacientes"></div>
+          <div class="avaliacao_paciente"></div>
         </div>
       </div>
     </div>

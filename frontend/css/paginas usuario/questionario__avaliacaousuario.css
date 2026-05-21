@@ -47,13 +47,14 @@ h5 {
   height: 10px;
   color: #fff;
   font-family: Arial, Helvetica, sans-serif;
-  font-size: 15px;
+  font-size: 25px;
   font-style: normal;
   font-weight: 700;
-  line-height: 31.01px;
+  line-height: 31.01px; /* 155.05% */
+  letter-spacing: -0.93px;
   padding-right: 50px;
-  padding-left: 30px;
-  margin-top: 10px;
+  padding-left: 50px;
+  margin-top: 25px;
 }
 
 a {
@@ -63,11 +64,11 @@ a {
 
   color: #fff;
   text-align: center;
-  text-decoration-line: none;
   margin-left: 8px;
 }
 
 p {
+  width: 190px;
   color: #fff;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 15px;
@@ -75,9 +76,18 @@ p {
   font-weight: 500;
   line-height: 31.01px; /* 206.733% */
   letter-spacing: -0.93px;
-  margin: 1px;
+  padding-right: 70px;
   margin-left: 30px;
-  padding-top: 1px;
+}
+
+span {
+  color: #fff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 31.01px; /* 206.733% */
+  letter-spacing: -0.93px;
 }
 
 button {
@@ -85,10 +95,8 @@ button {
   height: 93px;
   flex-shrink: 0;
   border-radius: 24px;
-  border: none;
+  border-color: #25dbb6;
   background: #25dbb6;
-  box-shadow: none;
-  outline: none;
 
   color: #fff;
   text-align: center;
@@ -100,14 +108,13 @@ button {
   letter-spacing: -0.93px;
 }
 
-.botao_cadastro {
+.botao_avaliacao {
   display: flex;
   width: 200px;
   height: 90px;
   justify-content: center;
   align-items: center;
-  margin-left: 350px;
-  margin-top: 20px;
+  margin-top: 200px;
 
   border: none;
   box-shadow: none;
@@ -115,8 +122,8 @@ button {
   cursor: pointer;
 }
 
-.botao_cadastro:hover {
-  background: #09715d;
+.botao_avaliacao:hover {
+  background: #0a6452;
 }
 
 .container_ {
@@ -209,11 +216,7 @@ button {
   display: flex;
 }
 
-.top {
-  display: flex;
-}
-
-.pacientes {
+.Questionario_paciente {
   width: 1150px;
   height: 590px;
   border-radius: 10px;
@@ -222,28 +225,34 @@ button {
   margin-left: 20px;
 }
 
-.buscar_paciente input {
-  width: 1030px;
-  height: 51.59px;
+.questionario {
+  display: flex;
+  width: 1080px;
+  height: 480px;
   border-radius: 25.6px;
-  background: rgba(15, 34, 100, 0.63);
+  background: rgba(9, 6, 73, 0.19);
   box-shadow: 0 0 0 1px #f9f9f9 inset;
-  margin-top: 20px;
-  margin-left: 40px;
-  padding-left: 40px;
-  color: #fff;
-  border: none;
-  outline: none;
-  text-decoration: white;
-  text-decoration-color: #fff;
+  margin-left: 30px;
+  padding-left: 10px;
+  padding-top: 10px;
 }
 
-.lista_pacientes {
-  width: 1070px;
-  height: 350px;
-  border-radius: 25.6px;
-  background: rgba(9, 6, 73, 0.52);
-  box-shadow: 0 0 0 1px #f9f9f9 inset;
-  margin-left: 40px;
-  margin-top: 10px;
+.part1 {
+  padding-left: 2px;
+}
+
+.pergunta {
+  padding-top: 5px;
+}
+
+.questionario input {
+  width: 70px;
+  height: 28px;
+  border-radius: 20px;
+  border: 1px solid #fff;
+  background: rgba(6, 3, 46, 0.24);
+  padding-left: 10px;
+  color: #fff;
+  box-shadow: none;
+  outline: none;
 }

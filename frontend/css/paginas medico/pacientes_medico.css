@@ -166,15 +166,15 @@ p {
 
 .paciente {
   width: 1150px;
-  height: 570px;
+  height: 590px;
   border-radius: 10px;
   background: #30719a;
-  margin-top: 30px;
+  margin-top: 20px;
   margin-left: 20px;
 }
 
 .buscar_paciente input {
-  width: 1080px;
+  width: 1040px;
   height: 51.59px;
   border-radius: 25.6px;
   background: rgba(15, 34, 100, 0.63);

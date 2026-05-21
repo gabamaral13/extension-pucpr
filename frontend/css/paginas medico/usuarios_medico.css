@@ -211,10 +211,10 @@ button {
 
 .usuarios {
   width: 1150px;
-  height: 570px;
+  height: 590px;
   border-radius: 10px;
   background: #30719a;
-  margin-top: 30px;
+  margin-top: 20px;
   margin-left: 20px;
 }
 
@@ -233,10 +233,24 @@ button {
 }
 
 .usuarios_ {
-  width: 1030px;
-  height: 162px;
+  width: 1070px;
+  height: 300px;
   border-radius: 25.6px;
   background: rgba(9, 6, 73, 0.61);
   margin-top: 35px;
   margin-left: 50px;
+}
+
+.card_api {
+  width: 900px;
+  height: 70px;
+  background: rgba(7, 70, 125, 0.92);
+  border: 1px solid rgb(255, 255, 255);
+  border-radius: 10px;
+  margin-left: 75px;
+  margin-bottom: 10px;
+  padding-top: 20px;
+  padding-left: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  color: #ffffff;
 }
