@@ -1,303 +1,13 @@
-// Integração Frontend <-> Backend - X-Triagem
+// ==========================================================
+// X-Triagem - Integração Frontend <-> Backend
+// Arquivo: frontend/javascript/index.js
+// ==========================================================
 
-const API_URL = window.location.protocol === "file:" ? "http://localhost:3000" : window.location.origin;
+const API_URL = window.location.origin;
 
-const ROTAS = {
-  login: "/html/login.html",
-  adminDashboard: "/html/paginas medico/dashboard_medico.html",
-  userDashboard: "/html/paginas usuario/dashboard_usuario.html",
-  adminPacientes: "/html/paginas medico/pacientes_medico.html",
-  userPacientes: "/html/paginas usuario/pacientes_usuario.html",
-};
-
-const perguntasChecklist = [
-  "Deficiência intelectual",
-  "Face alongada/orelhas grandes",
-  "Macroorquidismo",
-  "Hipermobilidade articular",
-  "Dificuldades de aprendizagem",
-  "Déficit de atenção",
-  "Movimentos repetitivos",
-  "Atraso na fala",
-  "Hiperatividade",
-  "Evita contato visual",
-  "Evita contato físico",
-  "Agressividade",
-];
-
-function aplicarEstilosIntegracao() {
-  if (document.getElementById("estilos-integracao-api")) return;
-
-  const style = document.createElement("style");
-  style.id = "estilos-integracao-api";
-  style.textContent = `
-    html, body {
-      min-height: 100%;
-      overflow-x: hidden;
-    }
-
-    .corpo_ {
-      align-items: flex-start !important;
-    }
-
-    .paciente,
-    .pacientes,
-    .avaliacao,
-    .relatorios,
-    .usuarios,
-    .historico,
-    .areabase {
-      box-sizing: border-box;
-      overflow: visible !important;
-    }
-
-    .lista_pacientes,
-    .lista_relatorios,
-    .usuarios_,
-    .historico_avaliacao,
-    .avaliacao_paciente {
-      width: 100%;
-      box-sizing: border-box;
-      margin-top: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      max-height: none !important;
-      overflow: visible !important;
-    }
-
-    .user_ {
-      width: 100% !important;
-      min-height: 90px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-      padding: 8px 12px;
-      box-sizing: border-box;
-    }
-
-    .usuario_logado_nome {
-      color: #fff;
-      font-family: Arial, Helvetica, sans-serif;
-      font-size: 16px;
-      font-weight: 700;
-      max-width: 170px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      margin: 0;
-    }
-
-    button.botao_user,
-    .botao_api {
-      min-width: 105px;
-      min-height: 44px;
-      background: #25dbb6;
-      color: #fff;
-      text-align: center;
-      font-family: Arial, Helvetica, sans-serif;
-      font-size: 15px;
-      font-weight: 700;
-      border-radius: 18px;
-      border: none;
-      box-shadow: none;
-      outline: none;
-      cursor: pointer;
-      padding: 10px 16px;
-    }
-
-    button.botao_user:hover,
-    .botao_api:hover {
-      background: #087b64;
-    }
-
-    .botao_api_secundario {
-      background: rgba(255, 255, 255, 0.14);
-      border: 1px solid rgba(255, 255, 255, 0.45);
-    }
-
-    .card_api {
-      width: 100%;
-      max-width: none;
-      margin: 0;
-      background: rgba(9, 6, 73, 0.58);
-      border: 1px solid rgba(255, 255, 255, 0.48);
-      border-radius: 16px;
-      padding: 16px 20px;
-      color: #ffffff;
-      font-family: Arial, Helvetica, sans-serif;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.22);
-      box-sizing: border-box;
-    }
-
-    .card_api .card_header {
-      font-size: 18px;
-      color: #ffffff;
-      font-weight: 800;
-      margin-bottom: 10px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.20);
-      padding-bottom: 8px;
-    }
-
-    .card_api .card_body {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-      gap: 10px 22px;
-      align-items: start;
-    }
-
-    .card_api .dado_item {
-      font-size: 14px;
-      color: #ffffff;
-      line-height: 1.45;
-      word-break: break-word;
-    }
-
-    .card_api .dado_item.largo {
-      grid-column: 1 / -1;
-    }
-
-    .card_api strong,
-    .card_api .dado_item strong {
-      color: #25dbb6;
-    }
-
-    .mensagem_api,
-    .erro_api {
-      color: #ffffff;
-      text-align: center;
-      font-family: Arial, Helvetica, sans-serif;
-      padding: 30px;
-    }
-
-    .erro_api {
-      color: #ffb3b3;
-    }
-
-    .buscar_paciente input,
-    .buscar_usuario input,
-    .busca_paciente input,
-    .paciente_ input,
-    .data_inicio input,
-    .data_fim input,
-    select.select_api,
-    select#pacienteAvaliacao,
-    select#pacienteHistorico {
-      box-sizing: border-box;
-      border-radius: 18px !important;
-      background: rgba(9, 6, 73, 0.72) !important;
-      color: #ffffff !important;
-      padding: 13px 18px !important;
-      border: 1px solid rgba(255, 255, 255, 0.75) !important;
-      outline: none !important;
-      height: auto !important;
-    }
-
-    select.select_api,
-    select#pacienteAvaliacao,
-    select#pacienteHistorico {
-      width: 100% !important;
-      max-width: 520px !important;
-      margin: 8px 0 0 0 !important;
-    }
-
-    .form_avaliacao_api {
-      width: 100%;
-      color: #ffffff;
-      font-family: Arial, Helvetica, sans-serif;
-      box-sizing: border-box;
-    }
-
-    .grid_perguntas_api {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 14px;
-      margin: 18px 0;
-      width: 100%;
-      box-sizing: border-box;
-    }
-
-    .pergunta_api {
-      background: rgba(9, 6, 73, 0.58);
-      border: 1px solid rgba(255, 255, 255, 0.45);
-      border-radius: 14px;
-      padding: 14px;
-      min-height: 105px;
-      box-sizing: border-box;
-    }
-
-    .pergunta_api p {
-      margin: 0 0 12px 0;
-      font-weight: 800;
-      line-height: 1.35;
-      color: #fff;
-    }
-
-    .opcoes_api {
-      display: flex;
-      gap: 18px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .opcoes_api label {
-      cursor: pointer;
-    }
-
-    #resultadoAvaliacao {
-      margin-top: 15px;
-    }
-
-    .linha_acoes_api {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      align-items: center;
-      margin-top: 12px;
-    }
-
-    @media print {
-      .navegador,
-      .botao_imprimir,
-      .botao_api,
-      .botao_user,
-      .filtros,
-      .buscar_paciente,
-      .buscar_usuario,
-      .busca_paciente,
-      .top button {
-        display: none !important;
-      }
-
-      body,
-      .corpo,
-      .corpo_,
-      .relatorios,
-      .historico,
-      .avaliacao,
-      .paciente,
-      .pacientes,
-      .usuarios,
-      .areabase {
-        background: #ffffff !important;
-        color: #000000 !important;
-      }
-
-      .card_api {
-        color: #000000 !important;
-        background: #ffffff !important;
-        border: 1px solid #000000 !important;
-        box-shadow: none !important;
-      }
-
-      .card_api * {
-        color: #000000 !important;
-      }
-    }
-  `;
-  document.head.appendChild(style);
-}
+// =========================
+// FUNÇÕES BASE
+// =========================
 
 function token() {
   return localStorage.getItem("token");
@@ -336,63 +46,35 @@ function escaparHTML(valor) {
     .replaceAll("'", "&#039;");
 }
 
-function valor(obj, ...chaves) {
-  for (const chave of chaves) {
-    if (obj && obj[chave] !== undefined && obj[chave] !== null && obj[chave] !== "") {
-      return obj[chave];
-    }
+function formatarData(data) {
+  if (!data) return "Não informado";
+
+  const somenteData = String(data).split(" ")[0];
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(somenteData)) {
+    const [ano, mes, dia] = somenteData.split("-");
+    return `${dia}/${mes}/${ano}`;
   }
 
-  return "";
+  return escaparHTML(data);
 }
 
-function formatarData(valorData) {
-  if (!valorData) return "Não informado";
-
-  const somenteData = String(valorData).split("T")[0].split(" ")[0];
-  const partes = somenteData.split("-");
-
-  if (partes.length === 3) return `${partes[2]}/${partes[1]}/${partes[0]}`;
-
-  return String(valorData);
-}
-
-function formatarScore(valorScore) {
-  const numero = Number(valorScore);
-  return Number.isFinite(numero) ? numero.toFixed(2) : "-";
+function formatarScore(score) {
+  const numero = Number(score);
+  if (Number.isNaN(numero)) return "-";
+  return numero.toFixed(2);
 }
 
 async function apiFetch(caminho, opcoes = {}) {
-  async function executar(url) {
-    const resposta = await fetch(url, opcoes);
-    const texto = await resposta.text();
+  const resposta = await fetch(`${API_URL}${caminho}`, opcoes);
+  const texto = await resposta.text();
 
-    let dados = {};
+  let dados = {};
 
-    try {
-      dados = texto ? JSON.parse(texto) : {};
-    } catch (e) {
-      dados = { mensagem: texto };
-    }
-
-    return { resposta, dados };
-  }
-
-  let tentativa = await executar(`${API_URL}${caminho}`);
-
-  if (tentativa.resposta.status === 404 && !caminho.startsWith("/api/")) {
-    tentativa = await executar(`${API_URL}/api${caminho}`);
-  }
-
-  const { resposta, dados } = tentativa;
-
-  if (resposta.status === 401) {
-    const pagina = window.location.pathname.split("/").pop();
-
-    if (pagina !== "login.html" && pagina !== "index.html") {
-      localStorage.removeItem("token");
-      localStorage.removeItem("usuario");
-    }
+  try {
+    dados = texto ? JSON.parse(texto) : {};
+  } catch (e) {
+    dados = { mensagem: texto };
   }
 
   if (!resposta.ok) {
@@ -402,36 +84,22 @@ async function apiFetch(caminho, opcoes = {}) {
   return dados;
 }
 
+function caminhoLogin() {
+  return "/html/login.html";
+}
+
 function sair() {
   localStorage.removeItem("token");
   localStorage.removeItem("usuario");
-  window.location.href = ROTAS.login;
+  window.location.href = caminhoLogin();
 }
 
 function protegerPagina() {
-  const caminho = decodeURI(window.location.pathname);
-  const pagina = caminho.split("/").pop();
+  const pagina = window.location.pathname.split("/").pop();
   const paginasLivres = ["index.html", "login.html", ""];
 
-  if (paginasLivres.includes(pagina)) return;
-
-  const usuario = usuarioLogado();
-
-  if (!token() || !usuario) {
-    window.location.href = ROTAS.login;
-    return;
-  }
-
-  const ehPaginaMedico = caminho.includes("/paginas medico/");
-  const ehPaginaUsuario = caminho.includes("/paginas usuario/");
-
-  if (ehPaginaMedico && usuario.papel !== "admin") {
-    window.location.href = ROTAS.userDashboard;
-    return;
-  }
-
-  if (ehPaginaUsuario && usuario.papel === "admin") {
-    window.location.href = ROTAS.adminDashboard;
+  if (!paginasLivres.includes(pagina) && !token()) {
+    window.location.href = caminhoLogin();
   }
 }
 
@@ -440,30 +108,63 @@ function atualizarBoasVindas() {
   const titulo = document.querySelector(".container_ .titulo");
 
   if (titulo && usuario) {
-    titulo.textContent = usuario.papel === "admin" ? "Bem-vindo, Admin" : "Bem-vindo, User";
+    const papel = usuario.papel === "admin" ? "Admin" : "Usuário";
+    titulo.textContent = `Bem-vindo, ${papel}`;
   }
 
   const userArea = document.querySelector(".user_");
 
   if (userArea && usuario) {
-    const nome = usuario.nome || usuario.username || "Usuário";
-
     userArea.innerHTML = `
-      <p class="usuario_logado_nome" title="${escaparHTML(nome)}">${escaparHTML(nome)}</p>
+      <p>${escaparHTML(usuario.username || "Usuário")}</p>
       <button class="botao_user" type="button" onclick="sair()">Sair</button>
     `;
   }
 }
 
-function corrigirLinksUsuarioPorJS() {
-  const caminho = decodeURI(window.location.pathname);
+function paginaAtual() {
+  return window.location.pathname.split("/").pop() || "index.html";
+}
 
-  if (!caminho.includes("/paginas usuario/")) return;
+function usuarioEhAdmin() {
+  return usuarioLogado()?.papel === "admin";
+}
 
-  document.querySelectorAll('a[href$="dashboard_medico.html"]').forEach((a) => (a.href = "./dashboard_usuario.html"));
-  document.querySelectorAll('a[href$="pacientes_medico.html"]').forEach((a) => (a.href = "./pacientes_usuario.html"));
-  document.querySelectorAll('a[href$="avaliacao_medico.html"]').forEach((a) => (a.href = "./avaliacao_usuario.html"));
-  document.querySelectorAll('a[href$="relatorios_medico.html"]').forEach((a) => (a.href = "./relatorio_usuario.html"));
+// =========================
+// MÁSCARAS
+// =========================
+
+function aplicarMascaraCPF(valor) {
+  return valor
+    .replace(/\D/g, "")
+    .slice(0, 11)
+    .replace(/(\d{3})(\d)/, "$1.$2")
+    .replace(/(\d{3})(\d)/, "$1.$2")
+    .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+}
+
+function aplicarMascaraCEP(valor) {
+  return valor
+    .replace(/\D/g, "")
+    .slice(0, 8)
+    .replace(/(\d{5})(\d)/, "$1-$2");
+}
+
+function ativarMascaras() {
+  const cpf = document.getElementById("cpf");
+  const cep = document.getElementById("cep");
+
+  if (cpf) {
+    cpf.addEventListener("input", () => {
+      cpf.value = aplicarMascaraCPF(cpf.value);
+    });
+  }
+
+  if (cep) {
+    cep.addEventListener("input", () => {
+      cep.value = aplicarMascaraCEP(cep.value);
+    });
+  }
 }
 
 // =========================
@@ -484,9 +185,7 @@ async function fazerLogin(event) {
   try {
     const dados = await apiFetch("/auth/login", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, senha }),
     });
 
@@ -495,7 +194,11 @@ async function fazerLogin(event) {
     localStorage.setItem("token", dados.token);
     localStorage.setItem("usuario", JSON.stringify(usuario));
 
-    window.location.href = usuario?.papel === "admin" ? ROTAS.adminDashboard : ROTAS.userDashboard;
+    if (usuario?.papel === "admin") {
+      window.location.href = "/html/paginas medico/dashboard_medico.html";
+    } else {
+      window.location.href = "/html/paginas usuario/dashboard_usuario.html";
+    }
   } catch (erro) {
     alert(`Erro ao fazer login: ${erro.message}`);
   }
@@ -510,12 +213,13 @@ async function fazerCadastro(event) {
 
   const nome = document.getElementById("nome")?.value.trim();
   const email = document.getElementById("email")?.value.trim();
-  const cpf = document.getElementById("cpf")?.value.trim();
   const senha = document.getElementById("senha")?.value;
   const confirmaSenha = document.getElementById("confirmsenha")?.value;
 
-  if (!nome || !email || !senha) {
-    alert("Preencha nome, e-mail e senha.");
+  const username = email || nome;
+
+  if (!username || !senha) {
+    alert("Preencha e-mail/usuário e senha.");
     return;
   }
 
@@ -529,10 +233,7 @@ async function fazerCadastro(event) {
       method: "POST",
       headers: authHeaders(),
       body: JSON.stringify({
-        nome,
-        email,
-        cpf,
-        username: email,
+        username,
         senha,
         papel: "user",
       }),
@@ -546,17 +247,44 @@ async function fazerCadastro(event) {
 }
 
 function cardUsuario(usuario) {
-  const nome = valor(usuario, "nome", "username") || "Usuário sem nome";
-
   return `
     <div class="card_api">
-      <div class="card_header">${escaparHTML(nome)}</div>
+      <div class="card_header">${escaparHTML(usuario.username)}</div>
+
       <div class="card_body">
-        <div class="dado_item"><strong>ID:</strong> ${escaparHTML(valor(usuario, "id") || "-")}</div>
-        <div class="dado_item"><strong>Usuário:</strong> ${escaparHTML(valor(usuario, "username") || "-")}</div>
-        <div class="dado_item"><strong>E-mail:</strong> ${escaparHTML(valor(usuario, "email") || "Não informado")}</div>
-        <div class="dado_item"><strong>CPF:</strong> ${escaparHTML(valor(usuario, "cpf") || "Não informado")}</div>
-        <div class="dado_item"><strong>Perfil:</strong> ${escaparHTML(valor(usuario, "papel") || "-")}</div>
+        <div class="dado_item">
+          <strong>ID:</strong> ${escaparHTML(usuario.id)}
+        </div>
+
+        <div class="dado_item">
+          <strong>Perfil:</strong> ${escaparHTML(usuario.papel)}
+        </div>
+      </div>
+
+      <div class="acoes_card">
+        <button
+          class="botao_card"
+          type="button"
+          onclick="editarUsuario(${usuario.id}, '${escaparHTML(usuario.username)}', '${escaparHTML(usuario.papel)}')"
+        >
+          Editar
+        </button>
+
+        <button
+          class="botao_card"
+          type="button"
+          onclick="alterarPerfilUsuario(${usuario.id}, '${escaparHTML(usuario.papel)}')"
+        >
+          Alterar perfil
+        </button>
+
+        <button
+          class="botao_card botao_perigo"
+          type="button"
+          onclick="removerUsuario(${usuario.id}, '${escaparHTML(usuario.username)}')"
+        >
+          Remover
+        </button>
       </div>
     </div>
   `;
@@ -564,7 +292,6 @@ function cardUsuario(usuario) {
 
 async function carregarUsuarios() {
   const container = document.querySelector(".usuarios_");
-
   if (!container) return;
 
   try {
@@ -572,44 +299,110 @@ async function carregarUsuarios() {
       headers: authHeaders(),
     });
 
-    renderizarUsuarios(usuarios);
-
-    const busca = document.querySelector(".buscar_usuario input");
-
-    if (busca) {
-      busca.addEventListener("input", () => {
-        const termo = busca.value.trim().toLowerCase();
-
-        const filtrados = usuarios.filter((usuario) =>
-          [usuario.nome, usuario.email, usuario.username, usuario.cpf, usuario.papel]
-            .filter(Boolean)
-            .some((campo) => String(campo).toLowerCase().includes(termo))
-        );
-
-        renderizarUsuarios(filtrados);
-      });
-    }
+    container.innerHTML =
+      usuarios.map(cardUsuario).join("") ||
+      "<p>Nenhum usuário cadastrado.</p>";
   } catch (erro) {
-    container.innerHTML = `<p class="erro_api">Erro ao carregar usuários: ${escaparHTML(erro.message)}</p>`;
+    container.innerHTML = `<p>Erro ao carregar usuários: ${escaparHTML(
+      erro.message,
+    )}</p>`;
   }
 }
 
-function renderizarUsuarios(usuarios) {
-  const container = document.querySelector(".usuarios_");
+async function editarUsuario(id, usernameAtual, papelAtual) {
+  const novoUsername = prompt("Novo nome/e-mail do usuário:", usernameAtual);
 
-  if (!container) return;
+  if (!novoUsername || !novoUsername.trim()) {
+    alert("Nome de usuário inválido.");
+    return;
+  }
 
-  container.innerHTML =
-    usuarios.map(cardUsuario).join("") ||
-    "<p class='mensagem_api'>Nenhum usuário cadastrado.</p>";
+  const novoPerfil = prompt(
+    "Perfil do usuário: admin ou user",
+    papelAtual
+  );
+
+  if (!["admin", "user"].includes(novoPerfil)) {
+    alert("Perfil inválido. Use admin ou user.");
+    return;
+  }
+
+  try {
+    await apiFetch(`/usuarios/${id}`, {
+      method: "PUT",
+      headers: authHeaders(),
+      body: JSON.stringify({
+        username: novoUsername.trim(),
+        papel: novoPerfil,
+      }),
+    });
+
+    alert("Usuário editado com sucesso!");
+    carregarUsuarios();
+  } catch (erro) {
+    alert(`Erro ao editar usuário: ${erro.message}`);
+  }
 }
+
+async function alterarPerfilUsuario(id, perfilAtual) {
+  const novoPerfil = perfilAtual === "admin" ? "user" : "admin";
+
+  const confirmar = confirm(
+    `Deseja alterar o perfil deste usuário de "${perfilAtual}" para "${novoPerfil}"?`
+  );
+
+  if (!confirmar) return;
+
+  try {
+    await apiFetch(`/usuarios/${id}/perfil`, {
+      method: "PATCH",
+      headers: authHeaders(),
+      body: JSON.stringify({
+        papel: novoPerfil,
+      }),
+    });
+
+    alert("Perfil alterado com sucesso!");
+    carregarUsuarios();
+  } catch (erro) {
+    alert(`Erro ao alterar perfil: ${erro.message}`);
+  }
+}
+
+async function removerUsuario(id, username) {
+  const usuarioAtual = usuarioLogado();
+
+  if (usuarioAtual && Number(usuarioAtual.id) === Number(id)) {
+    alert("Você não pode remover o próprio usuário logado.");
+    return;
+  }
+
+  const confirmar = confirm(
+    `Tem certeza que deseja remover o usuário "${username}"?`
+  );
+
+  if (!confirmar) return;
+
+  try {
+    await apiFetch(`/usuarios/${id}`, {
+      method: "DELETE",
+      headers: authHeaders(),
+    });
+
+    alert("Usuário removido com sucesso!");
+    carregarUsuarios();
+  } catch (erro) {
+    alert(`Erro ao remover usuário: ${erro.message}`);
+  }
+}
+
 
 // =========================
 // PACIENTES
 // =========================
 
-function normalizarSexo(valorSexo) {
-  const sexo = String(valorSexo || "").trim().toUpperCase();
+function normalizarSexo(valor) {
+  const sexo = String(valor || "").trim().toUpperCase();
 
   if (sexo === "M" || sexo.startsWith("MASC")) return "M";
   if (sexo === "F" || sexo.startsWith("FEM")) return "F";
@@ -621,14 +414,14 @@ async function cadastrarPaciente(event) {
   if (event) event.preventDefault();
 
   const nome = document.getElementById("nome")?.value.trim();
-  const cpf = document.getElementById("cpf")?.value.trim() || null;
   const data_nascimento = document.getElementById("data")?.value;
   const sexo = normalizarSexo(document.getElementById("sexo")?.value);
-  const endereco = document.getElementById("endereco")?.value.trim() || null;
+
   const cep = document.getElementById("cep")?.value.trim() || null;
   const estado = document.getElementById("estado")?.value.trim() || null;
   const cidade = document.getElementById("cidade")?.value.trim() || null;
-  const responsavel = document.getElementById("responsavel")?.value.trim() || null;
+  const responsavel =
+    document.getElementById("responsavel")?.value.trim() || null;
 
   if (!nome || !data_nascimento || !sexo) {
     alert("Preencha nome, data de nascimento e sexo.");
@@ -636,7 +429,7 @@ async function cadastrarPaciente(event) {
   }
 
   if (!["M", "F"].includes(sexo)) {
-    alert("Sexo deve ser Masculino ou Feminino.");
+    alert("Sexo deve ser M ou F.");
     return;
   }
 
@@ -646,10 +439,8 @@ async function cadastrarPaciente(event) {
       headers: authHeaders(),
       body: JSON.stringify({
         nome,
-        cpf,
         data_nascimento,
         sexo,
-        endereco,
         cep,
         estado,
         cidade,
@@ -658,33 +449,88 @@ async function cadastrarPaciente(event) {
     });
 
     alert("Paciente cadastrado com sucesso!");
-
-    const usuario = usuarioLogado();
-
-    window.location.href = usuario?.papel === "admin" ? ROTAS.adminPacientes : ROTAS.userPacientes;
+    window.location.href = "/html/paginas usuario/pacientes_usuario.html";
   } catch (erro) {
     alert(`Erro ao cadastrar paciente: ${erro.message}`);
   }
 }
 
-function cardPaciente(paciente) {
-  const nome = valor(paciente, "nome", "paciente_nome") || "Paciente sem nome";
-  const id = valor(paciente, "id", "id_paciente", "paciente_id");
+function botoesPaciente(paciente) {
+  const id = Number(paciente.id);
+
+  const botaoAvaliar = `
+    <button class="botao_card" type="button" onclick="irParaAvaliacao(${id})">
+      Avaliar
+    </button>
+  `;
+
+  const botaoRelatorio = `
+    <button class="botao_card" type="button" onclick="irParaRelatorioPaciente(${id})">
+      Relatório
+    </button>
+  `;
+
+  const botaoHistorico = usuarioEhAdmin()
+    ? `
+      <button class="botao_card" type="button" onclick="irParaHistoricoPaciente(${id})">
+        Histórico
+      </button>
+    `
+    : "";
 
   return `
+    <div class="acoes_card">
+      ${botaoAvaliar}
+      ${botaoRelatorio}
+      ${botaoHistorico}
+    </div>
+  `;
+}
+
+function cardPaciente(paciente) {
+  return `
     <div class="card_api">
-      <div class="card_header">${escaparHTML(nome)}</div>
-      <div class="card_body">
-        <div class="dado_item"><strong>ID:</strong> ${escaparHTML(id || "-")}</div>
-        <div class="dado_item"><strong>CPF:</strong> ${escaparHTML(valor(paciente, "cpf", "paciente_cpf") || "Não informado")}</div>
-        <div class="dado_item"><strong>Sexo:</strong> ${escaparHTML(valor(paciente, "sexo") || "Não informado")}</div>
-        <div class="dado_item"><strong>Nascimento:</strong> ${escaparHTML(formatarData(valor(paciente, "data_nascimento")))}</div>
-        <div class="dado_item"><strong>CEP:</strong> ${escaparHTML(valor(paciente, "cep") || "Não informado")}</div>
-        <div class="dado_item"><strong>Estado:</strong> ${escaparHTML(valor(paciente, "estado") || "Não informado")}</div>
-        <div class="dado_item"><strong>Cidade:</strong> ${escaparHTML(valor(paciente, "cidade") || "Não informado")}</div>
-        <div class="dado_item largo"><strong>Endereço:</strong> ${escaparHTML(valor(paciente, "endereco") || "Não informado")}</div>
-        <div class="dado_item largo"><strong>Pais/Responsável:</strong> ${escaparHTML(valor(paciente, "responsavel") || "Não informado")}</div>
+      <div class="card_header">
+        ${escaparHTML(paciente.nome)}
       </div>
+
+      <div class="card_body">
+        <div class="dado_item">
+          <strong>ID:</strong> ${escaparHTML(paciente.id)}
+        </div>
+
+        <div class="dado_item">
+          <strong>Sexo:</strong> ${escaparHTML(paciente.sexo)}
+        </div>
+
+        <div class="dado_item">
+          <strong>Nascimento:</strong> ${formatarData(paciente.data_nascimento)}
+        </div>
+
+        <div class="dado_item">
+          <strong>CEP:</strong> ${escaparHTML(paciente.cep || "Não informado")}
+        </div>
+
+        <div class="dado_item">
+          <strong>Estado:</strong> ${escaparHTML(
+            paciente.estado || "Não informado",
+          )}
+        </div>
+
+        <div class="dado_item">
+          <strong>Cidade:</strong> ${escaparHTML(
+            paciente.cidade || "Não informado",
+          )}
+        </div>
+
+        <div class="dado_item" style="min-width: 100%;">
+          <strong>Pais/Responsável:</strong> ${escaparHTML(
+            paciente.responsavel || "Não informado",
+          )}
+        </div>
+      </div>
+
+      ${botoesPaciente(paciente)}
     </div>
   `;
 }
@@ -700,64 +546,87 @@ async function carregarPacientes() {
       headers: authHeaders(),
     });
 
-    if (lista) renderizarPacientes(pacientes);
+    if (lista) {
+      lista.innerHTML =
+        pacientes.map(cardPaciente).join("") ||
+        "<p>Nenhum paciente cadastrado.</p>";
+
+      ativarBuscaLocal(".buscar_paciente input", ".lista_pacientes .card_api");
+    }
 
     if (contador) {
       contador.innerHTML = `
-        <h2 style="color:#fff;font-family:Arial,sans-serif;font-size:48px;font-weight:700;margin:15px 0 0 40px;text-shadow:0 2px 4px rgba(0,0,0,.3);">
-          ${pacientes.length}
-        </h2>
+        <h2>${pacientes.length}</h2>
       `;
-    }
-
-    const busca = document.querySelector(".buscar_paciente input");
-
-    if (busca && lista) {
-      busca.addEventListener("input", () => {
-        const termo = busca.value.trim().toLowerCase();
-
-        const filtrados = pacientes.filter((paciente) =>
-          [paciente.id, paciente.nome, paciente.cpf, paciente.cidade, paciente.estado, paciente.responsavel]
-            .filter(Boolean)
-            .some((campo) => String(campo).toLowerCase().includes(termo))
-        );
-
-        renderizarPacientes(filtrados);
-      });
     }
 
     return pacientes;
   } catch (erro) {
     if (lista) {
-      lista.innerHTML = `<p class="erro_api">Erro ao carregar pacientes: ${escaparHTML(erro.message)}</p>`;
+      lista.innerHTML = `<p>Erro ao carregar pacientes: ${escaparHTML(
+        erro.message,
+      )}</p>`;
     }
 
     return [];
   }
 }
 
-function renderizarPacientes(pacientes) {
-  const lista = document.querySelector(".lista_pacientes");
+function irParaAvaliacao(pacienteId) {
+  localStorage.setItem("pacienteSelecionado", String(pacienteId));
 
-  if (!lista) return;
-
-  lista.innerHTML =
-    pacientes.map(cardPaciente).join("") ||
-    "<p class='mensagem_api'>Nenhum paciente cadastrado.</p>";
+  if (usuarioEhAdmin()) {
+    window.location.href = "/html/paginas medico/avaliacao_medico.html";
+  } else {
+    window.location.href = "/html/paginas usuario/avaliacao_usuario.html";
+  }
 }
+
+function irParaHistoricoPaciente(pacienteId) {
+  localStorage.setItem("pacienteSelecionado", String(pacienteId));
+  window.location.href = "/html/paginas medico/historico_medico.html";
+}
+
+function irParaRelatorioPaciente(pacienteId) {
+  localStorage.setItem("pacienteSelecionado", String(pacienteId));
+
+  if (usuarioEhAdmin()) {
+    window.location.href = "/html/paginas medico/relatorios_medico.html";
+  } else {
+    window.location.href = "/html/paginas usuario/relatorio_usuario.html";
+  }
+}
+
+// =========================
+// AVALIAÇÕES
+// =========================
+
+const perguntasChecklist = [
+  "Deficiência intelectual",
+  "Face alongada/orelhas",
+  "Macroorquidismo",
+  "Hipermobilidade articular",
+  "Dificuldades de aprendizagem",
+  "Déficit de atenção",
+  "Movimentos repetitivos",
+  "Atraso na fala",
+  "Hiperatividade",
+  "Evita contato visual",
+  "Evita contato físico",
+  "Agressividade",
+];
 
 function opcoesPacientes(pacientes) {
   return pacientes
-    .map((paciente) => {
-      const nome = valor(paciente, "nome") || "Paciente sem nome";
-      return `<option value="${paciente.id}">${escaparHTML(nome)} - ID ${paciente.id}</option>`;
-    })
+    .map(
+      (paciente) => `
+        <option value="${paciente.id}">
+          ${escaparHTML(paciente.nome)} - ID ${paciente.id}
+        </option>
+      `,
+    )
     .join("");
 }
-
-// =========================
-// AVALIAÇÃO
-// =========================
 
 async function prepararAvaliacao() {
   const areaAvaliacao = document.querySelector(".avaliacao_paciente");
@@ -771,71 +640,245 @@ async function prepararAvaliacao() {
     });
 
     if (!pacientes.length) {
-      areaAvaliacao.innerHTML = "<p class='mensagem_api'>Cadastre um paciente antes de criar uma avaliação.</p>";
+      areaAvaliacao.innerHTML =
+        "<p>Cadastre um paciente antes de criar uma avaliação.</p>";
       return;
     }
 
+    const pacienteSelecionado = localStorage.getItem("pacienteSelecionado");
+
+    const pacientePreSelecionado = pacientes.find(
+      (paciente) => String(paciente.id) === String(pacienteSelecionado),
+    );
+
     areaPaciente.innerHTML = `
       <p>Paciente</p>
-      <select id="pacienteAvaliacao" class="select_api">
-        ${opcoesPacientes(pacientes)}
-      </select>
+
+      <input
+        id="buscaPacienteAvaliacao"
+        type="text"
+        placeholder="Digite o nome do paciente"
+        list="listaPacientesAvaliacao"
+        autocomplete="off"
+        value="${
+          pacientePreSelecionado
+            ? escaparHTML(`${pacientePreSelecionado.nome} - ID ${pacientePreSelecionado.id}`)
+            : ""
+        }"
+      />
+
+      <datalist id="listaPacientesAvaliacao">
+        ${pacientes
+          .map(
+            (paciente) => `
+              <option value="${escaparHTML(`${paciente.nome} - ID ${paciente.id}`)}"></option>
+            `,
+          )
+          .join("")}
+      </datalist>
+
+      <div id="resumoPacienteSelecionado" class="resumo_paciente_box">
+        ${
+          pacientePreSelecionado
+            ? montarResumoPacienteAvaliacao(pacientePreSelecionado)
+            : "<p>Digite e selecione um paciente para visualizar o resumo.</p>"
+        }
+      </div>
     `;
 
+    window.__pacientesAvaliacao = pacientes;
+
+    const inputBusca = document.getElementById("buscaPacienteAvaliacao");
+
+    inputBusca.addEventListener("input", () => {
+      atualizarResumoPacienteAvaliacao();
+    });
+
     areaAvaliacao.innerHTML = `
-      <form id="formAvaliacao" class="form_avaliacao_api">
-        <div class="grid_perguntas_api">
-          ${perguntasChecklist
-            .map(
-              (pergunta, index) => `
-                <div class="pergunta_api">
-                  <p>${index + 1}. ${escaparHTML(pergunta)}</p>
-                  <div class="opcoes_api">
-                    <label>
-                      <input type="radio" name="resposta_${index}" value="1" required>
-                      Sim
-                    </label>
-                    <label>
-                      <input type="radio" name="resposta_${index}" value="0" required>
-                      Não
-                    </label>
-                  </div>
-                </div>
-              `
-            )
-            .join("")}
+      <div class="orientacoes_avaliacao">
+        <div class="orientacao_card">
+          <h4>Como preencher</h4>
+          <p>
+            Selecione o paciente correto, marque apenas os sintomas observados
+            durante a triagem e clique em salvar avaliação.
+          </p>
         </div>
 
-        <div class="linha_acoes_api">
-          <button class="botao_api" type="submit">Salvar avaliação</button>
+        <div class="orientacao_card">
+          <h4>Após salvar</h4>
+          <p>
+          O score será calculado automaticamente. O resultado ficará disponível
+          no histórico clínico e nos relatórios para consulta e impressão.
+          </p>
+        </div>
+      </div>
+
+      <form id="formAvaliacao">
+        ${perguntasChecklist
+          .map(
+            (pergunta, index) => `
+              <label>
+                <input type="checkbox" name="resposta" value="${index}">
+                ${index + 1}. ${escaparHTML(pergunta)}
+              </label>
+            `,
+          )
+          .join("")}
+
+        <div class="botoes_avaliacao">
+          <button type="submit">Salvar avaliação</button>
+
+          <button
+            class="botao_limpar"
+            type="button"
+            onclick="limparChecklistAvaliacao()"
+          >
+            Limpar checklist
+          </button>
         </div>
       </form>
+
+      <div class="aviso_avaliacao">
+        <strong>Atenção:</strong> confira o paciente selecionado antes de salvar.
+        Essa avaliação será vinculada ao histórico do paciente.
+      </div>
 
       <div id="resultadoAvaliacao"></div>
     `;
 
-    document.getElementById("formAvaliacao").addEventListener("submit", salvarAvaliacao);
+    document
+      .getElementById("formAvaliacao")
+      .addEventListener("submit", salvarAvaliacao);
   } catch (erro) {
-    areaAvaliacao.innerHTML = `<p class="erro_api">Erro ao preparar avaliação: ${escaparHTML(erro.message)}</p>`;
+    areaAvaliacao.innerHTML = `<p>Erro ao preparar avaliação: ${escaparHTML(
+      erro.message,
+    )}</p>`;
+  }
+}
+
+function montarResumoPacienteAvaliacao(paciente) {
+  return `
+    <h4>Resumo do paciente</h4>
+
+    <div class="resumo_paciente_grid">
+      <p>
+        <strong>Nome:</strong>
+        ${escaparHTML(paciente.nome)}
+      </p>
+
+      <p>
+        <strong>ID:</strong>
+        ${escaparHTML(paciente.id)}
+      </p>
+
+      <p>
+        <strong>Sexo:</strong>
+        ${escaparHTML(paciente.sexo || "Não informado")}
+      </p>
+
+      <p>
+        <strong>Nascimento:</strong>
+        ${formatarData(paciente.data_nascimento)}
+      </p>
+
+      <p>
+        <strong>Cidade:</strong>
+        ${escaparHTML(paciente.cidade || "Não informado")}
+      </p>
+
+      <p>
+        <strong>Responsável:</strong>
+        ${escaparHTML(paciente.responsavel || "Não informado")}
+      </p>
+    </div>
+  `;
+}
+
+function atualizarResumoPacienteAvaliacao() {
+  const input = document.getElementById("buscaPacienteAvaliacao");
+  const resumo = document.getElementById("resumoPacienteSelecionado");
+
+  if (!input || !resumo) return;
+
+  const textoPaciente = input.value.trim();
+  const pacientes = window.__pacientesAvaliacao || [];
+
+  const pacienteEncontrado = pacientes.find((paciente) => {
+    const textoCompleto = `${paciente.nome} - ID ${paciente.id}`;
+    return textoCompleto === textoPaciente;
+  });
+
+  if (!pacienteEncontrado) {
+    resumo.innerHTML =
+      "<p>Digite e selecione um paciente para visualizar o resumo.</p>";
+    return;
+  }
+
+  resumo.innerHTML = montarResumoPacienteAvaliacao(pacienteEncontrado);
+}
+
+function atualizarResumoPacienteHistorico() {
+  const input = document.getElementById("buscaPacienteHistorico");
+  const resumo = document.getElementById("resumoPacienteHistorico");
+
+  if (!input || !resumo) return;
+
+  const textoPaciente = input.value.trim();
+  const pacientes = window.__pacientesHistorico || [];
+
+  const pacienteEncontrado = pacientes.find((paciente) => {
+    const textoCompleto = `${paciente.nome} - ID ${paciente.id}`;
+    return textoCompleto === textoPaciente;
+  });
+
+  if (!pacienteEncontrado) {
+    resumo.innerHTML =
+      "<p>Digite e selecione um paciente para visualizar o histórico.</p>";
+    return;
+  }
+
+  resumo.innerHTML = montarResumoPacienteAvaliacao(pacienteEncontrado);
+}
+
+function limparChecklistAvaliacao() {
+  document.querySelectorAll('input[name="resposta"]').forEach((input) => {
+    input.checked = false;
+  });
+
+  const resultado = document.getElementById("resultadoAvaliacao");
+
+  if (resultado) {
+    resultado.innerHTML = "";
   }
 }
 
 async function salvarAvaliacao(event) {
   event.preventDefault();
 
-  const paciente_id = Number(document.getElementById("pacienteAvaliacao")?.value);
-  const respostas = [];
+  const textoPaciente = document
+    .getElementById("buscaPacienteAvaliacao")
+    ?.value.trim();
 
-  for (let i = 0; i < perguntasChecklist.length; i++) {
-    const marcada = document.querySelector(`input[name="resposta_${i}"]:checked`);
+  const pacientesAvaliacao = window.__pacientesAvaliacao || [];
 
-    if (!marcada) {
-      alert("Responda todas as 12 perguntas antes de salvar.");
-      return;
-    }
+  const pacienteEncontrado = pacientesAvaliacao.find((paciente) => {
+    const textoCompleto = `${paciente.nome} - ID ${paciente.id}`;
+    return textoCompleto === textoPaciente;
+  });
 
-    respostas.push(Number(marcada.value));
+  if (!pacienteEncontrado) {
+    alert("Selecione um paciente válido da lista.");
+    return;
   }
+
+  const paciente_id = Number(pacienteEncontrado.id);
+  const respostas = Array(12).fill(0);
+
+  document
+    .querySelectorAll('input[name="resposta"]:checked')
+    .forEach((input) => {
+      respostas[Number(input.value)] = 1;
+    });
 
   try {
     const dados = await apiFetch("/avaliacoes", {
@@ -847,21 +890,46 @@ async function salvarAvaliacao(event) {
       }),
     });
 
+    localStorage.setItem("ultimaAvaliacaoId", String(dados.id));
+
     document.getElementById("resultadoAvaliacao").innerHTML = `
-      <div class="card_api">
-        <div class="card_header">Resultado da avaliação</div>
-        <div class="card_body">
-          <div class="dado_item"><strong>Paciente:</strong> ${escaparHTML(dados.paciente_nome || paciente_id)}</div>
-          <div class="dado_item"><strong>Score:</strong> ${formatarScore(dados.score)}</div>
-          <div class="dado_item"><strong>Limite:</strong> ${formatarScore(dados.limite)}</div>
-          <div class="dado_item"><strong>Suspeita:</strong> ${dados.suspeito ? "Sim" : "Não"}</div>
-          <div class="dado_item largo"><strong>Recomendação:</strong> ${escaparHTML(dados.recomendacao)}</div>
+      <div class="resultado_box">
+        <h3>Resultado da Avaliação</h3>
+
+        <p>
+          <strong>Score final:</strong> ${formatarScore(dados.score)}
+        </p>
+
+        <p>
+          <strong>Limite:</strong> ${formatarScore(dados.limite)}
+        </p>
+
+        <p>
+          <strong>Classificação:</strong>
+          ${
+            dados.suspeito
+              ? "Acima do ponto de corte"
+              : "Abaixo do ponto de corte"
+          }
+        </p>
+
+        <p>
+          <strong>Recomendação:</strong> ${escaparHTML(dados.recomendacao)}
+        </p>
+
+        <div class="acoes_card">
+          <button class="botao_card" type="button" onclick="window.print()">
+            Imprimir
+          </button>
+
+          <button class="botao_card" type="button" onclick="irParaRelatorioPaciente(${paciente_id})">
+            Ver relatório
+          </button>
         </div>
       </div>
     `;
 
     alert("Avaliação salva com sucesso!");
-    document.getElementById("formAvaliacao").reset();
   } catch (erro) {
     alert(`Erro ao salvar avaliação: ${erro.message}`);
   }
@@ -871,55 +939,62 @@ async function salvarAvaliacao(event) {
 // HISTÓRICO E RELATÓRIOS
 // =========================
 
-function quantidadeSintomasMarcados(avaliacao) {
+function contarSintomasMarcados(respostasTexto) {
   try {
-    const respostas = JSON.parse(avaliacao.respostas || "[]");
-    return respostas.filter((resposta) => Number(resposta) === 1).length;
+    const respostas = JSON.parse(respostasTexto || "[]");
+    return respostas.filter(Boolean).length;
   } catch (e) {
     return "-";
   }
 }
 
 function cardAvaliacao(avaliacao) {
-  const nome = valor(avaliacao, "paciente_nome", "nome") || "Paciente sem nome";
-  const pacienteId = valor(avaliacao, "paciente_id", "id_paciente") || "-";
-  const avaliador = valor(avaliacao, "usuario_nome_completo", "usuario_nome", "username") || "-";
+  const sintomasMarcados = contarSintomasMarcados(avaliacao.respostas);
 
   return `
     <div class="card_api">
-      <div class="card_header">${escaparHTML(nome)}</div>
-      <div class="card_body">
-        <div class="dado_item"><strong>ID avaliação:</strong> ${escaparHTML(valor(avaliacao, "id") || "-")}</div>
-        <div class="dado_item"><strong>Paciente ID:</strong> ${escaparHTML(pacienteId)}</div>
-        <div class="dado_item"><strong>CPF:</strong> ${escaparHTML(valor(avaliacao, "paciente_cpf", "cpf") || "Não informado")}</div>
-        <div class="dado_item"><strong>Sexo:</strong> ${escaparHTML(valor(avaliacao, "sexo") || "-")}</div>
-        <div class="dado_item"><strong>Data:</strong> ${escaparHTML(formatarData(valor(avaliacao, "criado_em", "data")))}</div>
-        <div class="dado_item"><strong>Avaliador:</strong> ${escaparHTML(avaliador)}</div>
-        <div class="dado_item"><strong>Score:</strong> ${formatarScore(valor(avaliacao, "score"))}</div>
-        <div class="dado_item"><strong>Sintomas marcados:</strong> ${quantidadeSintomasMarcados(avaliacao)}</div>
-        <div class="dado_item largo"><strong>Recomendação:</strong> ${escaparHTML(valor(avaliacao, "recomendacao") || "Não informado")}</div>
+      <div class="card_header">
+        ${escaparHTML(
+          avaliacao.paciente_nome ||
+            avaliacao.nome ||
+            `Paciente ${avaliacao.paciente_id}`,
+        )}
       </div>
-    </div>
-  `;
-}
 
-function cardPacienteSemRelatorio(paciente) {
-  return `
-    <div class="card_api">
-      <div class="card_header">${escaparHTML(paciente.nome || "Paciente sem nome")}</div>
       <div class="card_body">
-        <div class="dado_item"><strong>ID:</strong> ${escaparHTML(paciente.id || "-")}</div>
-        <div class="dado_item"><strong>CPF:</strong> ${escaparHTML(paciente.cpf || "Não informado")}</div>
-        <div class="dado_item"><strong>Sexo:</strong> ${escaparHTML(paciente.sexo || "Não informado")}</div>
-        <div class="dado_item"><strong>Nascimento:</strong> ${escaparHTML(formatarData(paciente.data_nascimento))}</div>
-        <div class="dado_item"><strong>Cidade:</strong> ${escaparHTML(paciente.cidade || "Não informado")}</div>
-        <div class="dado_item"><strong>Estado:</strong> ${escaparHTML(paciente.estado || "Não informado")}</div>
-        <div class="dado_item largo">
-          <strong>Status:</strong> Paciente encontrado, mas ainda não possui avaliação salva.
+        <div class="dado_item">
+          <strong>Data:</strong> ${formatarData(avaliacao.criado_em)}
         </div>
-        <div class="dado_item largo">
-          <strong>Relatório:</strong> Para aparecer como relatório completo, primeiro faça uma avaliação desse paciente.
+
+        <div class="dado_item">
+          <strong>Score:</strong> ${formatarScore(avaliacao.score)}
         </div>
+
+        <div class="dado_item">
+          <strong>Sexo:</strong> ${escaparHTML(avaliacao.sexo || "-")}
+        </div>
+
+        <div class="dado_item">
+          <strong>Sintomas:</strong> ${sintomasMarcados}
+        </div>
+
+        <div class="dado_item">
+          <strong>Profissional:</strong> ${escaparHTML(
+            avaliacao.usuario_nome || "-",
+          )}
+        </div>
+
+        <div class="dado_item" style="min-width: 100%;">
+          <strong>Recomendação:</strong> ${escaparHTML(avaliacao.recomendacao)}
+        </div>
+      </div>
+
+      <div class="acoes_card">
+        <button class="botao_card" type="button" onclick="imprimirAvaliacao(${Number(
+          avaliacao.id,
+        )})">
+          Imprimir
+        </button>
       </div>
     </div>
   `;
@@ -936,39 +1011,118 @@ async function prepararHistorico() {
       headers: authHeaders(),
     });
 
+    const pacienteSelecionado = localStorage.getItem("pacienteSelecionado");
+
+    const pacientePreSelecionado = pacientes.find(
+      (paciente) => String(paciente.id) === String(pacienteSelecionado),
+    );
+
     seletorArea.innerHTML = `
       <p>Paciente</p>
-      <select id="pacienteHistorico" class="select_api">
-        <option value="">Selecione</option>
-        ${opcoesPacientes(pacientes)}
-      </select>
+
+      <input
+        id="buscaPacienteHistorico"
+        type="text"
+        placeholder="Digite o nome do paciente"
+        list="listaPacientesHistorico"
+        autocomplete="off"
+        value="${
+          pacientePreSelecionado
+            ? escaparHTML(`${pacientePreSelecionado.nome} - ID ${pacientePreSelecionado.id}`)
+            : ""
+        }"
+      />
+
+      <datalist id="listaPacientesHistorico">
+        ${pacientes
+          .map(
+            (paciente) => `
+              <option value="${escaparHTML(`${paciente.nome} - ID ${paciente.id}`)}"></option>
+            `,
+          )
+          .join("")}
+      </datalist>
+
+      <div id="resumoPacienteHistorico" class="resumo_paciente_box">
+        ${
+          pacientePreSelecionado
+            ? montarResumoPacienteAvaliacao(pacientePreSelecionado)
+            : "<p>Digite e selecione um paciente para visualizar o histórico.</p>"
+        }
+      </div>
     `;
 
-    document.getElementById("pacienteHistorico").addEventListener("change", carregarHistoricoPaciente);
+    window.__pacientesHistorico = pacientes;
+
+    area.innerHTML = `
+      <div class="historico_vazio">
+        <h4>Histórico de avaliações</h4>
+        <p>
+          Selecione um paciente para visualizar avaliações anteriores,
+          scores, recomendações e opções de impressão.
+        </p>
+      </div>
+    `;
+
+    const input = document.getElementById("buscaPacienteHistorico");
+
+    input.addEventListener("input", () => {
+      atualizarResumoPacienteHistorico();
+      carregarHistoricoPaciente();
+    });
+
+    if (pacientePreSelecionado) {
+      carregarHistoricoPaciente();
+    }
   } catch (erro) {
-    area.innerHTML = `<p class="erro_api">Erro ao carregar pacientes: ${escaparHTML(erro.message)}</p>`;
+    area.innerHTML = `<p>Erro ao carregar pacientes: ${escaparHTML(
+      erro.message,
+    )}</p>`;
   }
 }
 
 async function carregarHistoricoPaciente() {
-  const pacienteId = document.getElementById("pacienteHistorico")?.value;
   const area = document.querySelector(".historico_avaliacao");
 
-  if (!pacienteId || !area) {
-    if (area) area.innerHTML = "";
+  if (!area) return;
+
+  const input = document.getElementById("buscaPacienteHistorico");
+  const textoPaciente = input?.value.trim();
+
+  const pacientes = window.__pacientesHistorico || [];
+
+  const pacienteEncontrado = pacientes.find((paciente) => {
+    const textoCompleto = `${paciente.nome} - ID ${paciente.id}`;
+    return textoCompleto === textoPaciente;
+  });
+
+  if (!pacienteEncontrado) {
+    area.innerHTML = `
+      <div class="historico_vazio">
+        <h4>Histórico de avaliações</h4>
+        <p>
+          Digite e selecione um paciente válido para visualizar o histórico.
+        </p>
+      </div>
+    `;
     return;
   }
 
   try {
-    const avaliacoes = await apiFetch(`/avaliacoes/${pacienteId}`, {
+    const avaliacoes = await apiFetch(`/avaliacoes/${pacienteEncontrado.id}`, {
       headers: authHeaders(),
     });
 
     area.innerHTML =
       avaliacoes.map(cardAvaliacao).join("") ||
-      "<p class='mensagem_api'>Esse paciente ainda não possui avaliações.</p>";
+      `<div class="historico_vazio">
+        <h4>Nenhuma avaliação encontrada</h4>
+        <p>Esse paciente ainda não possui avaliações registradas.</p>
+      </div>`;
   } catch (erro) {
-    area.innerHTML = `<p class="erro_api">Erro ao carregar histórico: ${escaparHTML(erro.message)}</p>`;
+    area.innerHTML = `<p>Erro ao carregar histórico: ${escaparHTML(
+      erro.message,
+    )}</p>`;
   }
 }
 
@@ -980,76 +1134,364 @@ async function carregarRelatorios() {
   try {
     const params = new URLSearchParams();
 
-    const inicio = document.querySelector(".data_inicio input")?.value;
-    const fim = document.querySelector(".data_fim input")?.value;
+    const inicio = document.querySelector(".data_inicio input")?.value || "";
+    const fim = document.querySelector(".data_fim input")?.value || "";
 
-    const pacienteFiltro =
-      document.querySelector(".paciente_ input")?.value.trim() ||
-      document.querySelector(".busca_paciente input")?.value.trim();
+    const campoPaciente =
+      document.querySelector(".paciente_ input") ||
+      document.querySelector(".busca_paciente input");
 
-    if (inicio) params.set("inicio", inicio);
-    if (fim) params.set("fim", fim);
-    if (pacienteFiltro) params.set("paciente", pacienteFiltro);
+    let paciente = campoPaciente?.value.trim() || "";
+
+    const pacienteSelecionado = localStorage.getItem("pacienteSelecionado");
+
+    if (!paciente && pacienteSelecionado) {
+      paciente = pacienteSelecionado;
+
+      if (campoPaciente) {
+        campoPaciente.value = pacienteSelecionado;
+      }
+
+      localStorage.removeItem("pacienteSelecionado");
+    }
+
+    if (inicio && fim) {
+      params.set("inicio", inicio);
+      params.set("fim", fim);
+    }
+
+    if (paciente) {
+      params.set("paciente", paciente);
+    }
 
     const avaliacoes = await apiFetch(`/avaliacoes?${params.toString()}`, {
       headers: authHeaders(),
     });
 
-    if (avaliacoes.length > 0) {
-      lista.innerHTML = avaliacoes.map(cardAvaliacao).join("");
-      return;
-    }
+    const totalEncaminhamentos = avaliacoes.filter((avaliacao) =>
+      String(avaliacao.recomendacao || "")
+        .toLowerCase()
+        .includes("encaminhar"),
+    ).length;
 
-    if (pacienteFiltro) {
-      const pacientes = await apiFetch(`/pacientes?busca=${encodeURIComponent(pacienteFiltro)}`, {
-        headers: authHeaders(),
-      });
+    lista.innerHTML = `
+      <div class="resumo_relatorios">
+        <div>
+          <strong>${avaliacoes.length}</strong>
+          <span>relatórios encontrados</span>
+        </div>
 
-      if (pacientes.length > 0) {
-        lista.innerHTML = pacientes.map(cardPacienteSemRelatorio).join("");
-        return;
+        <div>
+          <strong>${totalEncaminhamentos}</strong>
+          <span>encaminhamentos</span>
+        </div>
+      </div>
+
+      ${
+        avaliacoes.length
+          ? avaliacoes.map(cardAvaliacao).join("")
+          : "<p>Nenhum relatório encontrado.</p>"
       }
-    }
-
-    lista.innerHTML = "<p class='mensagem_api'>Nenhum relatório encontrado.</p>";
+    `;
   } catch (erro) {
-    lista.innerHTML = `<p class="erro_api">Erro ao carregar relatórios: ${escaparHTML(erro.message)}</p>`;
+    lista.innerHTML = `<p>Erro ao carregar relatórios: ${escaparHTML(
+      erro.message,
+    )}</p>`;
   }
 }
 
-async function carregarResumoAdmin() {
-  const pagina = window.location.pathname.split("/").pop();
-
-  if (pagina !== "dashboard_medico.html" && pagina !== "relatorios_medico.html") return;
-
+async function imprimirAvaliacao(id) {
   try {
-    const resumo = await apiFetch("/relatorios?dias=30", {
+    const avaliacao = await apiFetch(`/avaliacoes/imprimir/${id}`, {
       headers: authHeaders(),
     });
 
-    const cardPacientes = document.querySelector(".dashboard .pacientes p, .graficos .pacientes p");
-    const cardAvaliacoes = document.querySelector(".dashboard .avaliacoes p, .graficos .avaliacoes p");
-    const cardEncaminhamentos = document.querySelector(".dashboard .encaminhamentos p, .graficos .encaminhamentos p");
-    const cardRelatorio = document.querySelector(".dashboard .relatorio p, .graficos .relatorio p");
+    const janela = window.open("", "_blank");
+
+    janela.document.write(`
+      <!doctype html>
+      <html lang="pt-BR">
+        <head>
+          <meta charset="UTF-8" />
+          <title>Relatório de Avaliação</title>
+
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              padding: 32px;
+              color: #111;
+            }
+
+            h1 {
+              margin-bottom: 4px;
+            }
+
+            h2 {
+              margin-top: 28px;
+              border-bottom: 1px solid #ccc;
+              padding-bottom: 8px;
+            }
+
+            .linha {
+              margin: 8px 0;
+            }
+
+            strong {
+              color: #000;
+            }
+
+            .box {
+              border: 1px solid #ccc;
+              border-radius: 8px;
+              padding: 16px;
+              margin-top: 16px;
+            }
+
+            @media print {
+              button {
+                display: none;
+              }
+            }
+          </style>
+        </head>
+
+        <body>
+          <h1>X-Triagem</h1>
+          <p>Relatório de avaliação clínica</p>
+
+          <h2>Dados do paciente</h2>
+
+          <div class="linha">
+            <strong>Paciente:</strong> ${escaparHTML(avaliacao.paciente_nome)}
+          </div>
+
+          <div class="linha">
+            <strong>Data de nascimento:</strong> ${formatarData(
+              avaliacao.data_nascimento,
+            )}
+          </div>
+
+          <div class="linha">
+            <strong>Sexo:</strong> ${escaparHTML(avaliacao.sexo)}
+          </div>
+
+          <h2>Resultado da avaliação</h2>
+
+          <div class="box">
+            <div class="linha">
+              <strong>Data:</strong> ${formatarData(avaliacao.criado_em)}
+            </div>
+
+            <div class="linha">
+              <strong>Score:</strong> ${formatarScore(avaliacao.score)}
+            </div>
+
+            <div class="linha">
+              <strong>Recomendação:</strong> ${escaparHTML(
+                avaliacao.recomendacao,
+              )}
+            </div>
+
+            <div class="linha">
+              <strong>Profissional responsável:</strong> ${escaparHTML(
+                avaliacao.usuario_nome,
+              )}
+            </div>
+          </div>
+
+          <br />
+
+          <button onclick="window.print()">Imprimir</button>
+        </body>
+      </html>
+    `);
+
+    janela.document.close();
+  } catch (erro) {
+    alert(`Erro ao preparar impressão: ${erro.message}`);
+  }
+}
+
+// =========================
+// DASHBOARDS
+// =========================
+
+async function carregarDashboardUsuario() {
+  const area = document.querySelector(".areabase");
+
+  if (!area || paginaAtual() !== "dashboard_usuario.html") return;
+
+  try {
+    const [pacientes, avaliacoes] = await Promise.all([
+      apiFetch("/pacientes", { headers: authHeaders() }),
+      apiFetch("/avaliacoes", { headers: authHeaders() }),
+    ]);
+
+    const ultimoPaciente = pacientes[pacientes.length - 1];
+
+    area.innerHTML = `
+      <h3 class="titu1">Dashboard</h3>
+      <p>Resumo geral do atendimento</p>
+
+      <div class="graficos">
+        <div>
+          <h5>Pacientes</h5>
+          <p><strong>${pacientes.length}</strong> cadastrados</p>
+        </div>
+
+        <div>
+          <h5>Avaliações</h5>
+          <p><strong>${avaliacoes.length}</strong> realizadas</p>
+        </div>
+
+        <div>
+          <h5>Relatórios</h5>
+          <p><strong>${avaliacoes.length}</strong> disponíveis</p>
+        </div>
+
+        <div>
+          <h5>Último paciente</h5>
+          <p>${escaparHTML(ultimoPaciente?.nome || "Nenhum paciente")}</p>
+        </div>
+      </div>
+
+      <hr />
+
+      <h3 class="titu2">Ações rápidas</h3>
+
+      <div class="acoes">
+        <a href="./cadastropaciente_usuario.html">
+          <button class="novo_user" type="button">Novo paciente</button>
+        </a>
+
+        <a href="./avaliacao_usuario.html">
+          <button class="nova_avaliacao" type="button">Nova avaliação</button>
+        </a>
+
+        <a href="./relatorio_usuario.html">
+          <button class="novo_relatorio" type="button">Ver relatórios</button>
+        </a>
+      </div>
+
+      <div class="sistema">
+  <h5>Resumo do atendimento</h5>
+  <p>
+    Use esta área para cadastrar pacientes, iniciar avaliações clínicas e consultar relatórios gerados.
+  </p>
+
+  <p>
+    <strong>Seu papel:</strong> Atendente<br />
+    <strong>Status:</strong> Sistema funcionando
+  </p>
+</div>
+    `;
+  } catch (erro) {
+    area.innerHTML = `<p>Erro ao carregar dashboard: ${escaparHTML(
+      erro.message,
+    )}</p>`;
+  }
+}
+
+async function carregarDashboardMedico() {
+  if (paginaAtual() !== "dashboard_medico.html") return;
+
+  try {
+    const [pacientes, avaliacoes] = await Promise.all([
+      apiFetch("/pacientes", { headers: authHeaders() }),
+      apiFetch("/avaliacoes", { headers: authHeaders() }),
+    ]);
+
+    const hoje = new Date();
+    const trintaDiasAtras = new Date();
+    trintaDiasAtras.setDate(hoje.getDate() - 30);
+
+    const avaliacoesUltimos30Dias = avaliacoes.filter((avaliacao) => {
+      if (!avaliacao.criado_em) return true;
+
+      const dataAvaliacao = new Date(avaliacao.criado_em);
+      return dataAvaliacao >= trintaDiasAtras;
+    });
+
+    const totalEncaminhamentos = avaliacoesUltimos30Dias.filter((avaliacao) =>
+      String(avaliacao.recomendacao || "")
+        .toLowerCase()
+        .includes("encaminhar")
+    ).length;
+
+    const cardPacientes = document.querySelector(".graficos .pacientes p");
+    const cardAvaliacoes = document.querySelector(".graficos .avaliacoes p");
+    const cardEncaminhamentos = document.querySelector(
+      ".graficos .encaminhamentos p"
+    );
+    const cardRelatorio = document.querySelector(".graficos .relatorio p");
 
     if (cardPacientes) {
-      cardPacientes.innerHTML = `<strong>${resumo.totalPacientes}</strong> registrados no sistema`;
+      cardPacientes.innerHTML = `<strong>${pacientes.length}</strong> registrados`;
     }
 
     if (cardAvaliacoes) {
-      cardAvaliacoes.innerHTML = `<strong>${resumo.totalAvaliacoes}</strong> realizadas nos últimos 30 dias`;
+      cardAvaliacoes.innerHTML = `<strong>${avaliacoesUltimos30Dias.length}</strong> nos últimos 30 dias`;
     }
 
     if (cardEncaminhamentos) {
-      cardEncaminhamentos.innerHTML = `<strong>${resumo.totalEncaminhamentos}</strong> para teste genético`;
+      cardEncaminhamentos.innerHTML = `<strong>${totalEncaminhamentos}</strong> para teste genético`;
     }
 
     if (cardRelatorio) {
-      cardRelatorio.innerHTML = `<strong>${resumo.avaliacoesPorUsuario?.length || 0}</strong> usuários cadastrados`;
+      cardRelatorio.innerHTML = `<strong>${avaliacoes.length}</strong> disponíveis`;
+    }
+
+    const sistema = document.querySelector(".sistema");
+
+    if (sistema) {
+      const ultimas = avaliacoes.slice(0, 3);
+
+      sistema.innerHTML = `
+        <h5>Últimas avaliações</h5>
+
+        ${
+          ultimas.length
+            ? ultimas
+                .map(
+                  (avaliacao) => `
+                    <p>
+                      <strong>${escaparHTML(
+                        avaliacao.paciente_nome ||
+                          avaliacao.nome ||
+                          `Paciente ${avaliacao.paciente_id}`
+                      )}</strong><br />
+                      Score: ${formatarScore(avaliacao.score)} |
+                      ${escaparHTML(avaliacao.recomendacao || "Sem recomendação")}
+                    </p>
+                  `
+                )
+                .join("")
+            : "<p>Nenhuma avaliação registrada ainda.</p>"
+        }
+      `;
     }
   } catch (erro) {
-    console.error("Erro ao carregar dashboard admin:", erro);
+    console.error("Erro ao carregar dashboard médico:", erro);
   }
+}
+
+// =========================
+// BUSCA LOCAL
+// =========================
+
+function ativarBuscaLocal(inputSelector, cardSelector) {
+  const input = document.querySelector(inputSelector);
+  if (!input) return;
+
+  input.addEventListener("input", () => {
+    const termo = input.value.toLowerCase().trim();
+    const cards = document.querySelectorAll(cardSelector);
+
+    cards.forEach((card) => {
+      const texto = card.textContent.toLowerCase();
+      card.style.display = texto.includes(termo) ? "" : "none";
+    });
+  });
 }
 
 // =========================
@@ -1057,18 +1499,17 @@ async function carregarResumoAdmin() {
 // =========================
 
 document.addEventListener("DOMContentLoaded", () => {
-  aplicarEstilosIntegracao();
-  corrigirLinksUsuarioPorJS();
   protegerPagina();
   atualizarBoasVindas();
+  ativarMascaras();
 
-  const pagina = window.location.pathname.split("/").pop() || "index.html";
+  const pagina = paginaAtual();
 
   const botaoLoginHome = document.getElementById("login");
 
   if (botaoLoginHome) {
     botaoLoginHome.addEventListener("click", () => {
-      window.location.href = ROTAS.login;
+      window.location.href = "/html/login.html";
     });
   }
 
@@ -1090,33 +1531,35 @@ document.addEventListener("DOMContentLoaded", () => {
     botao.addEventListener("click", () => window.print());
   });
 
-  document.querySelectorAll(".filtros button, .botao_aplicar").forEach((botao) => {
+  document.querySelectorAll(".filtros button").forEach((botao) => {
     botao.addEventListener("click", carregarRelatorios);
   });
 
-  document.querySelectorAll(".busca_paciente input, .paciente_ input").forEach((input) => {
-    input.addEventListener("input", () => {
-      clearTimeout(input._timerBuscaRelatorio);
-      input._timerBuscaRelatorio = setTimeout(carregarRelatorios, 350);
+  const buscaRelatorioUsuario = document.querySelector(".busca_paciente input");
+
+  if (buscaRelatorioUsuario) {
+    buscaRelatorioUsuario.addEventListener("input", () => {
+      clearTimeout(window.__timerBuscaRelatorio);
+
+      window.__timerBuscaRelatorio = setTimeout(() => {
+        carregarRelatorios();
+      }, 400);
     });
-  });
+  }
 
-  document.querySelectorAll(".botao_avaliacao").forEach((botao) => {
-    botao.addEventListener("click", () => {
-      document.getElementById("formAvaliacao")?.scrollIntoView({
-        behavior: "smooth",
-      });
-    });
-  });
+  if (pagina === "dashboard_medico.html") {
+    carregarDashboardMedico();
+  }
 
-  if (pagina === "dashboard_medico.html") carregarResumoAdmin();
-  if (pagina === "usuarios_medico.html") carregarUsuarios();
+  if (pagina === "dashboard_usuario.html") {
+    carregarDashboardUsuario();
+  }
 
-  if (
-    pagina === "pacientes_medico.html" ||
-    pagina === "pacientes_usuario.html" ||
-    pagina === "dashboard_usuario.html"
-  ) {
+  if (pagina === "usuarios_medico.html") {
+    carregarUsuarios();
+  }
+
+  if (pagina === "pacientes_medico.html" || pagina === "pacientes_usuario.html") {
     carregarPacientes();
   }
 
@@ -1124,7 +1567,9 @@ document.addEventListener("DOMContentLoaded", () => {
     prepararAvaliacao();
   }
 
-  if (pagina === "historico_medico.html") prepararHistorico();
+  if (pagina === "historico_medico.html") {
+    prepararHistorico();
+  }
 
   if (pagina === "relatorios_medico.html" || pagina === "relatorio_usuario.html") {
     carregarRelatorios();

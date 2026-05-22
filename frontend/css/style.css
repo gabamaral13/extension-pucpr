@@ -1035,3 +1035,376 @@ body.app-page {
     background: #ffffff !important;
   }
 }
+
+/* =========================
+   AÇÕES DOS CARDS / RESULTADO
+   ========================= */
+
+.acoes_card {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.botao_card {
+  min-height: 42px;
+  padding: 0 18px;
+  border-radius: 14px;
+  background: var(--cor-destaque);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.botao_card:hover {
+  background: var(--cor-destaque-hover);
+  transform: translateY(-1px);
+}
+
+.resultado_box {
+  width: 100%;
+  margin-top: 18px;
+  padding: 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(37, 219, 182, 0.55);
+  background: rgba(37, 219, 182, 0.12);
+}
+
+.resultado_box h3 {
+  margin: 0 0 12px;
+}
+
+.resultado_box p {
+  margin: 8px 0;
+}
+
+/* =========================
+   MELHORIAS DA AVALIAÇÃO
+   ========================= */
+
+.resumo_paciente_box {
+  width: 100%;
+  margin-top: 14px;
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(37, 219, 182, 0.38);
+  background: rgba(37, 219, 182, 0.08);
+}
+
+.resumo_paciente_box h4 {
+  margin: 0 0 12px;
+  font-size: 18px;
+  color: var(--cor-destaque);
+}
+
+.resumo_paciente_box p {
+  margin: 0;
+  color: var(--cor-texto-suave);
+}
+
+.resumo_paciente_grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px 18px;
+}
+
+.resumo_paciente_grid p {
+  margin: 0;
+  line-height: 1.35;
+}
+
+.orientacoes_avaliacao {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.orientacao_card {
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.36);
+  background: rgba(12, 22, 83, 0.52);
+}
+
+.orientacao_card h4 {
+  margin: 0 0 8px;
+  font-size: 18px;
+  color: var(--cor-destaque);
+}
+
+.orientacao_card p {
+  margin: 0;
+  line-height: 1.4;
+  color: var(--cor-texto-suave);
+}
+
+.botoes_avaliacao {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.botoes_avaliacao button {
+  width: auto !important;
+  min-width: 220px;
+}
+
+.botao_limpar {
+  min-height: 52px;
+  padding: 0 24px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 800;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.botao_limpar:hover {
+  background: rgba(255, 255, 255, 0.24);
+  transform: translateY(-1px);
+}
+
+.aviso_avaliacao {
+  width: 100%;
+  margin-top: 16px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 215, 0, 0.35);
+  background: rgba(255, 215, 0, 0.08);
+  color: var(--cor-texto-suave);
+  line-height: 1.4;
+}
+
+.aviso_avaliacao strong {
+  color: #ffd86b;
+}
+
+@media (max-width: 900px) {
+  .resumo_paciente_grid,
+  .orientacoes_avaliacao {
+    grid-template-columns: 1fr;
+  }
+
+  .botoes_avaliacao button {
+    width: 100% !important;
+  }
+}
+
+/* =========================
+   CORREÇÃO DE SCROLL NAS PÁGINAS INTERNAS
+   ========================= */
+
+body.app-page {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+.app-page .corpo {
+  min-height: 100vh !important;
+  height: auto !important;
+}
+
+.corpo_ {
+  min-height: calc(100vh - 118px) !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+
+.corpo_ > .areabase,
+.corpo_ > .avaliacao,
+.corpo_ > .historico,
+.corpo_ > .paciente,
+.corpo_ > .pacientes,
+.corpo_ > .relatorios,
+.corpo_ > .usuarios,
+.corpo_ > .cadastro_pacientes {
+  height: auto !important;
+  min-height: calc(100vh - 160px) !important;
+  overflow: visible !important;
+}
+
+.avaliacao_paciente {
+  height: auto !important;
+  min-height: 260px !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+#formAvaliacao {
+  height: auto !important;
+  overflow: visible !important;
+}
+
+.navegador {
+  height: auto !important;
+  min-height: calc(100vh - 160px) !important;
+  position: sticky;
+  top: 20px;
+}
+
+@media (max-width: 1180px) {
+  .navegador {
+    position: static;
+    min-height: auto !important;
+  }
+}
+
+.resumo_relatorios {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.resumo_relatorios div {
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(37, 219, 182, 0.1);
+  border: 1px solid rgba(37, 219, 182, 0.35);
+}
+
+.resumo_relatorios strong {
+  display: block;
+  font-size: 30px;
+  color: var(--cor-destaque);
+}
+
+.resumo_relatorios span {
+  color: var(--cor-texto-suave);
+  font-weight: 700;
+}
+
+.card_api .dado_item {
+  overflow-wrap: anywhere;
+}
+
+.card_api .dado_item:last-child {
+  max-width: 100%;
+}
+
+/* =========================
+   AJUSTE AÇÕES RÁPIDAS ADMIN
+   ========================= */
+
+.dashboard .acoes {
+  align-items: center;
+}
+
+.dashboard .acoes a {
+  display: block;
+}
+
+.dashboard .acoes button {
+  width: 100%;
+}
+
+/* =========================
+   HISTÓRICO ADMIN
+   ========================= */
+
+.historico_vazio {
+  width: 100%;
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 24px;
+  border-radius: 18px;
+  border: 1px dashed rgba(255, 255, 255, 0.35);
+  background: rgba(12, 22, 83, 0.32);
+}
+
+.historico_vazio h4 {
+  margin: 0 0 10px;
+  font-size: 24px;
+  color: var(--cor-destaque);
+}
+
+.historico_vazio p {
+  max-width: 720px;
+  margin: 0;
+  color: var(--cor-texto-suave);
+  line-height: 1.5;
+}
+
+.historico .selecionar_paciente {
+  align-self: start;
+}
+
+.historico .historico_avaliacao {
+  min-height: 420px;
+}
+
+/* =========================
+   CORREÇÃO RESUMO DO PACIENTE NO HISTÓRICO
+   ========================= */
+
+.historico .resumo_paciente_box {
+  padding: 16px !important;
+}
+
+.historico .resumo_paciente_grid {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 12px !important;
+}
+
+.historico .resumo_paciente_grid p {
+  width: 100% !important;
+  margin: 0 !important;
+  line-height: 1.35 !important;
+  word-break: normal !important;
+  overflow-wrap: anywhere !important;
+}
+
+.historico .resumo_paciente_grid strong {
+  display: inline-block !important;
+  min-width: 110px !important;
+  color: var(--cor-destaque) !important;
+}
+
+.historico #buscaPacienteHistorico {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* =========================
+   AJUSTE SCROLL RELATÓRIOS ADMIN
+   ========================= */
+
+.relatorios .lista_relatorios {
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+.relatorios {
+  overflow: visible !important;
+}
+
+/* =========================
+   BOTÃO DE REMOVER
+   ========================= */
+
+.botao_perigo {
+  background: #d9534f !important;
+}
+
+.botao_perigo:hover {
+  background: #b93d39 !important;
+}
