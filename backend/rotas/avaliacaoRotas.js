@@ -1,186 +1,288 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const db = require('../banco');
-const autenticacao = require('../middleware/autenticacao');
-const calcularScore = require('../utils/calculoScore');
+const db = require("../banco");
+const autenticacao = require("../middleware/autenticacao");
+const calcularScore = require("../utils/calculoScore");
 
-// Criar avaliação
-router.post('/', autenticacao, (req, res) => {
-  const { paciente_id, respostas } = req.body;
+function respostasValidas(respostas) {
+  return (
+    Array.isArray(respostas) &&
+    respostas.length === 12 &&
+    respostas.every((resposta) => Number(resposta) === 0 || Number(resposta) === 1)
+  );
+}
 
-  if (!paciente_id) {
-    return res.status(400).json({ erro: 'Paciente é obrigatório' });
+// ==================================================
+// CRIAR AVALIAÇÃO
+// Admin e User podem criar avaliação
+// ==================================================
+router.post("/", autenticacao, (req, res) => {
+  const pacienteId = Number(req.body.paciente_id);
+  const respostas = req.body.respostas;
+
+  if (!pacienteId) {
+    return res.status(400).json({
+      erro: "Paciente é obrigatório",
+    });
   }
 
-  if (!Array.isArray(respostas) || respostas.length !== 12) {
-    return res.status(400).json({ erro: 'É necessário enviar exatamente 12 respostas' });
+  if (!respostasValidas(respostas)) {
+    return res.status(400).json({
+      erro: "É necessário enviar exatamente 12 respostas com 0 ou 1",
+    });
   }
 
-  db.get('SELECT sexo FROM pacientes WHERE id = ?', [paciente_id], (err, paciente) => {
-    if (err) {
-      return res.status(500).json({ erro: 'Erro ao buscar paciente' });
-    }
-
-    if (!paciente) {
-      return res.status(404).json({ erro: 'Paciente não encontrado' });
-    }
-
-    let resultado;
-
-    try {
-      resultado = calcularScore(respostas, paciente.sexo);
-    } catch (erro) {
-      return res.status(400).json({ erro: erro.message });
-    }
-
-    const { score, recomendacao } = resultado;
-
-    db.run(
-      `INSERT INTO avaliacoes 
-        (paciente_id, usuario_id, respostas, score, recomendacao)
-       VALUES (?, ?, ?, ?, ?)`,
-      [
-        paciente_id,
-        req.usuario.id,
-        JSON.stringify(respostas),
-        score,
-        recomendacao
-      ],
-      function (err) {
-        if (err) {
-          return res.status(400).json({ erro: 'Erro ao salvar avaliação' });
-        }
-
-        res.json({
-          id: this.lastID,
-          ...resultado
-        });
-      }
-    );
-  });
-});
-
-// Listar avaliações
-router.get('/', autenticacao, (req, res) => {
-  const { paciente, inicio, fim } = req.query;
-
-  let query = `
-    SELECT
-      a.*,
-      p.nome AS paciente_nome,
-      p.data_nascimento,
-      p.sexo,
-      u.username AS usuario_nome
-    FROM avaliacoes a
-    JOIN pacientes p ON a.paciente_id = p.id
-    JOIN usuarios u ON a.usuario_id = u.id
-    WHERE 1=1
-  `;
-
-  const params = [];
-
-  // Usuário comum só vê as próprias avaliações
-  if (req.usuario.papel !== 'admin') {
-    query += ' AND a.usuario_id = ?';
-    params.push(req.usuario.id);
-  }
-
-  // Filtro por paciente: pode ser ID ou nome
-  if (paciente) {
-    if (/^\d+$/.test(String(paciente))) {
-      query += ' AND a.paciente_id = ?';
-      params.push(paciente);
-    } else {
-      query += ' AND p.nome LIKE ?';
-      params.push(`%${paciente}%`);
-    }
-  }
-
-  // Filtro por data
-  if (inicio && fim) {
-    query += ' AND DATE(a.criado_em) BETWEEN DATE(?) AND DATE(?)';
-    params.push(inicio, fim);
-  }
-
-  query += ' ORDER BY a.criado_em DESC';
-
-  db.all(query, params, (err, dados) => {
-    if (err) {
-      return res.status(500).json({ erro: 'Erro ao listar avaliações' });
-    }
-
-    res.json(dados);
-  });
-});
-
-// Dados para impressão
-// IMPORTANTE: essa rota precisa vir antes de "/:pacienteId"
-router.get('/imprimir/:id', autenticacao, (req, res) => {
   db.get(
     `
-    SELECT
-      a.*,
-      p.nome AS paciente_nome,
-      p.data_nascimento,
-      p.sexo,
-      u.username AS usuario_nome
-    FROM avaliacoes a
-    JOIN pacientes p ON a.paciente_id = p.id
-    JOIN usuarios u ON a.usuario_id = u.id
-    WHERE a.id = ?
+      SELECT id, nome, sexo
+      FROM pacientes
+      WHERE id = ?
     `,
-    [req.params.id],
-    (err, dados) => {
+    [pacienteId],
+    (err, paciente) => {
       if (err) {
-        return res.status(500).json({ erro: 'Erro ao buscar avaliação' });
+        console.error("Erro ao buscar paciente:", err.message);
+        return res.status(500).json({
+          erro: "Erro ao buscar paciente",
+        });
       }
 
-      if (!dados) {
-        return res.status(404).json({ erro: 'Avaliação não encontrada' });
+      if (!paciente) {
+        return res.status(404).json({
+          erro: "Paciente não encontrado",
+        });
       }
 
-      // Usuário comum só pode imprimir as próprias avaliações
-      if (req.usuario.papel !== 'admin' && dados.usuario_id !== req.usuario.id) {
-        return res.status(403).json({ erro: 'Acesso negado' });
+      let resultado;
+
+      try {
+        resultado = calcularScore(respostas.map(Number), paciente.sexo);
+      } catch (erro) {
+        return res.status(400).json({
+          erro: erro.message,
+        });
       }
 
-      res.json(dados);
+      db.run(
+        `
+          INSERT INTO avaliacoes (
+            paciente_id,
+            usuario_id,
+            respostas,
+            score,
+            limite,
+            suspeito,
+            recomendacao
+          )
+          VALUES (?, ?, ?, ?, ?, ?, ?)
+        `,
+        [
+          pacienteId,
+          req.usuario.id,
+          JSON.stringify(respostas.map(Number)),
+          resultado.score,
+          resultado.limite,
+          resultado.suspeito ? 1 : 0,
+          resultado.recomendacao,
+        ],
+        function (err) {
+          if (err) {
+            console.error("Erro ao salvar avaliação:", err.message);
+            return res.status(500).json({
+              erro: "Erro ao salvar avaliação",
+            });
+          }
+
+          return res.status(201).json({
+            id: this.lastID,
+            paciente_id: paciente.id,
+            paciente_nome: paciente.nome,
+            score: resultado.score,
+            limite: resultado.limite,
+            suspeito: resultado.suspeito,
+            recomendacao: resultado.recomendacao,
+          });
+        }
+      );
     }
   );
 });
 
-// Histórico por paciente
-router.get('/:pacienteId', autenticacao, (req, res) => {
-  let query = `
+// ==================================================
+// LISTAR AVALIAÇÕES / RELATÓRIOS
+// Admin e User podem visualizar relatórios
+// ==================================================
+router.get("/", autenticacao, (req, res) => {
+  const { paciente, inicio, fim } = req.query;
+
+  let sql = `
     SELECT
-      a.*,
+      a.id,
+      a.paciente_id,
+      a.usuario_id,
+      a.respostas,
+      a.score,
+      a.limite,
+      a.suspeito,
+      a.recomendacao,
+      a.criado_em,
+
       p.nome AS paciente_nome,
+      p.cpf AS paciente_cpf,
       p.data_nascimento,
       p.sexo,
-      u.username AS usuario_nome
+      p.endereco,
+      p.cep,
+      p.cidade,
+      p.estado,
+      p.responsavel,
+
+      u.username AS usuario_nome,
+      u.nome AS usuario_nome_completo
+    FROM avaliacoes a
+    JOIN pacientes p ON a.paciente_id = p.id
+    JOIN usuarios u ON a.usuario_id = u.id
+    WHERE 1 = 1
+  `;
+
+  const params = [];
+
+  if (paciente) {
+    if (/^\d+$/.test(String(paciente))) {
+      sql += ` AND a.paciente_id = ?`;
+      params.push(Number(paciente));
+    } else {
+      sql += `
+        AND (
+          p.nome LIKE ?
+          OR p.cpf LIKE ?
+          OR p.cidade LIKE ?
+          OR p.estado LIKE ?
+        )
+      `;
+      params.push(`%${paciente}%`, `%${paciente}%`, `%${paciente}%`, `%${paciente}%`);
+    }
+  }
+
+  if (inicio) {
+    sql += ` AND DATE(a.criado_em) >= DATE(?)`;
+    params.push(inicio);
+  }
+
+  if (fim) {
+    sql += ` AND DATE(a.criado_em) <= DATE(?)`;
+    params.push(fim);
+  }
+
+  sql += ` ORDER BY a.criado_em DESC`;
+
+  db.all(sql, params, (err, avaliacoes) => {
+    if (err) {
+      console.error("Erro ao listar avaliações:", err.message);
+      return res.status(500).json({
+        erro: "Erro ao listar avaliações",
+      });
+    }
+
+    return res.json(avaliacoes);
+  });
+});
+
+// ==================================================
+// HISTÓRICO DE UM PACIENTE
+// Admin e User podem ver histórico
+// ==================================================
+router.get("/:pacienteId", autenticacao, (req, res) => {
+  let sql = `
+    SELECT
+      a.id,
+      a.paciente_id,
+      a.usuario_id,
+      a.respostas,
+      a.score,
+      a.limite,
+      a.suspeito,
+      a.recomendacao,
+      a.criado_em,
+
+      p.nome AS paciente_nome,
+      p.cpf AS paciente_cpf,
+      p.data_nascimento,
+      p.sexo,
+
+      u.username AS usuario_nome,
+      u.nome AS usuario_nome_completo
     FROM avaliacoes a
     JOIN pacientes p ON a.paciente_id = p.id
     JOIN usuarios u ON a.usuario_id = u.id
     WHERE a.paciente_id = ?
+    ORDER BY a.criado_em DESC
   `;
 
-  const params = [req.params.pacienteId];
-
-  // Usuário comum só vê as próprias avaliações
-  if (req.usuario.papel !== 'admin') {
-    query += ' AND a.usuario_id = ?';
-    params.push(req.usuario.id);
-  }
-
-  query += ' ORDER BY a.criado_em DESC';
-
-  db.all(query, params, (err, dados) => {
+  db.all(sql, [req.params.pacienteId], (err, historico) => {
     if (err) {
-      return res.status(500).json({ erro: 'Erro ao buscar histórico' });
+      console.error("Erro ao buscar histórico:", err.message);
+      return res.status(500).json({
+        erro: "Erro ao buscar histórico",
+      });
     }
 
-    res.json(dados);
+    return res.json(historico);
   });
+});
+
+// ==================================================
+// BUSCAR UMA AVALIAÇÃO PARA IMPRESSÃO
+// ==================================================
+router.get("/imprimir/:id", autenticacao, (req, res) => {
+  db.get(
+    `
+      SELECT
+        a.id,
+        a.paciente_id,
+        a.usuario_id,
+        a.respostas,
+        a.score,
+        a.limite,
+        a.suspeito,
+        a.recomendacao,
+        a.criado_em,
+
+        p.nome AS paciente_nome,
+        p.cpf AS paciente_cpf,
+        p.data_nascimento,
+        p.sexo,
+        p.endereco,
+        p.cep,
+        p.cidade,
+        p.estado,
+        p.responsavel,
+
+        u.username AS usuario_nome,
+        u.nome AS usuario_nome_completo
+      FROM avaliacoes a
+      JOIN pacientes p ON a.paciente_id = p.id
+      JOIN usuarios u ON a.usuario_id = u.id
+      WHERE a.id = ?
+    `,
+    [req.params.id],
+    (err, avaliacao) => {
+      if (err) {
+        console.error("Erro ao buscar avaliação:", err.message);
+        return res.status(500).json({
+          erro: "Erro ao buscar avaliação",
+        });
+      }
+
+      if (!avaliacao) {
+        return res.status(404).json({
+          erro: "Avaliação não encontrada",
+        });
+      }
+
+      return res.json(avaliacao);
+    }
+  );
 });
 
 module.exports = router;

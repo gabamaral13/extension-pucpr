@@ -1,150 +1,223 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const db = require('../banco');
-const autenticacao = require('../middleware/autenticacao');
-const permissao = require('../middleware/permissao');
+const db = require("../banco");
+const autenticacao = require("../middleware/autenticacao");
+const calcularScore = require("../utils/calculoScore");
 
-// Relatório administrativo por período
-// Exemplo: GET /relatorios?dias=30
-router.get('/', autenticacao, permissao('admin'), (req, res) => {
-  const dias = req.query.dias || 30;
-  const dataFiltro = `-${dias} days`;
+function respostasValidas(respostas) {
+  return (
+    Array.isArray(respostas) &&
+    respostas.length === 12 &&
+    respostas.every((resposta) => Number(resposta) === 0 || Number(resposta) === 1)
+  );
+}
 
-  const relatorio = {};
+router.post("/", autenticacao, (req, res) => {
+  const pacienteId = Number(req.body.paciente_id);
+  const respostas = req.body.respostas;
+
+  if (!pacienteId) {
+    return res.status(400).json({ erro: "Paciente é obrigatório" });
+  }
+
+  if (!respostasValidas(respostas)) {
+    return res.status(400).json({ erro: "É necessário enviar exatamente 12 respostas com 0 ou 1" });
+  }
 
   db.get(
-    `
-    SELECT COUNT(DISTINCT paciente_id) AS totalPacientes
-    FROM avaliacoes
-    WHERE criado_em >= DATE('now', ?)
-    `,
-    [dataFiltro],
-    (err, pacientes) => {
+    "SELECT id, nome, sexo FROM pacientes WHERE id = ?",
+    [pacienteId],
+    (err, paciente) => {
       if (err) {
-        return res.status(500).json({ erro: "Erro ao buscar pacientes" });
+        console.error("Erro ao buscar paciente:", err.message);
+        return res.status(500).json({ erro: "Erro ao buscar paciente" });
       }
 
-      relatorio.totalPacientes = pacientes.totalPacientes || 0;
+      if (!paciente) {
+        return res.status(404).json({ erro: "Paciente não encontrado" });
+      }
 
-      db.get(
+      let resultado;
+
+      try {
+        resultado = calcularScore(respostas.map(Number), paciente.sexo);
+      } catch (erro) {
+        return res.status(400).json({ erro: erro.message });
+      }
+
+      db.run(
         `
-        SELECT COUNT(*) AS totalAvaliacoes
-        FROM avaliacoes
-        WHERE criado_em >= DATE('now', ?)
+          INSERT INTO avaliacoes (
+            paciente_id,
+            usuario_id,
+            respostas,
+            score,
+            limite,
+            suspeito,
+            recomendacao
+          )
+          VALUES (?, ?, ?, ?, ?, ?, ?)
         `,
-        [dataFiltro],
-        (err, avaliacoes) => {
+        [
+          pacienteId,
+          req.usuario.id,
+          JSON.stringify(respostas.map(Number)),
+          resultado.score,
+          resultado.limite,
+          resultado.suspeito ? 1 : 0,
+          resultado.recomendacao,
+        ],
+        function (err) {
           if (err) {
-            return res.status(500).json({ erro: "Erro ao buscar avaliações" });
+            console.error("Erro ao salvar avaliação:", err.message);
+            return res.status(400).json({ erro: "Erro ao salvar avaliação" });
           }
 
-          relatorio.totalAvaliacoes = avaliacoes.totalAvaliacoes || 0;
-
-          db.get(
-            `
-            SELECT COUNT(*) AS totalEncaminhamentos
-            FROM avaliacoes
-            WHERE criado_em >= DATE('now', ?)
-            AND recomendacao = 'Encaminhar para teste genético'
-            `,
-            [dataFiltro],
-            (err, encaminhamentos) => {
-              if (err) {
-                return res.status(500).json({ erro: "Erro ao buscar encaminhamentos" });
-              }
-
-              relatorio.totalEncaminhamentos = encaminhamentos.totalEncaminhamentos || 0;
-
-              db.all(
-                `
-                SELECT 
-                  u.username AS usuario, 
-                  COUNT(a.id) AS totalAvaliacoes
-                FROM avaliacoes a
-                JOIN usuarios u ON a.usuario_id = u.id
-                WHERE a.criado_em >= DATE('now', ?)
-                GROUP BY u.id, u.username
-                ORDER BY totalAvaliacoes DESC
-                `,
-                [dataFiltro],
-                (err, usuarios) => {
-                  if (err) {
-                    return res.status(500).json({ erro: "Erro ao buscar usuários" });
-                  }
-
-                  relatorio.periodo = `Últimos ${dias} dias`;
-                  relatorio.avaliacoesPorUsuario = usuarios;
-
-                  res.json(relatorio);
-                }
-              );
-            }
-          );
-        }
+          res.status(201).json({
+            id: this.lastID,
+            paciente_id: paciente.id,
+            paciente_nome: paciente.nome,
+            ...resultado,
+          });
+        },
       );
-    }
+    },
   );
 });
 
-// Relatório de desempenho dos funcionários
-// Exemplo: GET /relatorios/funcionarios?dias=30
-router.get('/funcionarios', autenticacao, permissao('admin'), (req, res) => {
-  const dias = req.query.dias || 30;
-  const dataFiltro = `-${dias} days`;
+router.get("/", autenticacao, (req, res) => {
+  const { paciente, inicio, fim } = req.query;
 
-  db.all(
+  let query = `
+    SELECT
+      a.*,
+      p.nome AS paciente_nome,
+      p.cpf AS paciente_cpf,
+      p.data_nascimento,
+      p.sexo,
+      p.cidade,
+      p.estado,
+      u.username AS usuario_nome,
+      u.nome AS usuario_nome_completo
+    FROM avaliacoes a
+    JOIN pacientes p ON a.paciente_id = p.id
+    JOIN usuarios u ON a.usuario_id = u.id
+    WHERE 1 = 1
+  `;
+
+  const params = [];
+
+  if (req.usuario.papel !== "admin") {
+    query += " AND a.usuario_id = ?";
+    params.push(req.usuario.id);
+  }
+
+  if (paciente) {
+    if (/^\d+$/.test(String(paciente))) {
+      query += " AND a.paciente_id = ?";
+      params.push(Number(paciente));
+    } else {
+      query += " AND (p.nome LIKE ? OR p.cpf LIKE ?)";
+      params.push(`%${paciente}%`, `%${paciente}%`);
+    }
+  }
+
+  if (inicio) {
+    query += " AND DATE(a.criado_em) >= DATE(?)";
+    params.push(inicio);
+  }
+
+  if (fim) {
+    query += " AND DATE(a.criado_em) <= DATE(?)";
+    params.push(fim);
+  }
+
+  query += " ORDER BY a.criado_em DESC";
+
+  db.all(query, params, (err, dados) => {
+    if (err) {
+      console.error("Erro ao listar avaliações:", err.message);
+      return res.status(500).json({ erro: "Erro ao listar avaliações" });
+    }
+
+    res.json(dados);
+  });
+});
+
+router.get("/imprimir/:id", autenticacao, (req, res) => {
+  db.get(
     `
-    SELECT 
-      u.id,
-      u.username AS funcionario,
-      u.papel,
-      COUNT(a.id) AS totalAvaliacoes,
-      COUNT(DISTINCT a.paciente_id) AS totalPacientesAtendidos,
-      SUM(CASE 
-        WHEN a.recomendacao = 'Encaminhar para teste genético'
-        THEN 1 ELSE 0 
-      END) AS totalEncaminhamentos
-    FROM usuarios u
-    LEFT JOIN avaliacoes a 
-      ON u.id = a.usuario_id
-      AND a.criado_em >= DATE('now', ?)
-    GROUP BY u.id, u.username, u.papel
-    ORDER BY totalAvaliacoes DESC
+      SELECT
+        a.*,
+        p.nome AS paciente_nome,
+        p.cpf AS paciente_cpf,
+        p.data_nascimento,
+        p.sexo,
+        p.endereco,
+        p.cep,
+        p.cidade,
+        p.estado,
+        p.responsavel,
+        u.username AS usuario_nome,
+        u.nome AS usuario_nome_completo
+      FROM avaliacoes a
+      JOIN pacientes p ON a.paciente_id = p.id
+      JOIN usuarios u ON a.usuario_id = u.id
+      WHERE a.id = ?
     `,
-    [dataFiltro],
-    (err, funcionarios) => {
+    [req.params.id],
+    (err, dados) => {
       if (err) {
-        return res.status(500).json({ erro: "Erro ao gerar relatório de funcionários" });
+        console.error("Erro ao buscar avaliação:", err.message);
+        return res.status(500).json({ erro: "Erro ao buscar avaliação" });
       }
 
-      db.get(
-        `
-        SELECT 
-          COUNT(DISTINCT usuario_id) AS funcionariosQueAtenderam,
-          COUNT(DISTINCT paciente_id) AS pacientesAtendidos,
-          COUNT(*) AS avaliacoesRealizadas
-        FROM avaliacoes
-        WHERE criado_em >= DATE('now', ?)
-        `,
-        [dataFiltro],
-        (err, resumo) => {
-          if (err) {
-            return res.status(500).json({ erro: "Erro ao gerar resumo do relatório" });
-          }
+      if (!dados) {
+        return res.status(404).json({ erro: "Avaliação não encontrada" });
+      }
 
-          res.json({
-            periodo: `Últimos ${dias} dias`,
-            resumo: {
-              funcionariosQueAtenderam: resumo.funcionariosQueAtenderam || 0,
-              pacientesAtendidos: resumo.pacientesAtendidos || 0,
-              avaliacoesRealizadas: resumo.avaliacoesRealizadas || 0
-            },
-            funcionarios
-          });
-        }
-      );
-    }
+      if (req.usuario.papel !== "admin" && dados.usuario_id !== req.usuario.id) {
+        return res.status(403).json({ erro: "Acesso negado" });
+      }
+
+      res.json(dados);
+    },
   );
+});
+
+router.get("/:pacienteId", autenticacao, (req, res) => {
+  let query = `
+    SELECT
+      a.*,
+      p.nome AS paciente_nome,
+      p.cpf AS paciente_cpf,
+      p.data_nascimento,
+      p.sexo,
+      u.username AS usuario_nome,
+      u.nome AS usuario_nome_completo
+    FROM avaliacoes a
+    JOIN pacientes p ON a.paciente_id = p.id
+    JOIN usuarios u ON a.usuario_id = u.id
+    WHERE a.paciente_id = ?
+  `;
+
+  const params = [req.params.pacienteId];
+
+  if (req.usuario.papel !== "admin") {
+    query += " AND a.usuario_id = ?";
+    params.push(req.usuario.id);
+  }
+
+  query += " ORDER BY a.criado_em DESC";
+
+  db.all(query, params, (err, dados) => {
+    if (err) {
+      console.error("Erro ao buscar histórico:", err.message);
+      return res.status(500).json({ erro: "Erro ao buscar histórico" });
+    }
+
+    res.json(dados);
+  });
 });
 
 module.exports = router;

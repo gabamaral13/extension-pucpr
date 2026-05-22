@@ -1,98 +1,228 @@
-const express = require('express');
+const express = require("express");
 const app = express();
-const cors = require('cors');
-const path = require('path');
-const os = require('os');
+const cors = require("cors");
+const path = require("path");
+const os = require("os");
+const bcrypt = require("bcrypt");
 
-// Importa o banco
-require('./banco');
+const db = require("./banco");
+
+const autenticacao = require("./middleware/autenticacao");
+const permissao = require("./middleware/permissao");
+
+const authRotas = require("./rotas/authRotas");
+const usuarioRotas = require("./rotas/usuarioRotas");
+const pacienteRotas = require("./rotas/pacienteRotas");
+const avaliacaoRotas = require("./rotas/avaliacaoRotas");
+const relatorioRotas = require("./rotas/relatorioRotas");
 
 // Middlewares
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Servir o frontend pelo próprio backend
-app.use(express.static(path.join(__dirname, '../frontend')));
+// Frontend
+app.use(express.static(path.join(__dirname, "../frontend")));
 
-// Rotas da API
-app.use('/auth', require('./rotas/authRotas'));
-app.use('/usuarios', require('./rotas/usuarioRotas'));
-app.use('/pacientes', require('./rotas/pacienteRotas'));
-app.use('/avaliacoes', require('./rotas/avaliacaoRotas'));
-app.use('/relatorios', require('./rotas/relatorioRotas'));
+// ===============================
+// ROTAS DE USUÁRIO DIRETAS
+// deixei vários caminhos aceitos para não quebrar
+// ===============================
+
+async function criarUsuario(req, res) {
+  const { nome, email, cpf, username, senha, papel } = req.body;
+
+  const nomeFinal = String(nome || "").trim() || null;
+  const emailFinal = String(email || "").trim().toLowerCase() || null;
+  const cpfFinal = String(cpf || "").trim() || null;
+  const usernameFinal = String(username || emailFinal || nomeFinal || "").trim();
+  const papelFinal = papel || "user";
+
+  if (!usernameFinal || !senha) {
+    return res.status(400).json({
+      erro: "Nome/e-mail/usuário e senha são obrigatórios",
+    });
+  }
+
+  if (!["admin", "user"].includes(papelFinal)) {
+    return res.status(400).json({ erro: "Papel inválido" });
+  }
+
+  db.get(
+    `
+      SELECT id
+      FROM usuarios
+      WHERE username = ?
+      OR (email IS NOT NULL AND email <> '' AND email = ?)
+      LIMIT 1
+    `,
+    [usernameFinal, emailFinal],
+    async (err, existente) => {
+      if (err) {
+        console.error("Erro ao verificar usuário:", err.message);
+        return res.status(500).json({ erro: "Erro ao verificar usuário" });
+      }
+
+      if (existente) {
+        return res.status(400).json({
+          erro: "Usuário ou e-mail já cadastrado",
+        });
+      }
+
+      const hash = await bcrypt.hash(senha, 10);
+
+      db.run(
+        `
+          INSERT INTO usuarios (nome, email, cpf, username, senha, papel)
+          VALUES (?, ?, ?, ?, ?, ?)
+        `,
+        [nomeFinal, emailFinal, cpfFinal, usernameFinal, hash, papelFinal],
+        function (err) {
+          if (err) {
+            console.error("Erro ao criar usuário:", err.message);
+            return res.status(400).json({
+              erro: "Erro ao criar usuário. Verifique se os campos existem no banco.",
+            });
+          }
+
+          return res.status(201).json({
+            mensagem: "Usuário criado com sucesso",
+            id: this.lastID,
+          });
+        }
+      );
+    }
+  );
+}
+
+function listarUsuarios(req, res) {
+  db.all(
+    `
+      SELECT id, nome, email, cpf, username, papel, criado_em
+      FROM usuarios
+      ORDER BY COALESCE(nome, username) ASC
+    `,
+    [],
+    (err, dados) => {
+      if (err) {
+        console.error("Erro ao listar usuários:", err.message);
+        return res.status(500).json({ erro: "Erro ao listar usuários" });
+      }
+
+      return res.json(dados);
+    }
+  );
+}
+
+// Caminhos aceitos para cadastro/listagem de usuários
+app.post(
+  [
+    "/usuarios",
+    "/api/usuarios",
+    "/usuario",
+    "/api/usuario",
+    "/usuarios/cadastrar",
+    "/api/usuarios/cadastrar",
+  ],
+  autenticacao,
+  permissao("admin"),
+  criarUsuario
+);
+
+app.get(
+  ["/usuarios", "/api/usuarios", "/usuario", "/api/usuario"],
+  autenticacao,
+  permissao("admin"),
+  listarUsuarios
+);
+
+// ===============================
+// ROTAS NORMAIS
+// ===============================
+
+app.use("/auth", authRotas);
+app.use("/api/auth", authRotas);
+
+app.use("/usuarios", usuarioRotas);
+app.use("/api/usuarios", usuarioRotas);
+
+app.use("/pacientes", pacienteRotas);
+app.use("/api/pacientes", pacienteRotas);
+
+app.use("/avaliacoes", avaliacaoRotas);
+app.use("/api/avaliacoes", avaliacaoRotas);
+
+app.use("/relatorios", relatorioRotas);
+app.use("/api/relatorios", relatorioRotas);
 
 // Página inicial
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/html/index.html'));
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend/html/index.html"));
 });
 
-// Rota teste
-app.get('/api/status', (req, res) => {
-  res.json({ mensagem: 'API do sistema hospitalar rodando 🚀' });
+// Status da API
+app.get("/api/status", (req, res) => {
+  res.json({ mensagem: "API do sistema hospitalar rodando 🚀" });
 });
 
 // Porta
 const PORTA = process.env.PORT || 3000;
-const HOST = '0.0.0.0';
+const HOST = "0.0.0.0";
 
-// Função para mostrar IPs úteis da rede local
 function mostrarIpsDaRede() {
   const interfaces = os.networkInterfaces();
 
-  console.log('\nAcesse em outro dispositivo da mesma rede usando um destes links:\n');
+  console.log("\nAcesse em outro dispositivo da mesma rede usando um destes links:\n");
 
   let encontrouIp = false;
 
   Object.keys(interfaces).forEach((nome) => {
     interfaces[nome].forEach((rede) => {
-      const ehIPv4 = rede.family === 'IPv4';
+      const ehIPv4 = rede.family === "IPv4";
       const ehInterno = rede.internal;
       const ehIpVirtual =
-        nome.toLowerCase().includes('virtual') ||
-        nome.toLowerCase().includes('vmware') ||
-        nome.toLowerCase().includes('virtualbox') ||
-        nome.toLowerCase().includes('wsl') ||
-        rede.address.startsWith('169.254.');
+        nome.toLowerCase().includes("virtual") ||
+        nome.toLowerCase().includes("vmware") ||
+        nome.toLowerCase().includes("virtualbox") ||
+        nome.toLowerCase().includes("wsl") ||
+        rede.address.startsWith("169.254.");
 
       if (ehIPv4 && !ehInterno && !ehIpVirtual) {
         encontrouIp = true;
         console.log(`http://${rede.address}:${PORTA}`);
         console.log(`http://${rede.address}:${PORTA}/html/index.html`);
         console.log(`http://${rede.address}:${PORTA}/api/status`);
-        console.log('');
+        console.log("");
       }
     });
   });
 
   if (!encontrouIp) {
-    console.log('Nenhum IP de rede local encontrado.');
+    console.log("Nenhum IP de rede local encontrado.");
     console.log('Use o comando "ipconfig" para verificar o IPv4 manualmente.\n');
   }
 }
 
-// Rota para páginas/API inexistentes
+// Rota inexistente
 app.use((req, res) => {
   res.status(404).json({
-    erro: 'Rota não encontrada',
-    caminho: req.originalUrl
+    erro: "Rota não encontrada",
+    caminho: req.originalUrl,
   });
 });
 
-// Inicia o servidor
+// Iniciar servidor
 const servidor = app.listen(PORTA, HOST, () => {
   console.log(`Servidor rodando localmente em http://localhost:${PORTA}`);
   console.log(`Frontend local em http://localhost:${PORTA}/html/index.html`);
-
   mostrarIpsDaRede();
 });
 
-// Tratamento de erro ao iniciar o servidor
-servidor.on('error', (erro) => {
-  if (erro.code === 'EADDRINUSE') {
+servidor.on("error", (erro) => {
+  if (erro.code === "EADDRINUSE") {
     console.error(`Erro: a porta ${PORTA} já está sendo usada.`);
-    console.error('Feche outro servidor Node ou use outra porta.');
+    console.error("Feche outro servidor Node ou use outra porta.");
   } else {
-    console.error('Erro ao iniciar o servidor:', erro.message);
+    console.error("Erro ao iniciar o servidor:", erro.message);
   }
 });

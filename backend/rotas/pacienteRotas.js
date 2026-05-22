@@ -1,29 +1,45 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const db = require('../banco');
-const autenticacao = require('../middleware/autenticacao');
+const db = require("../banco");
+const autenticacao = require("../middleware/autenticacao");
 
-// Criar paciente
-router.post('/', autenticacao, (req, res) => {
+function normalizarSexo(valor) {
+  const sexo = String(valor || "").trim().toUpperCase();
+
+  if (sexo === "M" || sexo.startsWith("MASC")) return "M";
+  if (sexo === "F" || sexo.startsWith("FEM")) return "F";
+
+  return sexo;
+}
+
+// ==================================================
+// CADASTRAR PACIENTE
+// Admin e User podem cadastrar paciente
+// ==================================================
+router.post("/", autenticacao, (req, res) => {
   const {
     nome,
+    cpf,
     data_nascimento,
     sexo,
+    endereco,
     cep,
     estado,
     cidade,
-    responsavel
+    responsavel,
   } = req.body;
 
-  if (!nome || !data_nascimento || !sexo) {
+  const sexoNormalizado = normalizarSexo(sexo);
+
+  if (!nome || !data_nascimento || !sexoNormalizado) {
     return res.status(400).json({
-      erro: 'Nome, data de nascimento e sexo são obrigatórios'
+      erro: "Nome, data de nascimento e sexo são obrigatórios",
     });
   }
 
-  if (!['M', 'F'].includes(sexo)) {
+  if (!["M", "F"].includes(sexoNormalizado)) {
     return res.status(400).json({
-      erro: 'Sexo deve ser M ou F'
+      erro: "Sexo deve ser M ou F",
     });
   }
 
@@ -31,82 +47,112 @@ router.post('/', autenticacao, (req, res) => {
     `
       INSERT INTO pacientes (
         nome,
+        cpf,
         data_nascimento,
         sexo,
+        endereco,
         cep,
         estado,
         cidade,
         responsavel
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `,
     [
       nome,
+      cpf || null,
       data_nascimento,
-      sexo,
+      sexoNormalizado,
+      endereco || null,
       cep || null,
       estado || null,
       cidade || null,
-      responsavel || null
+      responsavel || null,
     ],
     function (err) {
       if (err) {
-        console.error('Erro ao criar paciente:', err.message);
-
-        return res.status(400).json({
-          erro: 'Erro ao criar paciente'
+        console.error("Erro ao cadastrar paciente:", err.message);
+        return res.status(500).json({
+          erro: "Erro ao cadastrar paciente",
         });
       }
 
-      res.status(201).json({
-        mensagem: 'Paciente criado com sucesso',
-        id: this.lastID
+      return res.status(201).json({
+        mensagem: "Paciente cadastrado com sucesso",
+        id: this.lastID,
       });
     }
   );
 });
 
-// Listar pacientes
-router.get('/', autenticacao, (req, res) => {
-  db.all(
-    `
-      SELECT
-        id,
-        nome,
-        data_nascimento,
-        sexo,
-        cep,
-        estado,
-        cidade,
-        responsavel,
-        criado_em
-      FROM pacientes
-      ORDER BY nome ASC
-    `,
-    [],
-    (err, dados) => {
-      if (err) {
-        console.error('Erro ao listar pacientes:', err.message);
+// ==================================================
+// LISTAR PACIENTES
+// Admin e User podem visualizar pacientes
+// Agora busca também por ID.
+// ==================================================
+router.get("/", autenticacao, (req, res) => {
+  const buscaOriginal = req.query.busca ? String(req.query.busca).trim() : "";
+  const busca = buscaOriginal ? `%${buscaOriginal}%` : null;
 
-        return res.status(500).json({
-          erro: 'Erro ao listar pacientes'
-        });
-      }
+  let sql = `
+    SELECT
+      id,
+      nome,
+      cpf,
+      data_nascimento,
+      sexo,
+      endereco,
+      cep,
+      estado,
+      cidade,
+      responsavel,
+      criado_em
+    FROM pacientes
+  `;
 
-      res.json(dados);
+  const params = [];
+
+  if (busca) {
+    sql += `
+      WHERE CAST(id AS TEXT) LIKE ?
+      OR nome LIKE ?
+      OR cpf LIKE ?
+      OR cidade LIKE ?
+      OR estado LIKE ?
+      OR responsavel LIKE ?
+    `;
+
+    params.push(busca, busca, busca, busca, busca, busca);
+  }
+
+  sql += ` ORDER BY nome ASC`;
+
+  db.all(sql, params, (err, pacientes) => {
+    if (err) {
+      console.error("Erro ao listar pacientes:", err.message);
+      return res.status(500).json({
+        erro: "Erro ao listar pacientes",
+      });
     }
-  );
+
+    return res.json(pacientes);
+  });
 });
 
-// Buscar paciente por ID
-router.get('/:id', autenticacao, (req, res) => {
+// ==================================================
+// BUSCAR PACIENTE POR ID
+// Admin e User podem visualizar paciente
+// ==================================================
+router.get("/:id", autenticacao, (req, res) => {
   db.get(
     `
       SELECT
         id,
         nome,
+        cpf,
         data_nascimento,
         sexo,
+        endereco,
         cep,
         estado,
         cidade,
@@ -116,22 +162,21 @@ router.get('/:id', autenticacao, (req, res) => {
       WHERE id = ?
     `,
     [req.params.id],
-    (err, dado) => {
+    (err, paciente) => {
       if (err) {
-        console.error('Erro ao buscar paciente:', err.message);
-
+        console.error("Erro ao buscar paciente:", err.message);
         return res.status(500).json({
-          erro: 'Erro ao buscar paciente'
+          erro: "Erro ao buscar paciente",
         });
       }
 
-      if (!dado) {
+      if (!paciente) {
         return res.status(404).json({
-          erro: 'Paciente não encontrado'
+          erro: "Paciente não encontrado",
         });
       }
 
-      res.json(dado);
+      return res.json(paciente);
     }
   );
 });
