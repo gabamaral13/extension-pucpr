@@ -25,7 +25,7 @@ const db = require("./banco");
             }
 
             process.exit();
-
+          },
         );
       } else {
         db.run(
@@ -39,6 +39,9 @@ const db = require("./banco");
             }
 
             process.exit();
-
+          },
+        );
+      }
+    },
   );
 })();
