@@ -213,7 +213,7 @@ button {
 }
 
 .Questionario_paciente {
-  width: 1150px;
+  width: 1160px;
   height: 590px;
   border-radius: 10px;
   background: #30719a;
@@ -223,7 +223,7 @@ button {
 
 .questionario {
   display: flex;
-  width: 1080px;
+  width: 1090px;
   height: 480px;
   border-radius: 25.6px;
   background: rgba(9, 6, 73, 0.19);
