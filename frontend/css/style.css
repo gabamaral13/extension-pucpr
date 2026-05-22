@@ -1,102 +1,1037 @@
-body {
-  width: 100vw;
-  height: 100vh;
+/* ==========================================================
+   X-Triagem - CSS único do projeto
+   Este arquivo substitui os CSS separados das páginas.
+   Caminho: frontend/css/style.css
+   ========================================================== */
 
+:root {
+  --cor-fundo-1: #05051f;
+  --cor-fundo-2: #08084b;
+  --cor-card: rgba(9, 6, 73, 0.68);
+  --cor-card-2: rgba(12, 22, 83, 0.7);
+  --cor-borda: rgba(255, 255, 255, 0.55);
+  --cor-texto: #ffffff;
+  --cor-texto-suave: rgba(255, 255, 255, 0.78);
+  --cor-destaque: #25dbb6;
+  --cor-destaque-hover: #087b64;
+  --cor-input: rgba(15, 34, 100, 0.72);
+  --sombra: 0 18px 45px rgba(0, 0, 0, 0.32);
+  --raio: 22px;
+  --fonte: Arial, Helvetica, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--fonte);
+  color: var(--cor-texto);
   background:
-    linear-gradient(
-      272deg,
-      rgba(10, 10, 10, 0) 0%,
-      rgba(10, 10, 10, 0.56) 100%
-    ),
-    url(./imagens/Xtriagem.png);
+    linear-gradient(120deg, rgba(3, 4, 25, 0.92), rgba(8, 12, 65, 0.78)),
+    url("./imagens/plano_de_fundo002.png");
   background-size: cover;
   background-position: center;
-  background-repeat: no-repeat;
-  overflow: hidden;
+  background-attachment: fixed;
+  overflow-x: hidden;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select {
+  font-family: var(--fonte);
+}
+
+button {
+  border: 0;
+  cursor: pointer;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 3px solid rgba(37, 219, 182, 0.35);
+  outline-offset: 2px;
+}
+
+input,
+select {
+  width: 100%;
+  min-height: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 16px;
+  background: var(--cor-input);
+  color: #ffffff;
+  padding: 0 16px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+select option {
+  background: #08084b;
+  color: #ffffff;
+}
+
+input::placeholder {
+  color: rgba(255, 255, 255, 0.74);
+}
+
+hr {
+  width: 100%;
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.22);
+  margin: 22px 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+p {
+  margin-top: 0;
 }
 
 .corpo {
-  width: 100vw;
-  height: 100vh;
-  margin: 0%;
-  display: flex;
-  flex-direction: column;
-  padding: 0%;
-  background-position: center;
-  background-size: cover;
-  overflow: hidden;
-  background-repeat: no-repeat;
+  width: 100%;
+  min-height: 100vh;
 }
 
-.container {
+/* BOTÕES */
+
+.botao_login,
+.botao_log,
+.botao_cadastro,
+.botao_cadastrar,
+.botao_avaliacao,
+.botao_imprimir,
+.botao_user_,
+.botao_aplicar,
+.botao_user,
+.novo_user,
+.nova_avaliacao,
+.novo_relatorio,
+#formAvaliacao button {
+  min-height: 52px;
+  padding: 0 24px;
+  border-radius: 18px;
+  background: var(--cor-destaque);
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.24);
+  transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+}
+
+.botao_login:hover,
+.botao_log:hover,
+.botao_cadastro:hover,
+.botao_cadastrar:hover,
+.botao_avaliacao:hover,
+.botao_imprimir:hover,
+.botao_user_:hover,
+.botao_aplicar:hover,
+.botao_user:hover,
+.novo_user:hover,
+.nova_avaliacao:hover,
+.novo_relatorio:hover,
+#formAvaliacao button:hover {
+  background: var(--cor-destaque-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 15px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* PÁGINA INICIAL */
+
+body.home-page {
+  overflow: hidden;
+  background:
+    linear-gradient(272deg, rgba(10, 10, 10, 0.08) 0%, rgba(10, 10, 10, 0.72) 100%),
+    url("./imagens/Xtriagem.png");
+  background-size: cover;
+  background-position: center;
+}
+
+.home-page .corpo {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: 34px clamp(24px, 5vw, 84px) 46px;
+}
+
+.home-page .container {
   display: flex;
-  width: 100%;
-  height: 20px;
-  padding: 20px;
   justify-content: flex-end;
   align-items: center;
 }
 
-.botao_login {
-  width: 248px;
-  height: 93px;
-  flex-shrink: 0;
+.home-page .botao_login {
+  width: 240px;
+  height: 82px;
+  font-size: 29px;
   border-radius: 24px;
-  background: #25dbb6;
-
-  border: none;
-  box-shadow: none;
-  outline: none;
-
-  color: #fff;
-  text-align: center;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 31px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: 31.01px; /* 100.032% */
-  letter-spacing: -0.93px;
-  margin-top: 50px;
-  margin-right: 70px;
-  cursor: pointer;
 }
 
-.botao_login:hover {
-  background: #057c64;
+.home-page .titulo {
+  align-self: center;
 }
 
-.simbolo {
-  width: 300px;
-  height: auto;
-  align-items: center;
-  justify-content: center;
-  padding-left: 150px;
-}
-
-h1 {
-  display: flex;
-  width: 700px;
-  height: 600px;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-
+.home-page .titulo h1 {
+  max-width: 760px;
+  margin: 0;
+  font-family: Verdana, Geneva, sans-serif;
+  font-size: clamp(74px, 10vw, 132px);
+  line-height: 0.95;
+  font-weight: 500;
+  letter-spacing: -4px;
   color: #f0f0f0;
-  text-align: center;
-  font-family: Verdana, sans-serif;
-  font-size: 100px;
-  font-style: normal;
-  font-weight: 500px;
-  line-height: 40px; /* 31.25% */
-  letter-spacing: -0.93px;
-  margin-top: 900px;
-  margin-left: 150px;
+  text-shadow: 0 14px 34px rgba(0, 0, 0, 0.45);
 }
 
-.titulo {
+.home-page .simbolo {
+  width: 170px;
+  margin-left: clamp(20px, 8vw, 120px);
+  margin-bottom: 20px;
+}
+
+/* LOGIN E CADASTRO DE USUÁRIO */
+
+body.login-page,
+body.auth-page {
+  min-height: 100vh;
+  background:
+    linear-gradient(0deg, rgba(0, 0, 0, 0.32), rgba(0, 0, 0, 0.32)),
+    url("./imagens/plano_de_fundo001.png");
+  background-size: cover;
+  background-position: center;
+}
+
+.login-page .corpo,
+.auth-page .corpo {
+  min-height: 100vh;
   display: flex;
-  width: 100px;
-  height: 74px;
-  flex-direction: column;
+  align-items: center;
   justify-content: center;
+  padding: 28px;
+}
+
+.formulario_login,
+.formulario_cadastro {
+  width: min(94vw, 560px);
+  padding: 34px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.88);
+  color: #070720;
+  box-shadow: var(--sombra);
+  backdrop-filter: blur(8px);
+}
+
+.formulario_cadastro {
+  width: min(94vw, 900px);
+}
+
+.formulario_login .titulo,
+.formulario_cadastro .titulo {
+  width: 100%;
+  margin: 0 0 26px;
+  text-align: center;
+  font-size: clamp(36px, 5vw, 56px);
+  line-height: 1;
+  color: #05051f;
+}
+
+.formulario_login .dados,
+.formulario_cadastro .dados {
+  width: 100%;
+  display: grid;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.formulario_login input,
+.formulario_cadastro input {
+  min-height: 58px;
+  border: 0;
+  background: #d9d9d9;
+  color: #111111;
+  text-align: center;
+  border-radius: 20px;
+}
+
+.formulario_login input::placeholder,
+.formulario_cadastro input::placeholder {
+  color: rgba(0, 0, 0, 0.62);
+}
+
+.formulario_login .botao_log {
+  width: 180px;
+  height: 70px;
+  font-size: 26px;
+  display: block;
+  margin: 28px auto 0;
+}
+
+.formulario_cadastro .dados {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 28px;
+}
+
+.formulario_cadastro h5 {
+  color: #05051f;
+  font-size: 20px;
+  margin: 0 0 14px;
+}
+
+.formulario_cadastro .dados_pessoais,
+.formulario_cadastro .senha {
+  display: grid;
+  gap: 14px;
+}
+
+.formulario_cadastro .botao_cadastro {
+  width: 220px;
+  height: 66px;
+  display: block;
+  margin: 28px auto 0;
+}
+
+/* LAYOUT INTERNO */
+
+body.app-page {
+  overflow: hidden;
+}
+
+.app-page .corpo {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: 118px minmax(0, 1fr);
+}
+
+.container_ {
+  width: 100%;
+  min-height: 118px;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  padding: 14px clamp(18px, 3vw, 36px);
+  background: rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(8px);
+}
+
+.container_ .logo {
+  width: 88px;
+  height: 88px;
+  object-fit: contain;
+}
+
+.container_ .titulo {
+  margin: 0;
+  font-size: clamp(30px, 4vw, 54px);
+  line-height: 1.05;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -1.5px;
+}
+
+.corpo_ {
+  width: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  gap: 20px;
+  padding: 20px;
+}
+
+.navegador {
+  min-height: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 18px 12px;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  background: var(--cor-card);
+  box-shadow: var(--sombra);
+  overflow: hidden;
+}
+
+.navegador br {
+  display: none;
+}
+
+.dash {
+  width: 100%;
+  padding: 10px 8px 18px;
+  text-align: center;
+}
+
+.dash h3 {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.1;
+}
+
+.navegador .espaco,
+.navegador > a,
+.navegador .espaco > a {
+  display: block;
+  width: 100%;
+}
+
+.botoes_areas {
+  width: 100%;
+  height: 52px;
+  margin: 7px 0;
+  border-radius: 18px;
+  background: rgba(37, 219, 182, 0.95);
+  color: #ffffff;
+  font-size: 19px;
+  font-weight: 800;
+  transition: background 0.18s ease, transform 0.18s ease;
+}
+
+.botoes_areas:hover {
+  background: var(--cor-destaque-hover);
+  transform: translateX(2px);
+}
+
+.user_ {
+  width: 100%;
+  min-height: 80px;
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.user_ p {
+  margin: 0 !important;
+  font-size: 18px !important;
+  line-height: 1.25;
+  word-break: break-word;
+}
+
+.botao_user {
+  min-width: 92px;
+  height: 48px;
+  padding: 0 14px;
+  font-size: 18px;
+}
+
+.corpo_ > .areabase,
+.corpo_ > .avaliacao,
+.corpo_ > .historico,
+.corpo_ > .paciente,
+.corpo_ > .pacientes,
+.corpo_ > .relatorios,
+.corpo_ > .usuarios,
+.corpo_ > .cadastro_pacientes {
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  padding: 26px;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  background: var(--cor-card);
+  box-shadow: var(--sombra);
+  overflow: hidden;
+}
+
+.titu1 {
+  margin: 0;
+  font-size: clamp(28px, 3vw, 42px);
+  line-height: 1.1;
+  font-weight: 800;
+}
+
+.titu2 {
+  margin: 0;
+  font-size: 26px;
+  line-height: 1.15;
+}
+
+.titu p,
+.top p,
+.topo_ p,
+.relatorios > p,
+.paciente > p,
+.pacientes p,
+.avaliacao p,
+.historico p,
+.usuarios p,
+.areabase p {
+  color: var(--cor-texto-suave);
+  line-height: 1.35;
+}
+
+.top,
+.topo_ {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.top .titu,
+.topo_ .titu {
+  min-width: 0;
+}
+
+.top button,
+.topo_ button {
+  white-space: nowrap;
+}
+
+/* LISTAS E CARDS */
+
+.lista_pacientes,
+.lista_relatorios,
+.usuarios_,
+.historico_avaliacao,
+.avaliacao_paciente {
+  width: 100%;
+  margin-top: 18px;
+  padding: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 20px;
+  background: rgba(5, 6, 44, 0.48);
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.lista_pacientes,
+.usuarios_ {
+  height: calc(100% - 148px);
+}
+
+.lista_relatorios {
+  height: calc(100% - 292px);
+  min-height: 180px;
+}
+
+.historico_avaliacao {
+  height: 100%;
+  min-height: 260px;
+}
+
+.avaliacao_paciente {
+  height: calc(100% - 290px);
+  min-height: 190px;
+}
+
+.card_api {
+  width: 100%;
+  max-width: 100%;
+  min-height: 72px;
+  margin: 0 0 14px;
+  padding: 16px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: 16px;
+  background: rgba(9, 6, 73, 0.66);
+  color: #ffffff;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.22);
+}
+
+.card_api:last-child {
+  margin-bottom: 0;
+}
+
+.card_api .card_header {
+  font-size: 17px;
+  font-weight: 800;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.card_api .card_body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 24px;
+}
+
+.card_api .dado_item {
+  min-width: 150px;
+  color: #e4e4e4;
+  font-size: 14px;
+}
+
+.card_api .dado_item strong,
+.card_api strong {
+  color: var(--cor-destaque);
+}
+
+.buscar_paciente,
+.buscar_usuario,
+.busca_paciente {
+  width: 100%;
+  margin-top: 18px;
+}
+
+.buscar_paciente input,
+.buscar_usuario input,
+.busca_paciente input {
+  height: 54px;
+}
+
+/* DASHBOARD */
+
+.areabase > .dashboard {
+  width: 100%;
+  height: 100%;
+}
+
+.graficos {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  margin: 24px 0;
+}
+
+.graficos > div,
+.areabase > .dashboard {
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: 18px;
+  background: var(--cor-card-2);
+}
+
+.graficos > div {
+  min-height: 132px;
+  padding: 18px;
+}
+
+.graficos h5,
+.sistema h5,
+.dashboard h5 {
+  margin: 0 0 8px;
+  font-size: 21px;
+}
+
+.graficos p strong,
+.dashboard p strong {
+  font-size: 28px;
+  color: var(--cor-destaque);
+}
+
+.acoes {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin: 18px 0;
+}
+
+.acoes button,
+.acoes a {
+  width: 100%;
+}
+
+.sistema {
+  width: 100%;
+  min-height: 140px;
+  margin-top: 22px;
+  padding: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: 18px;
+  background: var(--cor-card-2);
+}
+
+.dashboard_usuario-page .areabase > .dashboard,
+.app-page .areabase > .dashboard:only-of-type {
+  padding: 24px;
+  min-height: 230px;
+}
+
+.pacientes_registrados h2 {
+  margin: 10px 0 0;
+  color: var(--cor-destaque);
+  font-size: 42px;
+}
+
+/* AVALIAÇÃO / HISTÓRICO */
+
+.escolha_paciente,
+.selecionar_paciente,
+.filtros {
+  width: 100%;
+  margin-top: 18px;
+  padding: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: 18px;
+  background: rgba(12, 22, 83, 0.58);
+}
+
+.escolha_paciente h5,
+.selecionar_paciente h5,
+.filtros h5 {
+  margin: 0 0 12px;
+  font-size: 20px;
+}
+
+.escolha_paciente .paciente,
+.selecionar_paciente .paciente {
+  width: 100%;
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.16);
+}
+
+.escolha_paciente .paciente p,
+.selecionar_paciente .paciente p {
+  margin-bottom: 8px;
+}
+
+#formAvaliacao {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  gap: 10px 18px;
+}
+
+#formAvaliacao label {
+  min-height: 48px;
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  margin: 0 !important;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(6, 3, 46, 0.25);
+}
+
+#formAvaliacao input[type="checkbox"] {
+  width: 18px;
+  min-height: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  accent-color: var(--cor-destaque);
+}
+
+#formAvaliacao button,
+#resultadoAvaliacao {
+  grid-column: 1 / -1;
+}
+
+#formAvaliacao button {
+  width: min(100%, 240px);
+  margin-top: 8px;
+}
+
+#resultadoAvaliacao {
+  margin-top: 8px;
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(37, 219, 182, 0.1);
+}
+
+.corp {
+  height: calc(100% - 114px);
+  display: grid;
+  grid-template-columns: 350px minmax(0, 1fr);
+  gap: 20px;
+}
+
+/* RELATÓRIOS */
+
+.fil {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  align-items: end;
+}
+
+.fil p {
+  margin: 0 0 6px;
+}
+
+.botao_aplicar {
+  width: 100%;
+  height: 52px;
+}
+
+/* CADASTRO PACIENTE */
+
+.cadastro_pacientes {
+  display: flex;
+  flex-direction: column;
+}
+
+.geral {
+  width: 100%;
+  min-height: 0;
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: 26px;
+  margin-top: 18px;
+  overflow: hidden;
+}
+
+.vertical,
+.geral > div:has(.vertical) {
+  display: none;
+}
+
+.cadastro_pacientes .dados,
+.dados_pessoais,
+.endereco_paciente,
+.info {
+  width: 100%;
+  min-width: 0;
+}
+
+.cadastro_pacientes .dados {
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.dados_pessoais h5,
+.endereco_paciente h5,
+.info h5 {
+  margin: 0 0 12px;
+  font-size: 20px;
+}
+
+.dados_,
+.pais {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.dados_pessoais input,
+.endereco_paciente input,
+.infor_paciente input,
+#nome,
+#cpf,
+#data,
+#sexo,
+#endereco,
+#cidade,
+#cep,
+#estado {
+  margin-bottom: 10px;
+}
+
+.info {
+  padding: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: 18px;
+  background: rgba(12, 22, 83, 0.58);
+}
+
+.infor_paciente input {
+  height: 210px;
+  align-items: flex-start;
+}
+
+.botao_cadastrar {
+  width: min(100%, 280px);
+  margin-top: 18px;
+}
+
+/* QUESTIONÁRIO REDIRECT */
+
+.redirect-page .corpo {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 28px;
+  text-align: center;
+}
+
+.redirect-page a {
+  color: var(--cor-destaque);
+  font-weight: 800;
+}
+
+/* RESPONSIVO */
+
+@media (max-width: 1180px) {
+  body.app-page {
+    overflow: auto;
+  }
+
+  .app-page .corpo {
+    min-height: 100vh;
+    grid-template-rows: auto 1fr;
+  }
+
+  .corpo_ {
+    grid-template-columns: 1fr;
+    height: auto;
+    overflow: visible;
+  }
+
+  .navegador,
+  .corpo_ > .areabase,
+  .corpo_ > .avaliacao,
+  .corpo_ > .historico,
+  .corpo_ > .paciente,
+  .corpo_ > .pacientes,
+  .corpo_ > .relatorios,
+  .corpo_ > .usuarios,
+  .corpo_ > .cadastro_pacientes {
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .navegador {
+    gap: 8px;
+  }
+
+  .navegador .espaco {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .navegador > a {
+    margin-bottom: 10px;
+  }
+
+  .lista_pacientes,
+  .lista_relatorios,
+  .usuarios_,
+  .historico_avaliacao,
+  .avaliacao_paciente {
+    height: auto;
+    max-height: none;
+    min-height: 180px;
+  }
+
+  .graficos,
+  .acoes,
+  .fil,
+  .geral,
+  .corp,
+  #formAvaliacao,
+  .formulario_cadastro .dados {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 680px) {
+  .container_ {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .container_ .logo {
+    width: 72px;
+    height: 72px;
+  }
+
+  .top,
+  .topo_ {
+    flex-direction: column;
+  }
+
+  .top button,
+  .topo_ button,
+  .botao_cadastro,
+  .botao_cadastrar,
+  .botao_avaliacao,
+  .botao_imprimir,
+  .botao_user_ {
+    width: 100%;
+  }
+
+  .navegador .espaco {
+    grid-template-columns: 1fr;
+  }
+
+  .home-page .container {
+    justify-content: center;
+  }
+
+  .home-page .botao_login {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .home-page .titulo h1 {
+    text-align: center;
+  }
+
+  .home-page .simbolo {
+    margin: 0 auto 20px;
+  }
+
+  .dados_,
+  .pais {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* IMPRESSÃO */
+
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    overflow: visible !important;
+  }
+
+  .container_,
+  .navegador,
+  .top button,
+  .topo_ button,
+  .botao_imprimir,
+  .botao_aplicar {
+    display: none !important;
+  }
+
+  .corpo,
+  .corpo_,
+  .corpo_ > * {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    padding: 0 !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    color: #000000 !important;
+  }
+
+  .card_api,
+  .lista_relatorios,
+  .historico_avaliacao {
+    color: #000000 !important;
+    border: 1px solid #999999 !important;
+    background: #ffffff !important;
+  }
 }
