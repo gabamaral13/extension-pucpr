@@ -14,7 +14,11 @@ function adicionarColuna(tabela, coluna, definicao) {
   db.run(`ALTER TABLE ${tabela} ADD COLUMN ${coluna} ${definicao}`, (err) => {
     if (err) {
       if (err.message.includes("duplicate column name")) return;
-      console.error(`Erro ao adicionar coluna ${coluna} em ${tabela}:`, err.message);
+
+      console.error(
+        `Erro ao adicionar coluna ${coluna} em ${tabela}:`,
+        err.message
+      );
       return;
     }
 
@@ -91,18 +95,50 @@ db.serialize(() => {
     )
   `);
 
+  // Migração para bancos antigos
   adicionarColuna("avaliacoes", "limite", "REAL");
   adicionarColuna("avaliacoes", "suspeito", "INTEGER DEFAULT 0");
+
+  // ==================================================
+  // TABELA: AVISOS / COMUNICADOS INTERNOS
+  // ==================================================
+  db.run(`
+    CREATE TABLE IF NOT EXISTS avisos (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      titulo TEXT NOT NULL,
+      mensagem TEXT NOT NULL,
+      criado_por INTEGER,
+      ativo INTEGER DEFAULT 1,
+      criado_em DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+      FOREIGN KEY (criado_por) REFERENCES usuarios(id) ON DELETE SET NULL
+    )
+  `);
+
+  // Migração para bancos antigos
+  adicionarColuna("avisos", "ativo", "INTEGER DEFAULT 1");
 
   // ==================================================
   // ÍNDICES
   // ==================================================
   db.run(`CREATE INDEX IF NOT EXISTS idx_pacientes_nome ON pacientes(nome)`);
   db.run(`CREATE INDEX IF NOT EXISTS idx_pacientes_cpf ON pacientes(cpf)`);
+
   db.run(`CREATE INDEX IF NOT EXISTS idx_usuarios_email ON usuarios(email)`);
-  db.run(`CREATE INDEX IF NOT EXISTS idx_avaliacoes_paciente ON avaliacoes(paciente_id)`);
-  db.run(`CREATE INDEX IF NOT EXISTS idx_avaliacoes_usuario ON avaliacoes(usuario_id)`);
-  db.run(`CREATE INDEX IF NOT EXISTS idx_avaliacoes_data ON avaliacoes(criado_em)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_usuarios_username ON usuarios(username)`);
+
+  db.run(
+    `CREATE INDEX IF NOT EXISTS idx_avaliacoes_paciente ON avaliacoes(paciente_id)`
+  );
+  db.run(
+    `CREATE INDEX IF NOT EXISTS idx_avaliacoes_usuario ON avaliacoes(usuario_id)`
+  );
+  db.run(
+    `CREATE INDEX IF NOT EXISTS idx_avaliacoes_data ON avaliacoes(criado_em)`
+  );
+
+  db.run(`CREATE INDEX IF NOT EXISTS idx_avisos_data ON avisos(criado_em)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_avisos_ativo ON avisos(ativo)`);
 });
 
 module.exports = db;

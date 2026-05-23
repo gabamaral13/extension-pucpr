@@ -2,7 +2,7 @@
 
 Sistema web desenvolvido para uso interno de uma instituição de saúde, com foco no gerenciamento de pacientes e avaliações clínicas relacionadas à triagem da Síndrome do X-Frágil.
 
-O sistema permite que profissionais autorizados cadastrem pacientes, realizem avaliações por checklist, acompanhem históricos e gerem relatórios para consulta e impressão.
+O sistema permite que profissionais autorizados cadastrem pacientes, consultem dados, editem informações, realizem avaliações por checklist, acompanhem históricos, gerem relatórios e publiquem comunicados internos.
 
 ---
 
@@ -13,7 +13,13 @@ O sistema permite que profissionais autorizados cadastrem pacientes, realizem av
   - **Admin**: médico/diretor
   - **User**: atendente
 - 🧑‍⚕️ Cadastro de pacientes
+- 🔎 Visualização completa dos dados do paciente
+- ✏️ Edição de informações do paciente
+- 🗑️ Exclusão de pacientes
 - 👥 Cadastro e listagem de usuários
+- 📢 Comunicados internos:
+  - Admin pode publicar e excluir avisos
+  - Usuários podem visualizar os avisos no dashboard
 - 📋 Checklist clínico com 12 sintomas
 - 🧮 Cálculo automático de score
 - 📊 Geração de recomendação clínica
@@ -21,6 +27,7 @@ O sistema permite que profissionais autorizados cadastrem pacientes, realizem av
 - 📄 Relatórios com filtros
 - 🖨️ Opção de impressão de relatórios e históricos
 - 🌐 Integração entre frontend e backend
+- 📡 Acesso pela rede local/LAN
 - 🌍 Possibilidade de teste externo usando LocalTunnel
 
 ---
@@ -55,6 +62,7 @@ extension-pucpr/
 │   ├── rotas/
 │   │   ├── authRotas.js
 │   │   ├── avaliacaoRotas.js
+│   │   ├── avisoRotas.js
 │   │   ├── pacienteRotas.js
 │   │   ├── relatorioRotas.js
 │   │   └── usuarioRotas.js
@@ -178,7 +186,7 @@ admin123
 
 ---
 
-## 🌐 Acesso pela rede local
+## 🌐 Acesso pela rede local / LAN
 
 O servidor está configurado para aceitar conexões externas na rede local usando:
 
@@ -186,28 +194,44 @@ O servidor está configurado para aceitar conexões externas na rede local usand
 0.0.0.0
 ```
 
-Ao iniciar o servidor, serão exibidos links parecidos com:
+Ao iniciar o servidor com:
+
+```bash
+npm start
+```
+
+o terminal exibirá links de acesso parecidos com:
 
 ```txt
 http://192.168.x.x:3000
-http://172.x.x.x:3000
+http://192.168.x.x:3000/html/index.html
+http://192.168.x.x:3000/api/status
 ```
 
-Esses links podem ser usados por outros dispositivos conectados na mesma rede.
+Esses links podem ser usados por outros dispositivos conectados na mesma rede Wi-Fi ou cabo.
 
 Exemplo:
 
 ```txt
-http://SEU-IP:3000
+http://SEU-IP:3000/html/index.html
 ```
 
-ou:
+Observação: se aparecer mais de um IP, use o IP da rede principal, normalmente parecido com:
 
 ```txt
-http://SEU-IP:3000/api/status
+192.168.0.x
+192.168.1.x
+192.168.18.x
 ```
 
-Observação: em redes de faculdade, empresa ou alguns hotspots de celular, pode existir bloqueio entre dispositivos. Nesse caso, mesmo estando na mesma rede, outro computador pode não conseguir acessar o servidor local.
+IPs como `192.168.56.x` geralmente são de adaptadores virtuais, como VirtualBox, VMware ou redes internas, e normalmente não devem ser usados para acesso por outro dispositivo.
+
+Caso outro dispositivo não consiga acessar, verifique:
+
+- Se os dois dispositivos estão na mesma rede;
+- Se o firewall do Windows permitiu o Node.js;
+- Se a rede não bloqueia comunicação entre dispositivos;
+- Se o servidor ainda está rodando no terminal.
 
 ---
 
@@ -270,11 +294,16 @@ Importante:
 O administrador possui acesso às principais áreas do sistema:
 
 - Dashboard administrativo
-- Listagem de pacientes
+- Cadastro e listagem de usuários
+- Cadastro e listagem de pacientes
+- Visualização dos dados completos dos pacientes
+- Edição de informações dos pacientes
+- Exclusão de pacientes
 - Criação de avaliações
 - Histórico de avaliações
 - Relatórios
-- Cadastro e listagem de usuários
+- Impressão de relatórios e históricos
+- Publicação e exclusão de comunicados internos
 
 ### User
 
@@ -283,7 +312,12 @@ O usuário comum possui acesso às funções operacionais:
 - Dashboard do usuário
 - Cadastro de pacientes
 - Listagem de pacientes
+- Visualização dos dados completos dos pacientes
+- Edição de informações dos pacientes
+- Exclusão de pacientes
+- Criação de avaliações
 - Relatórios
+- Visualização dos comunicados internos
 
 ---
 
@@ -303,6 +337,7 @@ Verifica se a API está rodando corretamente.
 
 ```http
 POST /auth/login
+POST /api/auth/login
 ```
 
 Realiza login e retorna o token JWT.
@@ -314,9 +349,13 @@ Realiza login e retorna o token JWT.
 ```http
 GET /usuarios
 POST /usuarios
+GET /api/usuarios
+POST /api/usuarios
 ```
 
 Rotas protegidas para listagem e cadastro de usuários.
+
+Apenas usuários com perfil **admin** podem cadastrar e listar usuários.
 
 ---
 
@@ -326,9 +365,23 @@ Rotas protegidas para listagem e cadastro de usuários.
 GET /pacientes
 POST /pacientes
 GET /pacientes/:id
+PUT /pacientes/:id
+DELETE /pacientes/:id
 ```
 
-Rotas para cadastro e consulta de pacientes.
+ou:
+
+```http
+GET /api/pacientes
+POST /api/pacientes
+GET /api/pacientes/:id
+PUT /api/pacientes/:id
+DELETE /api/pacientes/:id
+```
+
+Rotas para cadastro, consulta, edição e exclusão de pacientes.
+
+Observação: ao excluir um paciente, as avaliações vinculadas a ele também são removidas por causa da relação com `ON DELETE CASCADE` no banco de dados.
 
 ---
 
@@ -341,6 +394,15 @@ GET /avaliacoes/:pacienteId
 GET /avaliacoes/imprimir/:id
 ```
 
+ou:
+
+```http
+GET /api/avaliacoes
+POST /api/avaliacoes
+GET /api/avaliacoes/:pacienteId
+GET /api/avaliacoes/imprimir/:id
+```
+
 Rotas para criação, consulta, histórico e impressão de avaliações.
 
 ---
@@ -349,9 +411,34 @@ Rotas para criação, consulta, histórico e impressão de avaliações.
 
 ```http
 GET /relatorios
+GET /api/relatorios
 ```
 
 Rota utilizada para geração de dados resumidos e relatórios.
+
+---
+
+### Comunicados internos
+
+```http
+GET /avisos
+POST /avisos
+DELETE /avisos/:id
+```
+
+ou:
+
+```http
+GET /api/avisos
+POST /api/avisos
+DELETE /api/avisos/:id
+```
+
+Rotas utilizadas para o mural de comunicados internos.
+
+- `GET`: admin e user podem visualizar os avisos.
+- `POST`: apenas admin pode publicar avisos.
+- `DELETE`: apenas admin pode excluir/desativar avisos.
 
 ---
 
@@ -361,10 +448,12 @@ O sistema utiliza um checklist com 12 sintomas relacionados à triagem clínica 
 
 Cada avaliação gera automaticamente:
 
-- Score da avaliação
-- Quantidade de sintomas marcados
-- Recomendação clínica
-- Registro no histórico do paciente
+- Score da avaliação;
+- Quantidade de sintomas marcados;
+- Limite utilizado no cálculo;
+- Indicação de suspeita;
+- Recomendação clínica;
+- Registro no histórico do paciente.
 
 ---
 
@@ -375,6 +464,63 @@ O score é calculado com base nas respostas marcadas no checklist clínico.
 Cada sintoma possui um peso específico, e o sistema calcula automaticamente a pontuação final da avaliação.
 
 A recomendação clínica é gerada de acordo com o score obtido e os critérios definidos no backend.
+
+O cálculo é feito no arquivo:
+
+```txt
+backend/utils/calculoScore.js
+```
+
+---
+
+## 📢 Comunicados internos
+
+O sistema possui um mural de comunicados internos integrado ao dashboard.
+
+No perfil **admin**, é possível:
+
+- Publicar avisos;
+- Inserir título e mensagem;
+- Visualizar os avisos publicados;
+- Excluir/desativar avisos antigos.
+
+No perfil **user**, é possível:
+
+- Visualizar os comunicados internos publicados pela administração;
+- Acompanhar avisos importantes diretamente pelo dashboard.
+
+Essa funcionalidade pode ser usada para informar:
+
+- Reuniões internas;
+- Mudanças de protocolo;
+- Manutenções no sistema;
+- Avisos administrativos;
+- Orientações para atendentes.
+
+---
+
+## 🗄️ Banco de dados
+
+O sistema utiliza SQLite como banco de dados local.
+
+O arquivo do banco fica em:
+
+```txt
+backend/banco.db
+```
+
+As principais tabelas são:
+
+- `usuarios`
+- `pacientes`
+- `avaliacoes`
+- `avisos`
+
+O arquivo responsável por criar e atualizar as tabelas é:
+
+```txt
+backend/banco.js
+```
 
 ---
 
@@ -387,6 +533,8 @@ A recomendação clínica é gerada de acordo com o score obtido e os critérios
 - Os relatórios e históricos podem ser visualizados e impressos pelos profissionais.
 - O banco de dados utilizado é SQLite e fica salvo localmente no arquivo `banco.db`.
 - Ao testar com LocalTunnel, os dados cadastrados por outros usuários são salvos no banco local da máquina que está executando o servidor.
+- Ao apagar um paciente, as avaliações vinculadas a ele também são removidas.
+- O sistema deve ser executado com o backend ativo para que login, cadastros, avaliações, relatórios e avisos funcionem corretamente.
 
 ---
 
@@ -398,11 +546,16 @@ A recomendação clínica é gerada de acordo com o score obtido e os critérios
 ✅ Controle de acesso por perfil  
 ✅ Integração entre frontend e backend  
 ✅ Cadastro e listagem de pacientes  
+✅ Visualização de dados completos dos pacientes  
+✅ Edição de pacientes  
+✅ Exclusão de pacientes  
 ✅ Cadastro e listagem de usuários  
 ✅ Avaliações integradas  
 ✅ Histórico de avaliações  
 ✅ Relatórios integrados  
 ✅ Impressão de relatórios e históricos  
+✅ Comunicados internos no dashboard  
+✅ Acesso pela rede local/LAN configurado  
 ✅ Acesso externo temporário via LocalTunnel testado  
 
 ---
@@ -445,10 +598,55 @@ node servidor.js
 http://localhost:3000/api/status
 ```
 
-### Gerar link público temporário
+### Testar pela rede local
+
+```txt
+http://SEU-IP:3000/html/index.html
+```
+
+
+## 🌍 Teste externo opcional com LocalTunnel
+
+Caso seja necessário testar o sistema fora da rede local, é possível gerar um link público temporário com o LocalTunnel.
+
+Com o servidor rodando em um terminal:
+
+```bash
+npm start
+```
+
+Em outro terminal, execute o comando abaixo:
 
 ```bash
 npx localtunnel --port 3000 --local-host 127.0.0.1
+```
+
+O LocalTunnel irá gerar um link temporário, que pode ser usado para acessar o sistema externamente.
+
+Observação: essa etapa é opcional. Para uso normal na mesma rede, basta utilizar o IP local exibido pelo servidor.
+
+
+---
+
+## 🧹 Observação sobre entrega
+
+Para enviar o projeto em ZIP, não é necessário incluir a pasta:
+
+```txt
+node_modules
+```
+
+Quem baixar o projeto pode instalar as dependências novamente com:
+
+```bash
+npm install
+```
+
+Também é recomendado manter o arquivo `.gitignore` configurado para ignorar:
+
+```txt
+node_modules
+.env
 ```
 
 ---

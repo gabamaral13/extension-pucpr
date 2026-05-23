@@ -15,6 +15,7 @@ const usuarioRotas = require("./rotas/usuarioRotas");
 const pacienteRotas = require("./rotas/pacienteRotas");
 const avaliacaoRotas = require("./rotas/avaliacaoRotas");
 const relatorioRotas = require("./rotas/relatorioRotas");
+const avisoRotas = require("./rotas/avisoRotas");
 
 // Middlewares
 app.use(cors());
@@ -45,7 +46,9 @@ async function criarUsuario(req, res) {
   }
 
   if (!["admin", "user"].includes(papelFinal)) {
-    return res.status(400).json({ erro: "Papel inválido" });
+    return res.status(400).json({
+      erro: "Papel inválido",
+    });
   }
 
   db.get(
@@ -60,7 +63,9 @@ async function criarUsuario(req, res) {
     async (err, existente) => {
       if (err) {
         console.error("Erro ao verificar usuário:", err.message);
-        return res.status(500).json({ erro: "Erro ao verificar usuário" });
+        return res.status(500).json({
+          erro: "Erro ao verificar usuário",
+        });
       }
 
       if (existente) {
@@ -69,28 +74,35 @@ async function criarUsuario(req, res) {
         });
       }
 
-      const hash = await bcrypt.hash(senha, 10);
+      try {
+        const hash = await bcrypt.hash(senha, 10);
 
-      db.run(
-        `
-          INSERT INTO usuarios (nome, email, cpf, username, senha, papel)
-          VALUES (?, ?, ?, ?, ?, ?)
-        `,
-        [nomeFinal, emailFinal, cpfFinal, usernameFinal, hash, papelFinal],
-        function (err) {
-          if (err) {
-            console.error("Erro ao criar usuário:", err.message);
-            return res.status(400).json({
-              erro: "Erro ao criar usuário. Verifique se os campos existem no banco.",
+        db.run(
+          `
+            INSERT INTO usuarios (nome, email, cpf, username, senha, papel)
+            VALUES (?, ?, ?, ?, ?, ?)
+          `,
+          [nomeFinal, emailFinal, cpfFinal, usernameFinal, hash, papelFinal],
+          function (err) {
+            if (err) {
+              console.error("Erro ao criar usuário:", err.message);
+              return res.status(400).json({
+                erro: "Erro ao criar usuário. Verifique se os campos existem no banco.",
+              });
+            }
+
+            return res.status(201).json({
+              mensagem: "Usuário criado com sucesso",
+              id: this.lastID,
             });
           }
-
-          return res.status(201).json({
-            mensagem: "Usuário criado com sucesso",
-            id: this.lastID,
-          });
-        }
-      );
+        );
+      } catch (erro) {
+        console.error("Erro ao criptografar senha:", erro.message);
+        return res.status(500).json({
+          erro: "Erro ao criar senha do usuário",
+        });
+      }
     }
   );
 }
@@ -106,7 +118,9 @@ function listarUsuarios(req, res) {
     (err, dados) => {
       if (err) {
         console.error("Erro ao listar usuários:", err.message);
-        return res.status(500).json({ erro: "Erro ao listar usuários" });
+        return res.status(500).json({
+          erro: "Erro ao listar usuários",
+        });
       }
 
       return res.json(dados);
@@ -155,6 +169,9 @@ app.use("/api/avaliacoes", avaliacaoRotas);
 app.use("/relatorios", relatorioRotas);
 app.use("/api/relatorios", relatorioRotas);
 
+app.use("/avisos", avisoRotas);
+app.use("/api/avisos", avisoRotas);
+
 // Página inicial
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../frontend/html/index.html"));
@@ -162,7 +179,9 @@ app.get("/", (req, res) => {
 
 // Status da API
 app.get("/api/status", (req, res) => {
-  res.json({ mensagem: "API do sistema hospitalar rodando 🚀" });
+  res.json({
+    mensagem: "API do sistema hospitalar rodando 🚀",
+  });
 });
 
 // Porta
@@ -172,7 +191,7 @@ const HOST = "0.0.0.0";
 function mostrarIpsDaRede() {
   const interfaces = os.networkInterfaces();
 
-  console.log("\nAcesse em outro dispositivo da mesma rede usando um destes links:\n");
+  console.log("\nAcesse em outro dispositivo da mesma rede usando este link:\n");
 
   let encontrouIp = false;
 
@@ -180,15 +199,22 @@ function mostrarIpsDaRede() {
     interfaces[nome].forEach((rede) => {
       const ehIPv4 = rede.family === "IPv4";
       const ehInterno = rede.internal;
+
+      const nomeInterface = nome.toLowerCase();
+
       const ehIpVirtual =
-        nome.toLowerCase().includes("virtual") ||
-        nome.toLowerCase().includes("vmware") ||
-        nome.toLowerCase().includes("virtualbox") ||
-        nome.toLowerCase().includes("wsl") ||
-        rede.address.startsWith("169.254.");
+        nomeInterface.includes("virtual") ||
+        nomeInterface.includes("vmware") ||
+        nomeInterface.includes("virtualbox") ||
+        nomeInterface.includes("vbox") ||
+        nomeInterface.includes("wsl") ||
+        nomeInterface.includes("hyper-v") ||
+        rede.address.startsWith("169.254.") ||
+        rede.address.startsWith("192.168.56.");
 
       if (ehIPv4 && !ehInterno && !ehIpVirtual) {
         encontrouIp = true;
+
         console.log(`http://${rede.address}:${PORTA}`);
         console.log(`http://${rede.address}:${PORTA}/html/index.html`);
         console.log(`http://${rede.address}:${PORTA}/api/status`);

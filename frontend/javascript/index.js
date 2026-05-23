@@ -1512,6 +1512,156 @@ async function imprimirAvaliacao(id) {
 }
 
 // =========================
+// AVISOS / COMUNICADOS INTERNOS
+// =========================
+
+function formatarDataHora(data) {
+  if (!data) return "Não informado";
+
+  const texto = String(data).trim();
+
+  // O SQLite salva CURRENT_TIMESTAMP em UTC.
+  // Exemplo: "2026-05-23 02:14:00"
+  // Aqui a gente transforma para horário do Brasil.
+  const dataUTC = texto.includes("T")
+    ? new Date(texto)
+    : new Date(texto.replace(" ", "T") + "Z");
+
+  if (Number.isNaN(dataUTC.getTime())) {
+    return texto;
+  }
+
+  const dataFormatada = dataUTC.toLocaleDateString("pt-BR", {
+    timeZone: "America/Sao_Paulo",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+
+  const horaFormatada = dataUTC.toLocaleTimeString("pt-BR", {
+    timeZone: "America/Sao_Paulo",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  return `${dataFormatada} às ${horaFormatada}`;
+}
+
+function cardAviso(aviso) {
+  const podeExcluir = usuarioEhAdmin();
+
+  const autor =
+    aviso.autor_nome ||
+    aviso.nome_usuario ||
+    aviso.username ||
+    aviso.autor ||
+    "Admin";
+
+  return `
+    <div class="card_aviso">
+      <div class="aviso_topo">
+        <div>
+          <h4>${escaparHTML(aviso.titulo)}</h4>
+          <span>
+            Publicado por ${escaparHTML(autor)} • ${formatarDataHora(aviso.criado_em)}
+          </span>
+        </div>
+
+        ${
+          podeExcluir
+            ? `
+              <button
+                class="botao_card botao_perigo"
+                type="button"
+                onclick="excluirAviso(${Number(aviso.id)})"
+              >
+                Excluir
+              </button>
+            `
+            : ""
+        }
+      </div>
+
+      <p>${escaparHTML(aviso.mensagem)}</p>
+    </div>
+  `;
+}
+
+async function carregarAvisosDashboard() {
+  const lista = document.querySelector(".lista_avisos_dashboard");
+
+  if (!lista) return;
+
+  try {
+    const avisos = await apiFetch("/avisos", {
+      headers: authHeaders(),
+    });
+
+    lista.innerHTML =
+      avisos.length > 0
+        ? avisos.map(cardAviso).join("")
+        : `
+          <div class="aviso_vazio">
+            <h4>Nenhum comunicado publicado</h4>
+            <p>Quando o administrador publicar um aviso, ele aparecerá aqui.</p>
+          </div>
+        `;
+  } catch (erro) {
+    lista.innerHTML = `<p>Erro ao carregar avisos: ${escaparHTML(
+      erro.message
+    )}</p>`;
+  }
+}
+
+async function publicarAviso(event) {
+  event.preventDefault();
+
+  const titulo = document.getElementById("avisoTitulo")?.value.trim();
+  const mensagem = document.getElementById("avisoMensagem")?.value.trim();
+
+  if (!titulo || !mensagem) {
+    alert("Preencha o título e a mensagem do aviso.");
+    return;
+  }
+
+  try {
+    await apiFetch("/avisos", {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify({
+        titulo,
+        mensagem,
+      }),
+    });
+
+    document.getElementById("formAviso")?.reset();
+
+    alert("Aviso publicado com sucesso!");
+    carregarAvisosDashboard();
+  } catch (erro) {
+    alert(`Erro ao publicar aviso: ${erro.message}`);
+  }
+}
+
+async function excluirAviso(id) {
+  const confirmar = confirm("Tem certeza que deseja excluir este aviso?");
+
+  if (!confirmar) return;
+
+  try {
+    await apiFetch(`/avisos/${id}`, {
+      method: "DELETE",
+      headers: authHeaders(),
+    });
+
+    alert("Aviso excluído com sucesso!");
+    carregarAvisosDashboard();
+  } catch (erro) {
+    alert(`Erro ao excluir aviso: ${erro.message}`);
+  }
+}
+
+// =========================
 // DASHBOARDS
 // =========================
 
@@ -1556,6 +1706,21 @@ async function carregarDashboardUsuario() {
 
       <hr />
 
+      <section class="mural_avisos">
+        <div class="mural_topo">
+          <div>
+            <h3>Comunicados Internos</h3>
+            <p>Avisos publicados pela administração.</p>
+          </div>
+        </div>
+
+        <div class="lista_avisos_dashboard">
+          <p>Carregando avisos...</p>
+        </div>
+      </section>
+
+      <hr />
+
       <h3 class="titu2">Ações rápidas</h3>
 
       <div class="acoes">
@@ -1573,20 +1738,24 @@ async function carregarDashboardUsuario() {
       </div>
 
       <div class="sistema">
-  <h5>Resumo do atendimento</h5>
-  <p>
-    Use esta área para cadastrar pacientes, iniciar avaliações clínicas e consultar relatórios gerados.
-  </p>
+        <h5>Resumo do atendimento</h5>
 
-  <p>
-    <strong>Seu papel:</strong> Atendente<br />
-    <strong>Status:</strong> Sistema funcionando
-  </p>
-</div>
+        <p>
+          Use esta área para cadastrar pacientes, iniciar avaliações clínicas
+          e consultar relatórios gerados.
+        </p>
+
+        <p>
+          <strong>Seu papel:</strong> Atendente<br />
+          <strong>Status:</strong> Sistema funcionando
+        </p>
+      </div>
     `;
+
+    carregarAvisosDashboard();
   } catch (erro) {
     area.innerHTML = `<p>Erro ao carregar dashboard: ${escaparHTML(
-      erro.message,
+      erro.message
     )}</p>`;
   }
 }
@@ -1646,6 +1815,40 @@ async function carregarDashboardMedico() {
       const ultimas = avaliacoes.slice(0, 3);
 
       sistema.innerHTML = `
+        <section class="mural_avisos">
+          <div class="mural_topo">
+            <div>
+              <h3>Comunicados Internos</h3>
+              <p>Publique avisos para todos os usuários do sistema.</p>
+            </div>
+          </div>
+
+          <form id="formAviso" class="form_aviso">
+            <input
+              id="avisoTitulo"
+              type="text"
+              placeholder="Título do aviso"
+              maxlength="100"
+            />
+
+            <textarea
+              id="avisoMensagem"
+              placeholder="Mensagem do aviso"
+              maxlength="500"
+            ></textarea>
+
+            <button class="botao_card" type="submit">
+              Publicar aviso
+            </button>
+          </form>
+
+          <div class="lista_avisos_dashboard">
+            <p>Carregando avisos...</p>
+          </div>
+        </section>
+
+        <hr />
+
         <h5>Últimas avaliações</h5>
 
         ${
@@ -1660,7 +1863,9 @@ async function carregarDashboardMedico() {
                           `Paciente ${avaliacao.paciente_id}`
                       )}</strong><br />
                       Score: ${formatarScore(avaliacao.score)} |
-                      ${escaparHTML(avaliacao.recomendacao || "Sem recomendação")}
+                      ${escaparHTML(
+                        avaliacao.recomendacao || "Sem recomendação"
+                      )}
                     </p>
                   `
                 )
@@ -1668,6 +1873,14 @@ async function carregarDashboardMedico() {
             : "<p>Nenhuma avaliação registrada ainda.</p>"
         }
       `;
+
+      const formAviso = document.getElementById("formAviso");
+
+      if (formAviso) {
+        formAviso.addEventListener("submit", publicarAviso);
+      }
+
+      carregarAvisosDashboard();
     }
   } catch (erro) {
     console.error("Erro ao carregar dashboard médico:", erro);
