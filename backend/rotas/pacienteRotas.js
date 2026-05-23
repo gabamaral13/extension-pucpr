@@ -88,7 +88,6 @@ router.post("/", autenticacao, (req, res) => {
 // ==================================================
 // LISTAR PACIENTES
 // Admin e User podem visualizar pacientes
-// Agora busca também por ID.
 // ==================================================
 router.get("/", autenticacao, (req, res) => {
   const buscaOriginal = req.query.busca ? String(req.query.busca).trim() : "";
@@ -120,9 +119,10 @@ router.get("/", autenticacao, (req, res) => {
       OR cidade LIKE ?
       OR estado LIKE ?
       OR responsavel LIKE ?
+      OR endereco LIKE ?
     `;
 
-    params.push(busca, busca, busca, busca, busca, busca);
+    params.push(busca, busca, busca, busca, busca, busca, busca);
   }
 
   sql += ` ORDER BY nome ASC`;
@@ -177,6 +177,117 @@ router.get("/:id", autenticacao, (req, res) => {
       }
 
       return res.json(paciente);
+    }
+  );
+});
+
+// ==================================================
+// EDITAR PACIENTE
+// Admin e User podem editar paciente
+// ==================================================
+router.put("/:id", autenticacao, (req, res) => {
+  const {
+    nome,
+    cpf,
+    data_nascimento,
+    sexo,
+    endereco,
+    cep,
+    estado,
+    cidade,
+    responsavel,
+  } = req.body;
+
+  const sexoNormalizado = normalizarSexo(sexo);
+
+  if (!nome || !data_nascimento || !sexoNormalizado) {
+    return res.status(400).json({
+      erro: "Nome, data de nascimento e sexo são obrigatórios",
+    });
+  }
+
+  if (!["M", "F"].includes(sexoNormalizado)) {
+    return res.status(400).json({
+      erro: "Sexo deve ser M ou F",
+    });
+  }
+
+  db.run(
+    `
+      UPDATE pacientes
+      SET
+        nome = ?,
+        cpf = ?,
+        data_nascimento = ?,
+        sexo = ?,
+        endereco = ?,
+        cep = ?,
+        estado = ?,
+        cidade = ?,
+        responsavel = ?
+      WHERE id = ?
+    `,
+    [
+      nome,
+      cpf || null,
+      data_nascimento,
+      sexoNormalizado,
+      endereco || null,
+      cep || null,
+      estado || null,
+      cidade || null,
+      responsavel || null,
+      req.params.id,
+    ],
+    function (err) {
+      if (err) {
+        console.error("Erro ao editar paciente:", err.message);
+        return res.status(500).json({
+          erro: "Erro ao editar paciente",
+        });
+      }
+
+      if (this.changes === 0) {
+        return res.status(404).json({
+          erro: "Paciente não encontrado",
+        });
+      }
+
+      return res.json({
+        mensagem: "Paciente editado com sucesso",
+      });
+    }
+  );
+});
+
+// ==================================================
+// EXCLUIR PACIENTE
+// Admin e User podem excluir paciente
+// ==================================================
+router.delete("/:id", autenticacao, (req, res) => {
+  db.run(
+    `
+      DELETE FROM pacientes
+      WHERE id = ?
+    `,
+    [req.params.id],
+    function (err) {
+      if (err) {
+        console.error("Erro ao excluir paciente:", err.message);
+        return res.status(500).json({
+          erro: "Erro ao excluir paciente",
+        });
+      }
+
+      if (this.changes === 0) {
+        return res.status(404).json({
+          erro: "Paciente não encontrado",
+        });
+      }
+
+      return res.json({
+        mensagem: "Paciente excluído com sucesso",
+      });
     }
   );
 });

@@ -410,13 +410,19 @@ function normalizarSexo(valor) {
   return sexo;
 }
 
+function valorOuNaoInformado(valor) {
+  return valor && String(valor).trim() ? String(valor).trim() : "Não informado";
+}
+
 async function cadastrarPaciente(event) {
   if (event) event.preventDefault();
 
   const nome = document.getElementById("nome")?.value.trim();
+  const cpf = document.getElementById("cpf")?.value.trim() || null;
   const data_nascimento = document.getElementById("data")?.value;
   const sexo = normalizarSexo(document.getElementById("sexo")?.value);
 
+  const endereco = document.getElementById("endereco")?.value.trim() || null;
   const cep = document.getElementById("cep")?.value.trim() || null;
   const estado = document.getElementById("estado")?.value.trim() || null;
   const cidade = document.getElementById("cidade")?.value.trim() || null;
@@ -439,8 +445,10 @@ async function cadastrarPaciente(event) {
       headers: authHeaders(),
       body: JSON.stringify({
         nome,
+        cpf,
         data_nascimento,
         sexo,
+        endereco,
         cep,
         estado,
         cidade,
@@ -478,11 +486,32 @@ function botoesPaciente(paciente) {
     `
     : "";
 
+  const botaoDados = `
+    <button class="botao_card" type="button" onclick="verDadosPaciente(${id})">
+      Dados
+    </button>
+  `;
+
+  const botaoEditar = `
+    <button class="botao_card" type="button" onclick="editarPaciente(${id})">
+      Editar
+    </button>
+  `;
+
+  const botaoExcluir = `
+    <button class="botao_card botao_perigo" type="button" onclick="excluirPaciente(${id})">
+      Excluir
+    </button>
+  `;
+
   return `
     <div class="acoes_card">
       ${botaoAvaliar}
       ${botaoRelatorio}
       ${botaoHistorico}
+      ${botaoDados}
+      ${botaoEditar}
+      ${botaoExcluir}
     </div>
   `;
 }
@@ -500,6 +529,12 @@ function cardPaciente(paciente) {
         </div>
 
         <div class="dado_item">
+          <strong>CPF:</strong> ${escaparHTML(
+            paciente.cpf || "Não informado"
+          )}
+        </div>
+
+        <div class="dado_item">
           <strong>Sexo:</strong> ${escaparHTML(paciente.sexo)}
         </div>
 
@@ -513,19 +548,25 @@ function cardPaciente(paciente) {
 
         <div class="dado_item">
           <strong>Estado:</strong> ${escaparHTML(
-            paciente.estado || "Não informado",
+            paciente.estado || "Não informado"
           )}
         </div>
 
         <div class="dado_item">
           <strong>Cidade:</strong> ${escaparHTML(
-            paciente.cidade || "Não informado",
+            paciente.cidade || "Não informado"
+          )}
+        </div>
+
+        <div class="dado_item" style="min-width: 100%;">
+          <strong>Endereço:</strong> ${escaparHTML(
+            paciente.endereco || "Não informado"
           )}
         </div>
 
         <div class="dado_item" style="min-width: 100%;">
           <strong>Pais/Responsável:</strong> ${escaparHTML(
-            paciente.responsavel || "Não informado",
+            paciente.responsavel || "Não informado"
           )}
         </div>
       </div>
@@ -564,11 +605,169 @@ async function carregarPacientes() {
   } catch (erro) {
     if (lista) {
       lista.innerHTML = `<p>Erro ao carregar pacientes: ${escaparHTML(
-        erro.message,
+        erro.message
       )}</p>`;
     }
 
     return [];
+  }
+}
+
+async function verDadosPaciente(pacienteId) {
+  try {
+    const paciente = await apiFetch(`/pacientes/${pacienteId}`, {
+      headers: authHeaders(),
+    });
+
+    alert(
+      `DADOS DO PACIENTE\n\n` +
+        `ID: ${valorOuNaoInformado(paciente.id)}\n` +
+        `Nome: ${valorOuNaoInformado(paciente.nome)}\n` +
+        `CPF: ${valorOuNaoInformado(paciente.cpf)}\n` +
+        `Data de nascimento: ${formatarData(paciente.data_nascimento)}\n` +
+        `Sexo: ${valorOuNaoInformado(paciente.sexo)}\n\n` +
+        `ENDEREÇO\n` +
+        `Endereço: ${valorOuNaoInformado(paciente.endereco)}\n` +
+        `CEP: ${valorOuNaoInformado(paciente.cep)}\n` +
+        `Cidade: ${valorOuNaoInformado(paciente.cidade)}\n` +
+        `Estado: ${valorOuNaoInformado(paciente.estado)}\n\n` +
+        `RESPONSÁVEL\n` +
+        `Pais/Responsável: ${valorOuNaoInformado(paciente.responsavel)}`
+    );
+  } catch (erro) {
+    alert(`Erro ao buscar dados do paciente: ${erro.message}`);
+  }
+}
+
+function pedirCampoPaciente(label, valorAtual, obrigatorio = false) {
+  const resposta = prompt(label, valorAtual || "");
+
+  if (resposta === null) {
+    return {
+      cancelado: true,
+      valor: null,
+    };
+  }
+
+  const valor = resposta.trim();
+
+  if (obrigatorio && !valor) {
+    alert("Este campo é obrigatório.");
+    return {
+      cancelado: true,
+      valor: null,
+    };
+  }
+
+  return {
+    cancelado: false,
+    valor: valor || null,
+  };
+}
+
+async function editarPaciente(pacienteId) {
+  try {
+    const paciente = await apiFetch(`/pacientes/${pacienteId}`, {
+      headers: authHeaders(),
+    });
+
+    const campoNome = pedirCampoPaciente(
+      "Nome completo:",
+      paciente.nome,
+      true
+    );
+    if (campoNome.cancelado) return;
+
+    const campoCpf = pedirCampoPaciente("CPF:", paciente.cpf || "");
+    if (campoCpf.cancelado) return;
+
+    const campoData = pedirCampoPaciente(
+      "Data de nascimento no formato AAAA-MM-DD:",
+      paciente.data_nascimento,
+      true
+    );
+    if (campoData.cancelado) return;
+
+    const campoSexo = pedirCampoPaciente(
+      "Sexo: M ou F",
+      paciente.sexo,
+      true
+    );
+    if (campoSexo.cancelado) return;
+
+    const sexoNormalizado = normalizarSexo(campoSexo.valor);
+
+    if (!["M", "F"].includes(sexoNormalizado)) {
+      alert("Sexo inválido. Use M ou F.");
+      return;
+    }
+
+    const campoEndereco = pedirCampoPaciente(
+      "Endereço:",
+      paciente.endereco || ""
+    );
+    if (campoEndereco.cancelado) return;
+
+    const campoCep = pedirCampoPaciente("CEP:", paciente.cep || "");
+    if (campoCep.cancelado) return;
+
+    const campoEstado = pedirCampoPaciente("Estado:", paciente.estado || "");
+    if (campoEstado.cancelado) return;
+
+    const campoCidade = pedirCampoPaciente("Cidade:", paciente.cidade || "");
+    if (campoCidade.cancelado) return;
+
+    const campoResponsavel = pedirCampoPaciente(
+      "Pais ou responsável:",
+      paciente.responsavel || ""
+    );
+    if (campoResponsavel.cancelado) return;
+
+    await apiFetch(`/pacientes/${pacienteId}`, {
+      method: "PUT",
+      headers: authHeaders(),
+      body: JSON.stringify({
+        nome: campoNome.valor,
+        cpf: campoCpf.valor,
+        data_nascimento: campoData.valor,
+        sexo: sexoNormalizado,
+        endereco: campoEndereco.valor,
+        cep: campoCep.valor,
+        estado: campoEstado.valor,
+        cidade: campoCidade.valor,
+        responsavel: campoResponsavel.valor,
+      }),
+    });
+
+    alert("Paciente editado com sucesso!");
+    carregarPacientes();
+  } catch (erro) {
+    alert(`Erro ao editar paciente: ${erro.message}`);
+  }
+}
+
+async function excluirPaciente(pacienteId) {
+  try {
+    const paciente = await apiFetch(`/pacientes/${pacienteId}`, {
+      headers: authHeaders(),
+    });
+
+    const confirmar = confirm(
+      `Tem certeza que deseja excluir o paciente "${paciente.nome}"?\n\n` +
+        `Atenção: se esse paciente tiver avaliações ou histórico, essas informações também serão removidas.`
+    );
+
+    if (!confirmar) return;
+
+    await apiFetch(`/pacientes/${pacienteId}`, {
+      method: "DELETE",
+      headers: authHeaders(),
+    });
+
+    alert("Paciente excluído com sucesso!");
+    carregarPacientes();
+  } catch (erro) {
+    alert(`Erro ao excluir paciente: ${erro.message}`);
   }
 }
 
