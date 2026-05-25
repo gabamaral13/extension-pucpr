@@ -108,8 +108,27 @@
             </div>
 
             <div class="info">
-              <h5>Informações do Paciente</h5>
-              <br />
+              <h5>Foto e responsável</h5>
+
+              <div class="foto_paciente_box">
+                <label class="foto_upload_area" for="fotoPaciente">
+                  <div id="previewFotoPaciente" class="foto_preview">
+                    <span>+</span>
+                    <p>Adicionar foto do paciente</p>
+                    <small>PNG, JPG ou WEBP</small>
+                  </div>
+                </label>
+
+                <input id="fotoPaciente" type="file" accept="image/*" hidden />
+
+                <button
+                  id="removerFotoPaciente"
+                  class="botao_foto_remover"
+                  type="button"
+                >
+                  Remover foto
+                </button>
+              </div>
 
               <div class="infor_paciente">
                 <input

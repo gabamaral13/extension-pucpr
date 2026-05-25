@@ -65,6 +65,49 @@ function formatarScore(score) {
   return numero.toFixed(2);
 }
 
+function fotoPacienteValida(foto) {
+  const valor = String(foto || "").trim();
+
+  if (!valor) return "";
+
+  const inicioValido = /^data:image\/(png|jpg|jpeg|webp);base64,/i.test(valor);
+  return inicioValido ? valor : "";
+}
+
+function iniciaisNome(nome) {
+  const partes = String(nome || "Paciente")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+
+  if (!partes.length) return "PX";
+
+  const primeira = partes[0]?.[0] || "P";
+  const segunda = partes.length > 1 ? partes[partes.length - 1]?.[0] : "X";
+
+  return `${primeira}${segunda}`.toUpperCase();
+}
+
+function avatarPacienteHTML(paciente, classeExtra = "") {
+  const foto = fotoPacienteValida(paciente?.foto);
+  const nome = escaparHTML(paciente?.nome || "Paciente");
+  const classe = `avatar_paciente ${classeExtra}`.trim();
+
+  if (foto) {
+    return `
+      <div class="${classe}">
+        <img src="${foto}" alt="Foto de ${nome}" />
+      </div>
+    `;
+  }
+
+  return `
+    <div class="${classe} avatar_paciente_sem_foto" aria-label="Paciente sem foto">
+      ${escaparHTML(iniciaisNome(paciente?.nome))}
+    </div>
+  `;
+}
+
 async function apiFetch(caminho, opcoes = {}) {
   const resposta = await fetch(`${API_URL}${caminho}`, opcoes);
   const texto = await resposta.text();
@@ -414,6 +457,98 @@ function valorOuNaoInformado(valor) {
   return valor && String(valor).trim() ? String(valor).trim() : "Não informado";
 }
 
+function redimensionarImagemPaciente(arquivo) {
+  return new Promise((resolve, reject) => {
+    if (!arquivo) {
+      resolve(null);
+      return;
+    }
+
+    if (!arquivo.type.startsWith("image/")) {
+      reject(new Error("Selecione apenas arquivos de imagem."));
+      return;
+    }
+
+    if (arquivo.size > 5 * 1024 * 1024) {
+      reject(new Error("A imagem deve ter no máximo 5 MB."));
+      return;
+    }
+
+    const leitor = new FileReader();
+
+    leitor.onload = () => {
+      const imagem = new Image();
+
+      imagem.onload = () => {
+        const tamanhoMaximo = 900;
+        const escala = Math.min(
+          1,
+          tamanhoMaximo / imagem.width,
+          tamanhoMaximo / imagem.height
+        );
+
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(imagem.width * escala));
+        canvas.height = Math.max(1, Math.round(imagem.height * escala));
+
+        const contexto = canvas.getContext("2d");
+        contexto.drawImage(imagem, 0, 0, canvas.width, canvas.height);
+
+        resolve(canvas.toDataURL("image/jpeg", 0.86));
+      };
+
+      imagem.onerror = () => reject(new Error("Não foi possível carregar a imagem."));
+      imagem.src = leitor.result;
+    };
+
+    leitor.onerror = () => reject(new Error("Não foi possível ler o arquivo."));
+    leitor.readAsDataURL(arquivo);
+  });
+}
+
+function configurarUploadFotoPaciente() {
+  const inputFoto = document.getElementById("fotoPaciente");
+  const previewFoto = document.getElementById("previewFotoPaciente");
+  const botaoRemover = document.getElementById("removerFotoPaciente");
+
+  if (!inputFoto || !previewFoto) return;
+
+  window.__fotoPacienteBase64 = null;
+
+  inputFoto.addEventListener("change", async () => {
+    const arquivo = inputFoto.files?.[0];
+
+    if (!arquivo) return;
+
+    try {
+      const fotoBase64 = await redimensionarImagemPaciente(arquivo);
+      window.__fotoPacienteBase64 = fotoBase64;
+
+      previewFoto.classList.add("com_foto");
+      previewFoto.innerHTML = `
+        <img src="${fotoBase64}" alt="Prévia da foto do paciente" />
+      `;
+    } catch (erro) {
+      alert(erro.message);
+      inputFoto.value = "";
+      window.__fotoPacienteBase64 = null;
+    }
+  });
+
+  if (botaoRemover) {
+    botaoRemover.addEventListener("click", () => {
+      inputFoto.value = "";
+      window.__fotoPacienteBase64 = null;
+      previewFoto.classList.remove("com_foto");
+      previewFoto.innerHTML = `
+        <span>+</span>
+        <p>Adicionar foto do paciente</p>
+        <small>PNG, JPG ou WEBP</small>
+      `;
+    });
+  }
+}
+
 async function cadastrarPaciente(event) {
   if (event) event.preventDefault();
 
@@ -428,6 +563,7 @@ async function cadastrarPaciente(event) {
   const cidade = document.getElementById("cidade")?.value.trim() || null;
   const responsavel =
     document.getElementById("responsavel")?.value.trim() || null;
+  const foto = window.__fotoPacienteBase64 || null;
 
   if (!nome || !data_nascimento || !sexo) {
     alert("Preencha nome, data de nascimento e sexo.");
@@ -453,6 +589,7 @@ async function cadastrarPaciente(event) {
         estado,
         cidade,
         responsavel,
+        foto,
       }),
     });
 
@@ -488,7 +625,7 @@ function botoesPaciente(paciente) {
 
   const botaoDados = `
     <button class="botao_card" type="button" onclick="verDadosPaciente(${id})">
-      Dados
+      Perfil
     </button>
   `;
 
@@ -518,37 +655,27 @@ function botoesPaciente(paciente) {
 
 function cardPaciente(paciente) {
   return `
-    <div class="card_api">
-      <div class="card_header">
-        ${escaparHTML(paciente.nome)}
+    <div class="card_api card_paciente">
+      <div class="paciente_card_topo">
+        ${avatarPacienteHTML(paciente, "avatar_paciente_card")}
+
+        <div class="paciente_card_info">
+          <div class="card_header">
+            ${escaparHTML(paciente.nome)}
+          </div>
+
+          <div class="paciente_tags">
+            <span>ID ${escaparHTML(paciente.id)}</span>
+            <span>${escaparHTML(paciente.sexo === "M" ? "Masculino" : "Feminino")}</span>
+            <span>${formatarData(paciente.data_nascimento)}</span>
+          </div>
+        </div>
       </div>
 
-      <div class="card_body">
-        <div class="dado_item">
-          <strong>ID:</strong> ${escaparHTML(paciente.id)}
-        </div>
-
+      <div class="card_body paciente_card_body">
         <div class="dado_item">
           <strong>CPF:</strong> ${escaparHTML(
             paciente.cpf || "Não informado"
-          )}
-        </div>
-
-        <div class="dado_item">
-          <strong>Sexo:</strong> ${escaparHTML(paciente.sexo)}
-        </div>
-
-        <div class="dado_item">
-          <strong>Nascimento:</strong> ${formatarData(paciente.data_nascimento)}
-        </div>
-
-        <div class="dado_item">
-          <strong>CEP:</strong> ${escaparHTML(paciente.cep || "Não informado")}
-        </div>
-
-        <div class="dado_item">
-          <strong>Estado:</strong> ${escaparHTML(
-            paciente.estado || "Não informado"
           )}
         </div>
 
@@ -558,14 +685,14 @@ function cardPaciente(paciente) {
           )}
         </div>
 
-        <div class="dado_item" style="min-width: 100%;">
-          <strong>Endereço:</strong> ${escaparHTML(
-            paciente.endereco || "Não informado"
+        <div class="dado_item">
+          <strong>Estado:</strong> ${escaparHTML(
+            paciente.estado || "Não informado"
           )}
         </div>
 
-        <div class="dado_item" style="min-width: 100%;">
-          <strong>Pais/Responsável:</strong> ${escaparHTML(
+        <div class="dado_item">
+          <strong>Responsável:</strong> ${escaparHTML(
             paciente.responsavel || "Não informado"
           )}
         </div>
@@ -619,24 +746,130 @@ async function verDadosPaciente(pacienteId) {
       headers: authHeaders(),
     });
 
-    alert(
-      `DADOS DO PACIENTE\n\n` +
-        `ID: ${valorOuNaoInformado(paciente.id)}\n` +
-        `Nome: ${valorOuNaoInformado(paciente.nome)}\n` +
-        `CPF: ${valorOuNaoInformado(paciente.cpf)}\n` +
-        `Data de nascimento: ${formatarData(paciente.data_nascimento)}\n` +
-        `Sexo: ${valorOuNaoInformado(paciente.sexo)}\n\n` +
-        `ENDEREÇO\n` +
-        `Endereço: ${valorOuNaoInformado(paciente.endereco)}\n` +
-        `CEP: ${valorOuNaoInformado(paciente.cep)}\n` +
-        `Cidade: ${valorOuNaoInformado(paciente.cidade)}\n` +
-        `Estado: ${valorOuNaoInformado(paciente.estado)}\n\n` +
-        `RESPONSÁVEL\n` +
-        `Pais/Responsável: ${valorOuNaoInformado(paciente.responsavel)}`
-    );
+    abrirPerfilPaciente(paciente);
   } catch (erro) {
     alert(`Erro ao buscar dados do paciente: ${erro.message}`);
   }
+}
+
+function fecharPerfilPaciente() {
+  const modal = document.querySelector(".modal_paciente_fundo");
+
+  if (modal) {
+    modal.remove();
+  }
+
+  document.body.classList.remove("modal_aberto");
+}
+
+function abrirPerfilPaciente(paciente) {
+  fecharPerfilPaciente();
+
+  const modal = document.createElement("div");
+  modal.className = "modal_paciente_fundo";
+
+  const id = Number(paciente.id);
+  const sexoFormatado = paciente.sexo === "M" ? "Masculino" : "Feminino";
+  const botaoHistorico = usuarioEhAdmin()
+    ? `
+      <button class="botao_card" type="button" onclick="fecharPerfilPaciente(); irParaHistoricoPaciente(${id})">
+        Histórico
+      </button>
+    `
+    : "";
+
+  modal.innerHTML = `
+    <div class="modal_paciente_card" role="dialog" aria-modal="true" aria-label="Perfil do paciente">
+      <button class="modal_fechar" type="button" onclick="fecharPerfilPaciente()">×</button>
+
+      <div class="perfil_paciente_topo">
+        ${avatarPacienteHTML(paciente, "avatar_paciente_modal")}
+
+        <div>
+          <p class="perfil_etiqueta">Perfil do paciente</p>
+          <h2>${escaparHTML(paciente.nome)}</h2>
+          <div class="paciente_tags">
+            <span>ID ${escaparHTML(paciente.id)}</span>
+            <span>${escaparHTML(sexoFormatado)}</span>
+            <span>${formatarData(paciente.data_nascimento)}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="perfil_grid">
+        <div>
+          <small>CPF</small>
+          <strong>${escaparHTML(valorOuNaoInformado(paciente.cpf))}</strong>
+        </div>
+
+        <div>
+          <small>Data de nascimento</small>
+          <strong>${formatarData(paciente.data_nascimento)}</strong>
+        </div>
+
+        <div>
+          <small>Sexo</small>
+          <strong>${escaparHTML(sexoFormatado)}</strong>
+        </div>
+
+        <div>
+          <small>Responsável</small>
+          <strong>${escaparHTML(valorOuNaoInformado(paciente.responsavel))}</strong>
+        </div>
+      </div>
+
+      <div class="perfil_secao">
+        <h3>Endereço</h3>
+
+        <div class="perfil_grid">
+          <div>
+            <small>Endereço</small>
+            <strong>${escaparHTML(valorOuNaoInformado(paciente.endereco))}</strong>
+          </div>
+
+          <div>
+            <small>CEP</small>
+            <strong>${escaparHTML(valorOuNaoInformado(paciente.cep))}</strong>
+          </div>
+
+          <div>
+            <small>Cidade</small>
+            <strong>${escaparHTML(valorOuNaoInformado(paciente.cidade))}</strong>
+          </div>
+
+          <div>
+            <small>Estado</small>
+            <strong>${escaparHTML(valorOuNaoInformado(paciente.estado))}</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="perfil_acoes">
+        <button class="botao_card" type="button" onclick="fecharPerfilPaciente(); irParaAvaliacao(${id})">
+          Iniciar avaliação
+        </button>
+
+        <button class="botao_card" type="button" onclick="fecharPerfilPaciente(); irParaRelatorioPaciente(${id})">
+          Ver relatório
+        </button>
+
+        ${botaoHistorico}
+
+        <button class="botao_card" type="button" onclick="fecharPerfilPaciente(); editarPaciente(${id})">
+          Editar dados
+        </button>
+      </div>
+    </div>
+  `;
+
+  modal.addEventListener("click", (evento) => {
+    if (evento.target === modal) {
+      fecharPerfilPaciente();
+    }
+  });
+
+  document.body.appendChild(modal);
+  document.body.classList.add("modal_aberto");
 }
 
 function pedirCampoPaciente(label, valorAtual, obrigatorio = false) {
@@ -1927,8 +2160,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const botaoCadastrarPaciente = document.querySelector(".botao_cadastrar");
 
-  if (pagina === "cadastropaciente_usuario.html" && botaoCadastrarPaciente) {
-    botaoCadastrarPaciente.addEventListener("click", cadastrarPaciente);
+  if (pagina === "cadastropaciente_usuario.html") {
+    configurarUploadFotoPaciente();
+
+    if (botaoCadastrarPaciente) {
+      botaoCadastrarPaciente.addEventListener("click", cadastrarPaciente);
+    }
   }
 
   const botaoCadastroUsuario = document.querySelector(".botao_user_");
