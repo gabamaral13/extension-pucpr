@@ -12,6 +12,60 @@ function normalizarSexo(valor) {
   return sexo;
 }
 
+function normalizarFoto(foto) {
+  if (foto === null || foto === undefined || foto === "") {
+    return {
+      valido: true,
+      valor: null,
+    };
+  }
+
+  const fotoTexto = String(foto).trim();
+
+  if (!fotoTexto) {
+    return {
+      valido: true,
+      valor: null,
+    };
+  }
+
+  const formatoValido = /^data:image\/(png|jpg|jpeg|webp);base64,/i.test(fotoTexto);
+
+  if (!formatoValido) {
+    return {
+      valido: false,
+      erro: "A foto deve ser uma imagem válida nos formatos PNG, JPG, JPEG ou WEBP",
+    };
+  }
+
+  if (fotoTexto.length > 5 * 1024 * 1024) {
+    return {
+      valido: false,
+      erro: "A foto é muito grande. Use uma imagem menor.",
+    };
+  }
+
+  return {
+    valido: true,
+    valor: fotoTexto,
+  };
+}
+
+const camposPaciente = `
+  id,
+  nome,
+  cpf,
+  data_nascimento,
+  sexo,
+  endereco,
+  cep,
+  estado,
+  cidade,
+  responsavel,
+  foto,
+  criado_em
+`;
+
 // ==================================================
 // CADASTRAR PACIENTE
 // Admin e User podem cadastrar paciente
@@ -27,9 +81,11 @@ router.post("/", autenticacao, (req, res) => {
     estado,
     cidade,
     responsavel,
+    foto,
   } = req.body;
 
   const sexoNormalizado = normalizarSexo(sexo);
+  const fotoNormalizada = normalizarFoto(foto);
 
   if (!nome || !data_nascimento || !sexoNormalizado) {
     return res.status(400).json({
@@ -40,6 +96,12 @@ router.post("/", autenticacao, (req, res) => {
   if (!["M", "F"].includes(sexoNormalizado)) {
     return res.status(400).json({
       erro: "Sexo deve ser M ou F",
+    });
+  }
+
+  if (!fotoNormalizada.valido) {
+    return res.status(400).json({
+      erro: fotoNormalizada.erro,
     });
   }
 
@@ -54,12 +116,13 @@ router.post("/", autenticacao, (req, res) => {
         cep,
         estado,
         cidade,
-        responsavel
+        responsavel,
+        foto
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `,
     [
-      nome,
+      String(nome).trim(),
       cpf || null,
       data_nascimento,
       sexoNormalizado,
@@ -68,6 +131,7 @@ router.post("/", autenticacao, (req, res) => {
       estado || null,
       cidade || null,
       responsavel || null,
+      fotoNormalizada.valor,
     ],
     function (err) {
       if (err) {
@@ -95,17 +159,7 @@ router.get("/", autenticacao, (req, res) => {
 
   let sql = `
     SELECT
-      id,
-      nome,
-      cpf,
-      data_nascimento,
-      sexo,
-      endereco,
-      cep,
-      estado,
-      cidade,
-      responsavel,
-      criado_em
+      ${camposPaciente}
     FROM pacientes
   `;
 
@@ -147,17 +201,7 @@ router.get("/:id", autenticacao, (req, res) => {
   db.get(
     `
       SELECT
-        id,
-        nome,
-        cpf,
-        data_nascimento,
-        sexo,
-        endereco,
-        cep,
-        estado,
-        cidade,
-        responsavel,
-        criado_em
+        ${camposPaciente}
       FROM pacientes
       WHERE id = ?
     `,
@@ -184,6 +228,8 @@ router.get("/:id", autenticacao, (req, res) => {
 // ==================================================
 // EDITAR PACIENTE
 // Admin e User podem editar paciente
+// Se a foto não for enviada no body, ela é mantida.
+// Se a foto for enviada como string vazia/null, ela é removida.
 // ==================================================
 router.put("/:id", autenticacao, (req, res) => {
   const {
@@ -199,6 +245,8 @@ router.put("/:id", autenticacao, (req, res) => {
   } = req.body;
 
   const sexoNormalizado = normalizarSexo(sexo);
+  const fotoFoiEnviada = Object.prototype.hasOwnProperty.call(req.body, "foto");
+  const fotoNormalizada = fotoFoiEnviada ? normalizarFoto(req.body.foto) : null;
 
   if (!nome || !data_nascimento || !sexoNormalizado) {
     return res.status(400).json({
@@ -212,33 +260,50 @@ router.put("/:id", autenticacao, (req, res) => {
     });
   }
 
+  if (fotoFoiEnviada && !fotoNormalizada.valido) {
+    return res.status(400).json({
+      erro: fotoNormalizada.erro,
+    });
+  }
+
+  const camposUpdate = [
+    "nome = ?",
+    "cpf = ?",
+    "data_nascimento = ?",
+    "sexo = ?",
+    "endereco = ?",
+    "cep = ?",
+    "estado = ?",
+    "cidade = ?",
+    "responsavel = ?",
+  ];
+
+  const params = [
+    String(nome).trim(),
+    cpf || null,
+    data_nascimento,
+    sexoNormalizado,
+    endereco || null,
+    cep || null,
+    estado || null,
+    cidade || null,
+    responsavel || null,
+  ];
+
+  if (fotoFoiEnviada) {
+    camposUpdate.push("foto = ?");
+    params.push(fotoNormalizada.valor);
+  }
+
+  params.push(req.params.id);
+
   db.run(
     `
       UPDATE pacientes
-      SET
-        nome = ?,
-        cpf = ?,
-        data_nascimento = ?,
-        sexo = ?,
-        endereco = ?,
-        cep = ?,
-        estado = ?,
-        cidade = ?,
-        responsavel = ?
+      SET ${camposUpdate.join(",\n          ")}
       WHERE id = ?
     `,
-    [
-      nome,
-      cpf || null,
-      data_nascimento,
-      sexoNormalizado,
-      endereco || null,
-      cep || null,
-      estado || null,
-      cidade || null,
-      responsavel || null,
-      req.params.id,
-    ],
+    params,
     function (err) {
       if (err) {
         console.error("Erro ao editar paciente:", err.message);

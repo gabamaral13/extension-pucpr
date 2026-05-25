@@ -63,6 +63,7 @@ db.serialize(() => {
       estado TEXT,
       cidade TEXT,
       responsavel TEXT,
+      foto TEXT,
       criado_em DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `);
@@ -74,6 +75,7 @@ db.serialize(() => {
   adicionarColuna("pacientes", "estado", "TEXT");
   adicionarColuna("pacientes", "cidade", "TEXT");
   adicionarColuna("pacientes", "responsavel", "TEXT");
+  adicionarColuna("pacientes", "foto", "TEXT");
 
   // ==================================================
   // TABELA: AVALIACOES
