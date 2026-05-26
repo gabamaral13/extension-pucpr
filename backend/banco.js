@@ -64,7 +64,10 @@ db.serialize(() => {
       cidade TEXT,
       responsavel TEXT,
       foto TEXT,
-      criado_em DATETIME DEFAULT CURRENT_TIMESTAMP
+      criado_por INTEGER,
+      criado_em DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+      FOREIGN KEY (criado_por) REFERENCES usuarios(id) ON DELETE SET NULL
     )
   `);
 
@@ -76,6 +79,7 @@ db.serialize(() => {
   adicionarColuna("pacientes", "cidade", "TEXT");
   adicionarColuna("pacientes", "responsavel", "TEXT");
   adicionarColuna("pacientes", "foto", "TEXT");
+  adicionarColuna("pacientes", "criado_por", "INTEGER");
 
   // ==================================================
   // TABELA: AVALIACOES
@@ -86,6 +90,7 @@ db.serialize(() => {
       paciente_id INTEGER NOT NULL,
       usuario_id INTEGER NOT NULL,
       respostas TEXT NOT NULL,
+      sintomas TEXT,
       score REAL NOT NULL,
       limite REAL,
       suspeito INTEGER DEFAULT 0,
@@ -98,6 +103,7 @@ db.serialize(() => {
   `);
 
   // Migração para bancos antigos
+  adicionarColuna("avaliacoes", "sintomas", "TEXT");
   adicionarColuna("avaliacoes", "limite", "REAL");
   adicionarColuna("avaliacoes", "suspeito", "INTEGER DEFAULT 0");
 
@@ -125,6 +131,7 @@ db.serialize(() => {
   // ==================================================
   db.run(`CREATE INDEX IF NOT EXISTS idx_pacientes_nome ON pacientes(nome)`);
   db.run(`CREATE INDEX IF NOT EXISTS idx_pacientes_cpf ON pacientes(cpf)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_pacientes_criado_por ON pacientes(criado_por)`);
 
   db.run(`CREATE INDEX IF NOT EXISTS idx_usuarios_email ON usuarios(email)`);
   db.run(`CREATE INDEX IF NOT EXISTS idx_usuarios_username ON usuarios(username)`);

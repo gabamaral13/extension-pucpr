@@ -4,6 +4,21 @@ const db = require("../banco");
 const autenticacao = require("../middleware/autenticacao");
 const calcularScore = require("../utils/calculoScore");
 
+const sintomasChecklist = [
+  "Deficiência intelectual",
+  "Face alongada/orelhas",
+  "Macroorquidismo",
+  "Hipermobilidade articular",
+  "Dificuldades de aprendizagem",
+  "Déficit de atenção",
+  "Movimentos repetitivos",
+  "Atraso na fala",
+  "Hiperatividade",
+  "Evita contato visual",
+  "Evita contato físico",
+  "Agressividade",
+];
+
 function respostasValidas(respostas) {
   return (
     Array.isArray(respostas) &&
@@ -12,9 +27,49 @@ function respostasValidas(respostas) {
   );
 }
 
+function listarSintomasMarcados(respostas) {
+  return respostas
+    .map(Number)
+    .map((resposta, index) => (resposta === 1 ? sintomasChecklist[index] : null))
+    .filter(Boolean);
+}
+
+const camposAvaliacao = `
+  a.id,
+  a.paciente_id,
+  a.usuario_id,
+  a.respostas,
+  a.sintomas,
+  a.score,
+  a.limite,
+  a.suspeito,
+  a.recomendacao,
+  a.criado_em,
+
+  p.nome AS paciente_nome,
+  p.cpf AS paciente_cpf,
+  p.data_nascimento,
+  p.sexo,
+  p.endereco,
+  p.cep,
+  p.cidade,
+  p.estado,
+  p.responsavel,
+  p.criado_por AS paciente_criado_por,
+
+  avaliador.username AS usuario_nome,
+  avaliador.nome AS usuario_nome_completo,
+  avaliador.email AS usuario_email,
+
+  criador.username AS paciente_criado_por_usuario,
+  criador.nome AS paciente_criado_por_nome,
+  criador.email AS paciente_criado_por_email
+`;
+
 // ==================================================
 // CRIAR AVALIAÇÃO
 // Admin e User podem criar avaliação
+// Agora salva também a lista textual dos sintomas marcados.
 // ==================================================
 router.post("/", autenticacao, (req, res) => {
   const pacienteId = Number(req.body.paciente_id);
@@ -53,10 +108,12 @@ router.post("/", autenticacao, (req, res) => {
         });
       }
 
+      const respostasNumericas = respostas.map(Number);
+      const sintomasMarcados = listarSintomasMarcados(respostasNumericas);
       let resultado;
 
       try {
-        resultado = calcularScore(respostas.map(Number), paciente.sexo);
+        resultado = calcularScore(respostasNumericas, paciente.sexo);
       } catch (erro) {
         return res.status(400).json({
           erro: erro.message,
@@ -69,17 +126,19 @@ router.post("/", autenticacao, (req, res) => {
             paciente_id,
             usuario_id,
             respostas,
+            sintomas,
             score,
             limite,
             suspeito,
             recomendacao
           )
-          VALUES (?, ?, ?, ?, ?, ?, ?)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `,
         [
           pacienteId,
           req.usuario.id,
-          JSON.stringify(respostas.map(Number)),
+          JSON.stringify(respostasNumericas),
+          JSON.stringify(sintomasMarcados),
           resultado.score,
           resultado.limite,
           resultado.suspeito ? 1 : 0,
@@ -97,6 +156,7 @@ router.post("/", autenticacao, (req, res) => {
             id: this.lastID,
             paciente_id: paciente.id,
             paciente_nome: paciente.nome,
+            sintomas: sintomasMarcados,
             score: resultado.score,
             limite: resultado.limite,
             suspeito: resultado.suspeito,
@@ -117,31 +177,11 @@ router.get("/", autenticacao, (req, res) => {
 
   let sql = `
     SELECT
-      a.id,
-      a.paciente_id,
-      a.usuario_id,
-      a.respostas,
-      a.score,
-      a.limite,
-      a.suspeito,
-      a.recomendacao,
-      a.criado_em,
-
-      p.nome AS paciente_nome,
-      p.cpf AS paciente_cpf,
-      p.data_nascimento,
-      p.sexo,
-      p.endereco,
-      p.cep,
-      p.cidade,
-      p.estado,
-      p.responsavel,
-
-      u.username AS usuario_nome,
-      u.nome AS usuario_nome_completo
+      ${camposAvaliacao}
     FROM avaliacoes a
     JOIN pacientes p ON a.paciente_id = p.id
-    JOIN usuarios u ON a.usuario_id = u.id
+    JOIN usuarios avaliador ON a.usuario_id = avaliador.id
+    LEFT JOIN usuarios criador ON p.criado_por = criador.id
     WHERE 1 = 1
   `;
 
@@ -193,28 +233,13 @@ router.get("/", autenticacao, (req, res) => {
 // Admin e User podem ver histórico
 // ==================================================
 router.get("/:pacienteId", autenticacao, (req, res) => {
-  let sql = `
+  const sql = `
     SELECT
-      a.id,
-      a.paciente_id,
-      a.usuario_id,
-      a.respostas,
-      a.score,
-      a.limite,
-      a.suspeito,
-      a.recomendacao,
-      a.criado_em,
-
-      p.nome AS paciente_nome,
-      p.cpf AS paciente_cpf,
-      p.data_nascimento,
-      p.sexo,
-
-      u.username AS usuario_nome,
-      u.nome AS usuario_nome_completo
+      ${camposAvaliacao}
     FROM avaliacoes a
     JOIN pacientes p ON a.paciente_id = p.id
-    JOIN usuarios u ON a.usuario_id = u.id
+    JOIN usuarios avaliador ON a.usuario_id = avaliador.id
+    LEFT JOIN usuarios criador ON p.criado_por = criador.id
     WHERE a.paciente_id = ?
     ORDER BY a.criado_em DESC
   `;
@@ -238,31 +263,11 @@ router.get("/imprimir/:id", autenticacao, (req, res) => {
   db.get(
     `
       SELECT
-        a.id,
-        a.paciente_id,
-        a.usuario_id,
-        a.respostas,
-        a.score,
-        a.limite,
-        a.suspeito,
-        a.recomendacao,
-        a.criado_em,
-
-        p.nome AS paciente_nome,
-        p.cpf AS paciente_cpf,
-        p.data_nascimento,
-        p.sexo,
-        p.endereco,
-        p.cep,
-        p.cidade,
-        p.estado,
-        p.responsavel,
-
-        u.username AS usuario_nome,
-        u.nome AS usuario_nome_completo
+        ${camposAvaliacao}
       FROM avaliacoes a
       JOIN pacientes p ON a.paciente_id = p.id
-      JOIN usuarios u ON a.usuario_id = u.id
+      JOIN usuarios avaliador ON a.usuario_id = avaliador.id
+      LEFT JOIN usuarios criador ON p.criado_por = criador.id
       WHERE a.id = ?
     `,
     [req.params.id],

@@ -52,23 +52,28 @@ function normalizarFoto(foto) {
 }
 
 const camposPaciente = `
-  id,
-  nome,
-  cpf,
-  data_nascimento,
-  sexo,
-  endereco,
-  cep,
-  estado,
-  cidade,
-  responsavel,
-  foto,
-  criado_em
+  pacientes.id,
+  pacientes.nome,
+  pacientes.cpf,
+  pacientes.data_nascimento,
+  pacientes.sexo,
+  pacientes.endereco,
+  pacientes.cep,
+  pacientes.estado,
+  pacientes.cidade,
+  pacientes.responsavel,
+  pacientes.foto,
+  pacientes.criado_por,
+  pacientes.criado_em,
+  criador.username AS criado_por_usuario,
+  criador.nome AS criado_por_nome,
+  criador.email AS criado_por_email
 `;
 
 // ==================================================
 // CADASTRAR PACIENTE
 // Admin e User podem cadastrar paciente
+// Agora salva também quem criou o cadastro.
 // ==================================================
 router.post("/", autenticacao, (req, res) => {
   const {
@@ -86,6 +91,7 @@ router.post("/", autenticacao, (req, res) => {
 
   const sexoNormalizado = normalizarSexo(sexo);
   const fotoNormalizada = normalizarFoto(foto);
+  const criadoPor = req.usuario?.id || null;
 
   if (!nome || !data_nascimento || !sexoNormalizado) {
     return res.status(400).json({
@@ -117,9 +123,10 @@ router.post("/", autenticacao, (req, res) => {
         estado,
         cidade,
         responsavel,
-        foto
+        foto,
+        criado_por
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `,
     [
       String(nome).trim(),
@@ -132,6 +139,7 @@ router.post("/", autenticacao, (req, res) => {
       cidade || null,
       responsavel || null,
       fotoNormalizada.valor,
+      criadoPor,
     ],
     function (err) {
       if (err) {
@@ -144,6 +152,7 @@ router.post("/", autenticacao, (req, res) => {
       return res.status(201).json({
         mensagem: "Paciente cadastrado com sucesso",
         id: this.lastID,
+        criado_por: criadoPor,
       });
     }
   );
@@ -161,25 +170,28 @@ router.get("/", autenticacao, (req, res) => {
     SELECT
       ${camposPaciente}
     FROM pacientes
+    LEFT JOIN usuarios criador ON criador.id = pacientes.criado_por
   `;
 
   const params = [];
 
   if (busca) {
     sql += `
-      WHERE CAST(id AS TEXT) LIKE ?
-      OR nome LIKE ?
-      OR cpf LIKE ?
-      OR cidade LIKE ?
-      OR estado LIKE ?
-      OR responsavel LIKE ?
-      OR endereco LIKE ?
+      WHERE CAST(pacientes.id AS TEXT) LIKE ?
+      OR pacientes.nome LIKE ?
+      OR pacientes.cpf LIKE ?
+      OR pacientes.cidade LIKE ?
+      OR pacientes.estado LIKE ?
+      OR pacientes.responsavel LIKE ?
+      OR pacientes.endereco LIKE ?
+      OR criador.username LIKE ?
+      OR criador.nome LIKE ?
     `;
 
-    params.push(busca, busca, busca, busca, busca, busca, busca);
+    params.push(busca, busca, busca, busca, busca, busca, busca, busca, busca);
   }
 
-  sql += ` ORDER BY nome ASC`;
+  sql += ` ORDER BY pacientes.nome ASC`;
 
   db.all(sql, params, (err, pacientes) => {
     if (err) {
@@ -203,7 +215,8 @@ router.get("/:id", autenticacao, (req, res) => {
       SELECT
         ${camposPaciente}
       FROM pacientes
-      WHERE id = ?
+      LEFT JOIN usuarios criador ON criador.id = pacientes.criado_por
+      WHERE pacientes.id = ?
     `,
     [req.params.id],
     (err, paciente) => {

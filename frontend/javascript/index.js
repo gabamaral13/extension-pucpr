@@ -770,6 +770,13 @@ function abrirPerfilPaciente(paciente) {
 
   const id = Number(paciente.id);
   const sexoFormatado = paciente.sexo === "M" ? "Masculino" : "Feminino";
+
+  const criadoPor =
+    paciente.criado_por_nome ||
+    paciente.criado_por_usuario ||
+    paciente.criado_por_email ||
+    "Não informado";
+
   const botaoHistorico = usuarioEhAdmin()
     ? `
       <button class="botao_card" type="button" onclick="fecharPerfilPaciente(); irParaHistoricoPaciente(${id})">
@@ -788,6 +795,7 @@ function abrirPerfilPaciente(paciente) {
         <div>
           <p class="perfil_etiqueta">Perfil do paciente</p>
           <h2>${escaparHTML(paciente.nome)}</h2>
+
           <div class="paciente_tags">
             <span>ID ${escaparHTML(paciente.id)}</span>
             <span>${escaparHTML(sexoFormatado)}</span>
@@ -844,6 +852,30 @@ function abrirPerfilPaciente(paciente) {
         </div>
       </div>
 
+      <div class="perfil_secao">
+        <h3>Cadastro</h3>
+
+        <div class="perfil_grid">
+          <div>
+            <small>Cadastrado por</small>
+            <strong>${escaparHTML(criadoPor)}</strong>
+          </div>
+
+          <div>
+            <small>Data do cadastro</small>
+            <strong>${formatarDataHora(paciente.criado_em)}</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="perfil_secao perfil_historico">
+        <h3>Histórico de avaliações</h3>
+
+        <div id="historicoPerfilPaciente">
+          <p>Carregando histórico do paciente...</p>
+        </div>
+      </div>
+
       <div class="perfil_acoes">
         <button class="botao_card" type="button" onclick="fecharPerfilPaciente(); irParaAvaliacao(${id})">
           Iniciar avaliação
@@ -870,6 +902,63 @@ function abrirPerfilPaciente(paciente) {
 
   document.body.appendChild(modal);
   document.body.classList.add("modal_aberto");
+
+  carregarHistoricoNoPerfilPaciente(id);
+}
+
+async function carregarHistoricoNoPerfilPaciente(pacienteId) {
+  const area = document.getElementById("historicoPerfilPaciente");
+
+  if (!area) return;
+
+  try {
+    const avaliacoes = await apiFetch(`/avaliacoes/${pacienteId}`, {
+      headers: authHeaders(),
+    });
+
+    if (!avaliacoes.length) {
+      area.innerHTML = `
+        <div class="historico_vazio">
+          <h4>Nenhuma avaliação encontrada</h4>
+          <p>Esse paciente ainda não possui exames ou avaliações registradas.</p>
+        </div>
+      `;
+      return;
+    }
+
+    area.innerHTML = avaliacoes.map(cardAvaliacaoPerfilPaciente).join("");
+  } catch (erro) {
+    area.innerHTML = `<p>Erro ao carregar histórico: ${escaparHTML(erro.message)}</p>`;
+  }
+}
+
+function cardAvaliacaoPerfilPaciente(avaliacao) {
+  const profissional = nomeProfissionalAvaliacao(avaliacao);
+
+  return `
+    <div class="perfil_avaliacao_item">
+      <div class="perfil_avaliacao_topo">
+        <strong>Exame / avaliação em ${formatarDataHora(avaliacao.criado_em)}</strong>
+        <span>Score ${formatarScore(avaliacao.score)}</span>
+      </div>
+
+      <p>
+        <strong>Quem fez a avaliação:</strong>
+        ${escaparHTML(profissional)}
+      </p>
+
+      <p>
+        <strong>Recomendação:</strong>
+        ${escaparHTML(avaliacao.recomendacao || "Não informado")}
+      </p>
+
+      <p>
+        <strong>Sintomas listados:</strong>
+      </p>
+
+      ${listaSintomasHTML(avaliacao)}
+    </div>
+  `;
 }
 
 function pedirCampoPaciente(label, valorAtual, obrigatorio = false) {
@@ -1371,17 +1460,72 @@ async function salvarAvaliacao(event) {
 // HISTÓRICO E RELATÓRIOS
 // =========================
 
-function contarSintomasMarcados(respostasTexto) {
+function lerArrayJSON(valor) {
+  if (Array.isArray(valor)) return valor;
+
   try {
-    const respostas = JSON.parse(respostasTexto || "[]");
-    return respostas.filter(Boolean).length;
+    const dados = JSON.parse(valor || "[]");
+    return Array.isArray(dados) ? dados : [];
   } catch (e) {
-    return "-";
+    return [];
   }
 }
 
+function obterSintomasDaAvaliacao(avaliacao) {
+  const sintomasSalvos = lerArrayJSON(avaliacao.sintomas);
+
+  if (sintomasSalvos.length > 0) {
+    return sintomasSalvos;
+  }
+
+  const respostas = lerArrayJSON(avaliacao.respostas);
+
+  return respostas
+    .map(Number)
+    .map((resposta, index) => (resposta === 1 ? perguntasChecklist[index] : null))
+    .filter(Boolean);
+}
+
+function contarSintomasMarcados(avaliacao) {
+  return obterSintomasDaAvaliacao(avaliacao).length;
+}
+
+function listaSintomasHTML(avaliacao) {
+  const sintomas = obterSintomasDaAvaliacao(avaliacao);
+
+  if (!sintomas.length) {
+    return `<p class="sintomas_vazio">Nenhum sintoma marcado nesta avaliação.</p>`;
+  }
+
+  return `
+    <ul class="lista_sintomas">
+      ${sintomas.map((sintoma) => `<li>${escaparHTML(sintoma)}</li>`).join("")}
+    </ul>
+  `;
+}
+
+function nomeProfissionalAvaliacao(avaliacao) {
+  return (
+    avaliacao.usuario_nome_completo ||
+    avaliacao.usuario_nome ||
+    avaliacao.usuario_email ||
+    "Não informado"
+  );
+}
+
+function nomeCriadorPaciente(avaliacao) {
+  return (
+    avaliacao.paciente_criado_por_nome ||
+    avaliacao.paciente_criado_por_usuario ||
+    avaliacao.paciente_criado_por_email ||
+    "Não informado"
+  );
+}
+
 function cardAvaliacao(avaliacao) {
-  const sintomasMarcados = contarSintomasMarcados(avaliacao.respostas);
+  const sintomasMarcados = contarSintomasMarcados(avaliacao);
+  const profissional = nomeProfissionalAvaliacao(avaliacao);
+  const criadorPaciente = nomeCriadorPaciente(avaliacao);
 
   return `
     <div class="card_api">
@@ -1389,13 +1533,13 @@ function cardAvaliacao(avaliacao) {
         ${escaparHTML(
           avaliacao.paciente_nome ||
             avaliacao.nome ||
-            `Paciente ${avaliacao.paciente_id}`,
+            `Paciente ${avaliacao.paciente_id}`
         )}
       </div>
 
       <div class="card_body">
         <div class="dado_item">
-          <strong>Data:</strong> ${formatarData(avaliacao.criado_em)}
+          <strong>Data:</strong> ${formatarDataHora(avaliacao.criado_em)}
         </div>
 
         <div class="dado_item">
@@ -1407,24 +1551,29 @@ function cardAvaliacao(avaliacao) {
         </div>
 
         <div class="dado_item">
-          <strong>Sintomas:</strong> ${sintomasMarcados}
+          <strong>Sintomas marcados:</strong> ${sintomasMarcados}
         </div>
 
         <div class="dado_item">
-          <strong>Profissional:</strong> ${escaparHTML(
-            avaliacao.usuario_nome || "-",
-          )}
+          <strong>Cadastrado por:</strong> ${escaparHTML(criadorPaciente)}
+        </div>
+
+        <div class="dado_item">
+          <strong>Avaliação feita por:</strong> ${escaparHTML(profissional)}
         </div>
 
         <div class="dado_item" style="min-width: 100%;">
           <strong>Recomendação:</strong> ${escaparHTML(avaliacao.recomendacao)}
         </div>
+
+        <div class="dado_item" style="min-width: 100%;">
+          <strong>Sintomas listados:</strong>
+          ${listaSintomasHTML(avaliacao)}
+        </div>
       </div>
 
       <div class="acoes_card">
-        <button class="botao_card" type="button" onclick="imprimirAvaliacao(${Number(
-          avaliacao.id,
-        )})">
+        <button class="botao_card" type="button" onclick="imprimirAvaliacao(${Number(avaliacao.id)})">
           Imprimir
         </button>
       </div>
@@ -1638,6 +1787,18 @@ async function imprimirAvaliacao(id) {
       headers: authHeaders(),
     });
 
+    const sintomas = obterSintomasDaAvaliacao(avaliacao);
+    const profissional = nomeProfissionalAvaliacao(avaliacao);
+    const criadorPaciente = nomeCriadorPaciente(avaliacao);
+
+    const sintomasHTML = sintomas.length
+      ? `
+        <ul>
+          ${sintomas.map((sintoma) => `<li>${escaparHTML(sintoma)}</li>`).join("")}
+        </ul>
+      `
+      : "<p>Nenhum sintoma marcado nesta avaliação.</p>";
+
     const janela = window.open("", "_blank");
 
     janela.document.write(`
@@ -1679,6 +1840,14 @@ async function imprimirAvaliacao(id) {
               margin-top: 16px;
             }
 
+            ul {
+              margin-top: 8px;
+            }
+
+            li {
+              margin-bottom: 6px;
+            }
+
             @media print {
               button {
                 display: none;
@@ -1698,20 +1867,26 @@ async function imprimirAvaliacao(id) {
           </div>
 
           <div class="linha">
-            <strong>Data de nascimento:</strong> ${formatarData(
-              avaliacao.data_nascimento,
-            )}
+            <strong>CPF:</strong> ${escaparHTML(avaliacao.paciente_cpf || "Não informado")}
+          </div>
+
+          <div class="linha">
+            <strong>Data de nascimento:</strong> ${formatarData(avaliacao.data_nascimento)}
           </div>
 
           <div class="linha">
             <strong>Sexo:</strong> ${escaparHTML(avaliacao.sexo)}
           </div>
 
+          <div class="linha">
+            <strong>Cadastrado por:</strong> ${escaparHTML(criadorPaciente)}
+          </div>
+
           <h2>Resultado da avaliação</h2>
 
           <div class="box">
             <div class="linha">
-              <strong>Data:</strong> ${formatarData(avaliacao.criado_em)}
+              <strong>Data da avaliação:</strong> ${formatarDataHora(avaliacao.criado_em)}
             </div>
 
             <div class="linha">
@@ -1719,16 +1894,22 @@ async function imprimirAvaliacao(id) {
             </div>
 
             <div class="linha">
-              <strong>Recomendação:</strong> ${escaparHTML(
-                avaliacao.recomendacao,
-              )}
+              <strong>Limite:</strong> ${formatarScore(avaliacao.limite)}
             </div>
 
             <div class="linha">
-              <strong>Profissional responsável:</strong> ${escaparHTML(
-                avaliacao.usuario_nome,
-              )}
+              <strong>Profissional responsável pela avaliação:</strong> ${escaparHTML(profissional)}
             </div>
+
+            <div class="linha">
+              <strong>Recomendação:</strong> ${escaparHTML(avaliacao.recomendacao)}
+            </div>
+          </div>
+
+          <h2>Sintomas listados</h2>
+
+          <div class="box">
+            ${sintomasHTML}
           </div>
 
           <br />

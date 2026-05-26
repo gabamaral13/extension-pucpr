@@ -1837,3 +1837,70 @@ body.modal_aberto {
     width: 100%;
   }
 }
+
+/* =========================
+   HISTÓRICO / SINTOMAS NO PERFIL
+   ========================= */
+
+.lista_sintomas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0;
+  margin: 10px 0 0;
+  list-style: none;
+}
+
+.lista_sintomas li {
+  padding: 7px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(37, 219, 182, 0.42);
+  background: rgba(37, 219, 182, 0.12);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.sintomas_vazio {
+  margin: 8px 0 0;
+  color: var(--cor-texto-suave);
+}
+
+.perfil_historico {
+  padding-top: 4px;
+}
+
+.perfil_avaliacao_item {
+  padding: 16px;
+  margin-top: 12px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.perfil_avaliacao_item p {
+  margin: 10px 0;
+  color: var(--cor-texto-suave);
+  line-height: 1.45;
+}
+
+.perfil_avaliacao_item strong {
+  color: #ffffff;
+}
+
+.perfil_avaliacao_topo {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.perfil_avaliacao_topo span {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(37, 219, 182, 0.16);
+  color: var(--cor-destaque);
+  font-size: 13px;
+  font-weight: 900;
+}
