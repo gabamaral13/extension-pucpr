@@ -44,6 +44,19 @@ const pesosFeminino = [
   0.02  // Agressividade
 ];
 
+const parametrosTriagem = {
+  masculino: {
+    limite: 0.56,
+    sensibilidade: 0.95,
+    auc: 0.73
+  },
+  feminino: {
+    limite: 0.55,
+    sensibilidade: 0.95,
+    auc: 0.76
+  }
+};
+
 function calcularScore(respostas, sexo) {
   if (!Array.isArray(respostas) || respostas.length !== 12) {
     throw new Error("É necessário enviar exatamente 12 respostas");
@@ -52,14 +65,14 @@ function calcularScore(respostas, sexo) {
   const sexoNormalizado = String(sexo).trim().toUpperCase();
 
   let pesos;
-  let limite;
+  let parametros;
 
   if (sexoNormalizado === "M" || sexoNormalizado === "MASCULINO") {
     pesos = pesosMasculino;
-    limite = 0.56;
+    parametros = parametrosTriagem.masculino;
   } else if (sexoNormalizado === "F" || sexoNormalizado === "FEMININO") {
     pesos = pesosFeminino;
-    limite = 0.55;
+    parametros = parametrosTriagem.feminino;
   } else {
     throw new Error("Sexo inválido. Use M ou F");
   }
@@ -76,14 +89,17 @@ function calcularScore(respostas, sexo) {
     score += resposta * pesos[i];
   });
 
-  const suspeito = score >= limite;
+  const scoreFinal = Number(score.toFixed(2));
+  const suspeito = scoreFinal >= parametros.limite;
 
   return {
-    score: Number(score.toFixed(2)),
-    limite,
+    score: scoreFinal,
+    limite: parametros.limite,
     suspeito,
+    sensibilidade: parametros.sensibilidade,
+    auc: parametros.auc,
     recomendacao: suspeito
-      ? "Encaminhar para teste genético"
+      ? "Encaminhar para teste genético confirmatório"
       : "Acompanhamento clínico"
   };
 }

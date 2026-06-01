@@ -153,15 +153,17 @@ router.post("/", autenticacao, (req, res) => {
           }
 
           return res.status(201).json({
-            id: this.lastID,
-            paciente_id: paciente.id,
-            paciente_nome: paciente.nome,
-            sintomas: sintomasMarcados,
-            score: resultado.score,
-            limite: resultado.limite,
-            suspeito: resultado.suspeito,
-            recomendacao: resultado.recomendacao,
-          });
+          id: this.lastID,
+          paciente_id: paciente.id,
+          paciente_nome: paciente.nome,
+          sintomas: sintomasMarcados,
+          score: resultado.score,
+          limite: resultado.limite,
+          suspeito: resultado.suspeito,
+          sensibilidade: resultado.sensibilidade,
+          auc: resultado.auc,
+          recomendacao: resultado.recomendacao,
+});
         }
       );
     }

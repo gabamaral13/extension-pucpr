@@ -65,6 +65,37 @@ function formatarScore(score) {
   return numero.toFixed(2);
 }
 
+function formatarPercentual(valor) {
+  const numero = Number(valor);
+  if (Number.isNaN(numero)) return "-";
+  return `${(numero * 100).toFixed(0)}%`;
+}
+
+function obterSensibilidadeAvaliacao(avaliacao) {
+  const valor = Number(avaliacao?.sensibilidade);
+
+  if (!Number.isNaN(valor) && valor > 0) {
+    return valor;
+  }
+
+  return 0.95;
+}
+
+function obterAucAvaliacao(avaliacao) {
+  const valor = Number(avaliacao?.auc);
+
+  if (!Number.isNaN(valor) && valor > 0) {
+    return valor;
+  }
+
+  const sexo = normalizarSexo(avaliacao?.sexo);
+
+  if (sexo === "M") return 0.73;
+  if (sexo === "F") return 0.76;
+
+  return null;
+}
+
 function fotoPacienteValida(foto) {
   const valor = String(foto || "").trim();
 
@@ -943,6 +974,21 @@ function cardAvaliacaoPerfilPaciente(avaliacao) {
       </div>
 
       <p>
+        <strong>Limite:</strong>
+        ${formatarScore(avaliacao.limite)}
+      </p>
+
+      <p>
+        <strong>Sensibilidade:</strong>
+        ${formatarPercentual(obterSensibilidadeAvaliacao(avaliacao))}
+      </p>
+
+      <p>
+        <strong>AUC:</strong>
+        ${formatarScore(obterAucAvaliacao(avaliacao))}
+      </p>
+
+      <p>
         <strong>Quem fez a avaliação:</strong>
         ${escaparHTML(profissional)}
       </p>
@@ -1411,6 +1457,11 @@ async function salvarAvaliacao(event) {
       }),
     });
 
+    const dadosResultado = {
+      ...dados,
+      sexo: pacienteEncontrado.sexo,
+    };
+
     localStorage.setItem("ultimaAvaliacaoId", String(dados.id));
 
     document.getElementById("resultadoAvaliacao").innerHTML = `
@@ -1423,6 +1474,14 @@ async function salvarAvaliacao(event) {
 
         <p>
           <strong>Limite:</strong> ${formatarScore(dados.limite)}
+        </p>
+
+        <p>
+          <strong>Sensibilidade:</strong> ${formatarPercentual(obterSensibilidadeAvaliacao(dadosResultado))}
+        </p>
+
+        <p>
+          <strong>AUC:</strong> ${formatarScore(obterAucAvaliacao(dadosResultado))}
         </p>
 
         <p>
@@ -1544,6 +1603,18 @@ function cardAvaliacao(avaliacao) {
 
         <div class="dado_item">
           <strong>Score:</strong> ${formatarScore(avaliacao.score)}
+        </div>
+
+        <div class="dado_item">
+          <strong>Limite:</strong> ${formatarScore(avaliacao.limite)}
+        </div>
+
+        <div class="dado_item">
+          <strong>Sensibilidade:</strong> ${formatarPercentual(obterSensibilidadeAvaliacao(avaliacao))}
+        </div>
+
+        <div class="dado_item">
+          <strong>AUC:</strong> ${formatarScore(obterAucAvaliacao(avaliacao))}
         </div>
 
         <div class="dado_item">
@@ -1895,6 +1966,14 @@ async function imprimirAvaliacao(id) {
 
             <div class="linha">
               <strong>Limite:</strong> ${formatarScore(avaliacao.limite)}
+            </div>
+
+            <div class="linha">
+              <strong>Sensibilidade:</strong> ${formatarPercentual(obterSensibilidadeAvaliacao(avaliacao))}
+            </div>
+
+            <div class="linha">
+              <strong>AUC:</strong> ${formatarScore(obterAucAvaliacao(avaliacao))}
             </div>
 
             <div class="linha">
