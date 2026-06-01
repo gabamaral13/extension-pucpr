@@ -34,6 +34,10 @@ function listarSintomasMarcados(respostas) {
     .filter(Boolean);
 }
 
+function usuarioEhAdmin(req) {
+  return req.usuario?.papel === "admin";
+}
+
 const camposAvaliacao = `
   a.id,
   a.paciente_id,
@@ -69,7 +73,6 @@ const camposAvaliacao = `
 // ==================================================
 // CRIAR AVALIAÇÃO
 // Admin e User podem criar avaliação
-// Agora salva também a lista textual dos sintomas marcados.
 // ==================================================
 router.post("/", autenticacao, (req, res) => {
   const pacienteId = Number(req.body.paciente_id);
@@ -153,17 +156,17 @@ router.post("/", autenticacao, (req, res) => {
           }
 
           return res.status(201).json({
-          id: this.lastID,
-          paciente_id: paciente.id,
-          paciente_nome: paciente.nome,
-          sintomas: sintomasMarcados,
-          score: resultado.score,
-          limite: resultado.limite,
-          suspeito: resultado.suspeito,
-          sensibilidade: resultado.sensibilidade,
-          auc: resultado.auc,
-          recomendacao: resultado.recomendacao,
-});
+            id: this.lastID,
+            paciente_id: paciente.id,
+            paciente_nome: paciente.nome,
+            sintomas: sintomasMarcados,
+            score: resultado.score,
+            limite: resultado.limite,
+            suspeito: resultado.suspeito,
+            sensibilidade: resultado.sensibilidade,
+            auc: resultado.auc,
+            recomendacao: resultado.recomendacao,
+          });
         }
       );
     }
@@ -172,7 +175,8 @@ router.post("/", autenticacao, (req, res) => {
 
 // ==================================================
 // LISTAR AVALIAÇÕES / RELATÓRIOS
-// Admin e User podem visualizar relatórios
+// Admin vê todos.
+// User comum vê somente pacientes que ele cadastrou.
 // ==================================================
 router.get("/", autenticacao, (req, res) => {
   const { paciente, inicio, fim } = req.query;
@@ -188,6 +192,11 @@ router.get("/", autenticacao, (req, res) => {
   `;
 
   const params = [];
+
+  if (!usuarioEhAdmin(req)) {
+    sql += ` AND p.criado_por = ?`;
+    params.push(req.usuario.id);
+  }
 
   if (paciente) {
     if (/^\d+$/.test(String(paciente))) {
@@ -232,10 +241,11 @@ router.get("/", autenticacao, (req, res) => {
 
 // ==================================================
 // HISTÓRICO DE UM PACIENTE
-// Admin e User podem ver histórico
+// Admin vê qualquer paciente.
+// User comum vê somente se ele cadastrou o paciente.
 // ==================================================
 router.get("/:pacienteId", autenticacao, (req, res) => {
-  const sql = `
+  let sql = `
     SELECT
       ${camposAvaliacao}
     FROM avaliacoes a
@@ -243,10 +253,18 @@ router.get("/:pacienteId", autenticacao, (req, res) => {
     JOIN usuarios avaliador ON a.usuario_id = avaliador.id
     LEFT JOIN usuarios criador ON p.criado_por = criador.id
     WHERE a.paciente_id = ?
-    ORDER BY a.criado_em DESC
   `;
 
-  db.all(sql, [req.params.pacienteId], (err, historico) => {
+  const params = [req.params.pacienteId];
+
+  if (!usuarioEhAdmin(req)) {
+    sql += ` AND p.criado_por = ?`;
+    params.push(req.usuario.id);
+  }
+
+  sql += ` ORDER BY a.criado_em DESC`;
+
+  db.all(sql, params, (err, historico) => {
     if (err) {
       console.error("Erro ao buscar histórico:", err.message);
       return res.status(500).json({
@@ -260,36 +278,43 @@ router.get("/:pacienteId", autenticacao, (req, res) => {
 
 // ==================================================
 // BUSCAR UMA AVALIAÇÃO PARA IMPRESSÃO
+// Admin imprime qualquer avaliação.
+// User comum imprime somente se o paciente foi cadastrado por ele.
 // ==================================================
 router.get("/imprimir/:id", autenticacao, (req, res) => {
-  db.get(
-    `
-      SELECT
-        ${camposAvaliacao}
-      FROM avaliacoes a
-      JOIN pacientes p ON a.paciente_id = p.id
-      JOIN usuarios avaliador ON a.usuario_id = avaliador.id
-      LEFT JOIN usuarios criador ON p.criado_por = criador.id
-      WHERE a.id = ?
-    `,
-    [req.params.id],
-    (err, avaliacao) => {
-      if (err) {
-        console.error("Erro ao buscar avaliação:", err.message);
-        return res.status(500).json({
-          erro: "Erro ao buscar avaliação",
-        });
-      }
+  let sql = `
+    SELECT
+      ${camposAvaliacao}
+    FROM avaliacoes a
+    JOIN pacientes p ON a.paciente_id = p.id
+    JOIN usuarios avaliador ON a.usuario_id = avaliador.id
+    LEFT JOIN usuarios criador ON p.criado_por = criador.id
+    WHERE a.id = ?
+  `;
 
-      if (!avaliacao) {
-        return res.status(404).json({
-          erro: "Avaliação não encontrada",
-        });
-      }
+  const params = [req.params.id];
 
-      return res.json(avaliacao);
+  if (!usuarioEhAdmin(req)) {
+    sql += ` AND p.criado_por = ?`;
+    params.push(req.usuario.id);
+  }
+
+  db.get(sql, params, (err, avaliacao) => {
+    if (err) {
+      console.error("Erro ao buscar avaliação:", err.message);
+      return res.status(500).json({
+        erro: "Erro ao buscar avaliação",
+      });
     }
-  );
+
+    if (!avaliacao) {
+      return res.status(404).json({
+        erro: "Avaliação não encontrada ou sem permissão de acesso",
+      });
+    }
+
+    return res.json(avaliacao);
+  });
 });
 
 module.exports = router;
