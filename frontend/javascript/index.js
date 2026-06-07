@@ -347,6 +347,76 @@ function valorCampoModal(modal, seletor) {
   return modal.querySelector(seletor)?.value.trim() || "";
 }
 
+
+// =========================
+// FEEDBACK VISUAL
+// =========================
+
+function mostrarToast(mensagem, tipo = "info") {
+  const texto = String(mensagem || "").trim();
+  if (!texto) return;
+
+  let area = document.querySelector(".toast_area");
+
+  if (!area) {
+    area = document.createElement("div");
+    area.className = "toast_area";
+    document.body.appendChild(area);
+  }
+
+  const toast = document.createElement("div");
+  toast.className = `toast_mensagem toast_${tipo}`;
+  toast.setAttribute("role", "status");
+
+  const titulo =
+    tipo === "sucesso"
+      ? "Tudo certo"
+      : tipo === "erro"
+      ? "Atenção"
+      : "Aviso";
+
+  toast.innerHTML = `
+    <strong>${escaparHTML(titulo)}</strong>
+    <span>${escaparHTML(texto)}</span>
+  `;
+
+  area.appendChild(toast);
+
+  setTimeout(() => {
+    toast.classList.add("toast_saindo");
+    setTimeout(() => toast.remove(), 260);
+  }, 3600);
+}
+
+function guardarNotificacaoPendente(mensagem, tipo = "sucesso") {
+  localStorage.setItem(
+    "xtriagem_notificacao",
+    JSON.stringify({ mensagem, tipo })
+  );
+}
+
+function exibirNotificacaoPendente() {
+  const notificacaoSalva = localStorage.getItem("xtriagem_notificacao");
+
+  if (!notificacaoSalva) return;
+
+  localStorage.removeItem("xtriagem_notificacao");
+
+  try {
+    const notificacao = JSON.parse(notificacaoSalva);
+    setTimeout(() => {
+      mostrarToast(notificacao.mensagem, notificacao.tipo || "sucesso");
+    }, 220);
+  } catch (e) {
+    mostrarToast(notificacaoSalva, "sucesso");
+  }
+}
+
+function redirecionarComFeedback(destino, mensagem, tipo = "sucesso") {
+  guardarNotificacaoPendente(mensagem, tipo);
+  window.location.href = destino;
+}
+
 // =========================
 // MÁSCARAS
 // =========================
@@ -395,7 +465,7 @@ async function fazerLogin(event) {
   const senha = document.getElementById("senha")?.value;
 
   if (!username || !senha) {
-    alert("Preencha usuário/e-mail e senha.");
+    mostrarToast("Preencha usuário/e-mail e senha.", "erro");
     return;
   }
 
@@ -412,12 +482,18 @@ async function fazerLogin(event) {
     localStorage.setItem("usuario", JSON.stringify(usuario));
 
     if (usuario?.papel === "admin") {
-      window.location.href = "/html/paginas medico/dashboard_medico.html";
+      redirecionarComFeedback(
+        "/html/paginas medico/dashboard_medico.html",
+        "Login realizado com sucesso!"
+      );
     } else {
-      window.location.href = "/html/paginas usuario/dashboard_usuario.html";
+      redirecionarComFeedback(
+        "/html/paginas usuario/dashboard_usuario.html",
+        "Login realizado com sucesso!"
+      );
     }
   } catch (erro) {
-    alert(`Erro ao fazer login: ${erro.message}`);
+    mostrarToast(`Erro ao fazer login: ${erro.message}`, "erro");
   }
 }
 
@@ -436,12 +512,12 @@ async function fazerCadastro(event) {
   const username = email || nome;
 
   if (!username || !senha) {
-    alert("Preencha e-mail/usuário e senha.");
+    mostrarToast("Preencha e-mail/usuário e senha.", "erro");
     return;
   }
 
   if (senha !== confirmaSenha) {
-    alert("As senhas não conferem.");
+    mostrarToast("As senhas não conferem.", "erro");
     return;
   }
 
@@ -456,10 +532,12 @@ async function fazerCadastro(event) {
       }),
     });
 
-    alert("Usuário cadastrado com sucesso!");
-    window.location.href = "/html/paginas medico/usuarios_medico.html";
+    redirecionarComFeedback(
+      "/html/paginas medico/usuarios_medico.html",
+      "Usuário cadastrado com sucesso!"
+    );
   } catch (erro) {
-    alert(`Erro ao cadastrar usuário: ${erro.message}`);
+    mostrarToast(`Erro ao cadastrar usuário: ${erro.message}`, "erro");
   }
 }
 
@@ -767,7 +845,7 @@ function configurarUploadFotoPaciente() {
         <img src="${fotoBase64}" alt="Prévia da foto do paciente" />
       `;
     } catch (erro) {
-      alert(erro.message);
+      mostrarToast(erro.message, "erro");
       inputFoto.value = "";
       window.__fotoPacienteBase64 = null;
     }
@@ -804,12 +882,12 @@ async function cadastrarPaciente(event) {
   const foto = window.__fotoPacienteBase64 || null;
 
   if (!nome || !data_nascimento || !sexo) {
-    alert("Preencha nome, data de nascimento e sexo.");
+    mostrarToast("Preencha nome, data de nascimento e sexo.", "erro");
     return;
   }
 
   if (!["M", "F"].includes(sexo)) {
-    alert("Sexo deve ser M ou F.");
+    mostrarToast("Sexo deve ser M ou F.", "erro");
     return;
   }
 
@@ -831,10 +909,12 @@ async function cadastrarPaciente(event) {
       }),
     });
 
-    alert("Paciente cadastrado com sucesso!");
-    window.location.href = "/html/paginas usuario/pacientes_usuario.html";
+    redirecionarComFeedback(
+      "/html/paginas usuario/pacientes_usuario.html",
+      "Paciente cadastrado com sucesso!"
+    );
   } catch (erro) {
-    alert(`Erro ao cadastrar paciente: ${erro.message}`);
+    mostrarToast(`Erro ao cadastrar paciente: ${erro.message}`, "erro");
   }
 }
 
@@ -986,7 +1066,7 @@ async function verDadosPaciente(pacienteId) {
 
     abrirPerfilPaciente(paciente);
   } catch (erro) {
-    alert(`Erro ao buscar dados do paciente: ${erro.message}`);
+    mostrarToast(`Erro ao buscar dados do paciente: ${erro.message}`, "erro");
   }
 }
 
@@ -1681,7 +1761,7 @@ async function salvarAvaliacao(event) {
   });
 
   if (!pacienteEncontrado) {
-    alert("Selecione um paciente válido da lista.");
+    mostrarToast("Selecione um paciente válido da lista.", "erro");
     return;
   }
 
@@ -1756,9 +1836,9 @@ async function salvarAvaliacao(event) {
       </div>
     `;
 
-    alert("Avaliação salva com sucesso!");
+    mostrarToast("Avaliação salva com sucesso!", "sucesso");
   } catch (erro) {
-    alert(`Erro ao salvar avaliação: ${erro.message}`);
+    mostrarToast(`Erro ao salvar avaliação: ${erro.message}`, "erro");
   }
 }
 
@@ -2247,7 +2327,7 @@ async function imprimirAvaliacao(id) {
 
     janela.document.close();
   } catch (erro) {
-    alert(`Erro ao preparar impressão: ${erro.message}`);
+    mostrarToast(`Erro ao preparar impressão: ${erro.message}`, "erro");
   }
 }
 
@@ -2360,7 +2440,7 @@ async function publicarAviso(event) {
   const mensagem = document.getElementById("avisoMensagem")?.value.trim();
 
   if (!titulo || !mensagem) {
-    alert("Preencha o título e a mensagem do aviso.");
+    mostrarToast("Preencha o título e a mensagem do aviso.", "erro");
     return;
   }
 
@@ -2376,10 +2456,10 @@ async function publicarAviso(event) {
 
     document.getElementById("formAviso")?.reset();
 
-    alert("Aviso publicado com sucesso!");
+    mostrarToast("Aviso publicado com sucesso!", "sucesso");
     carregarAvisosDashboard();
   } catch (erro) {
-    alert(`Erro ao publicar aviso: ${erro.message}`);
+    mostrarToast(`Erro ao publicar aviso: ${erro.message}`, "erro");
   }
 }
 
@@ -2421,7 +2501,18 @@ async function carregarDashboardUsuario() {
       apiFetch("/avaliacoes", { headers: authHeaders() }),
     ]);
 
-    const ultimoPaciente = pacientes[pacientes.length - 1];
+    const pacientesPorData = [...pacientes].sort((a, b) => {
+      const dataB = new Date(b.criado_em || 0).getTime();
+      const dataA = new Date(a.criado_em || 0).getTime();
+      return dataB - dataA;
+    });
+    const ultimoPaciente = pacientesPorData[0] || pacientes[pacientes.length - 1];
+    const totalEncaminhamentos = avaliacoes.filter((avaliacao) =>
+      String(avaliacao.recomendacao || "")
+        .toLowerCase()
+        .includes("encaminhar")
+    ).length;
+    const ultimasAvaliacoes = avaliacoes.slice(0, 4);
 
     area.innerHTML = `
       <h3 class="titu1">Dashboard</h3>
@@ -2439,8 +2530,8 @@ async function carregarDashboardUsuario() {
         </div>
 
         <div>
-          <h5>Relatórios</h5>
-          <p><strong>${avaliacoes.length}</strong> disponíveis</p>
+          <h5>Encaminhamentos</h5>
+          <p><strong>${totalEncaminhamentos}</strong> para teste</p>
         </div>
 
         <div>
@@ -2482,18 +2573,47 @@ async function carregarDashboardUsuario() {
         </a>
       </div>
 
-      <div class="sistema">
-        <h5>Resumo do atendimento</h5>
+      <div class="sistema painel_dashboard">
+        <div>
+          <h5>Resumo do atendimento</h5>
 
-        <p>
-          Use esta área para cadastrar pacientes, iniciar avaliações clínicas
-          e consultar relatórios gerados.
-        </p>
+          <p>
+            Use esta área para cadastrar pacientes, iniciar avaliações clínicas
+            e consultar relatórios gerados.
+          </p>
 
-        <p>
-          <strong>Seu papel:</strong> Atendente<br />
-          <strong>Status:</strong> Sistema funcionando
-        </p>
+          <p>
+            <strong>Seu papel:</strong> Atendente<br />
+            <strong>Status:</strong> Sistema funcionando
+          </p>
+        </div>
+
+        <div>
+          <h5>Últimas avaliações</h5>
+          <div class="ultimas_avaliacoes">
+            ${
+              ultimasAvaliacoes.length
+                ? ultimasAvaliacoes
+                    .map(
+                      (avaliacao) => `
+                        <article class="avaliacao_resumo_card">
+                          <strong>${escaparHTML(
+                            avaliacao.paciente_nome ||
+                              avaliacao.nome ||
+                              `Paciente ${avaliacao.paciente_id}`
+                          )}</strong>
+                          <span>Score ${formatarScore(avaliacao.score)}</span>
+                          <small>${escaparHTML(
+                            avaliacao.recomendacao || "Sem recomendação"
+                          )}</small>
+                        </article>
+                      `
+                    )
+                    .join("")
+                : `<p>Nenhuma avaliação registrada ainda.</p>`
+            }
+          </div>
+        </div>
       </div>
     `;
 
@@ -2596,27 +2716,29 @@ async function carregarDashboardMedico() {
 
         <h5>Últimas avaliações</h5>
 
-        ${
-          ultimas.length
-            ? ultimas
-                .map(
-                  (avaliacao) => `
-                    <p>
-                      <strong>${escaparHTML(
-                        avaliacao.paciente_nome ||
-                          avaliacao.nome ||
-                          `Paciente ${avaliacao.paciente_id}`
-                      )}</strong><br />
-                      Score: ${formatarScore(avaliacao.score)} |
-                      ${escaparHTML(
-                        avaliacao.recomendacao || "Sem recomendação"
-                      )}
-                    </p>
-                  `
-                )
-                .join("")
-            : "<p>Nenhuma avaliação registrada ainda.</p>"
-        }
+        <div class="ultimas_avaliacoes">
+          ${
+            ultimas.length
+              ? ultimas
+                  .map(
+                    (avaliacao) => `
+                      <article class="avaliacao_resumo_card">
+                        <strong>${escaparHTML(
+                          avaliacao.paciente_nome ||
+                            avaliacao.nome ||
+                            `Paciente ${avaliacao.paciente_id}`
+                        )}</strong>
+                        <span>Score ${formatarScore(avaliacao.score)}</span>
+                        <small>${escaparHTML(
+                          avaliacao.recomendacao || "Sem recomendação"
+                        )}</small>
+                      </article>
+                    `
+                  )
+                  .join("")
+              : "<p>Nenhuma avaliação registrada ainda.</p>"
+          }
+        </div>
       `;
 
       const formAviso = document.getElementById("formAviso");
@@ -2659,6 +2781,7 @@ document.addEventListener("DOMContentLoaded", () => {
   protegerPagina();
   atualizarBoasVindas();
   ativarMascaras();
+  exibirNotificacaoPendente();
 
   const pagina = paginaAtual();
 

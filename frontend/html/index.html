@@ -12,22 +12,75 @@
   </head>
 
   <body class="home-page">
-  <div class="corpo">
-    <div class="container">
-      <div>
-        <button class="botao_login" type="button" id="login">
+    <main class="home-shell">
+      <header class="home-topbar">
+        <div class="home-brand" aria-label="Identificação do sistema">
+          <img src="../css/imagens/x.png" alt="" />
+          <span>X-Triagem</span>
+        </div>
+
+        <button class="botao_login home-login" type="button" id="login">
           Fazer Login
         </button>
-      </div>
-    </div>
+      </header>
 
-    <div class="titulo">
-      <h1>X-Triagem</h1>
-    </div>
+      <section class="home-hero" aria-label="Apresentação do sistema X-Triagem">
+        <div class="home-copy">
+          <span class="home-kicker">Sistema Hospitalar Interno</span>
 
-    <div class="simbolo">
-      <img src="../css/imagens/x.png" alt="Símbolo X-Triagem" />
-    </div>
-  </div>
-</body>
+          <h1>X-Triagem</h1>
+
+          <p>
+            Gerenciamento de pacientes, avaliações clínicas e relatórios para apoio
+            à triagem da Síndrome do X-Frágil.
+          </p>
+
+          <div class="home-feature-grid" aria-label="Principais recursos do sistema">
+            <article class="home-feature-card">
+              <strong>🔐 Acesso seguro</strong>
+              <span>Perfis de administrador e usuário comum.</span>
+            </article>
+
+            <article class="home-feature-card">
+              <strong>📋 Avaliação clínica</strong>
+              <span>Checklist de sintomas com cálculo automático.</span>
+            </article>
+
+            <article class="home-feature-card">
+              <strong>📊 Relatórios</strong>
+              <span>Históricos e informações prontas para consulta.</span>
+            </article>
+
+            <article class="home-feature-card">
+              <strong>🧬 Recomendação</strong>
+              <span>Apoio ao encaminhamento para teste genético.</span>
+            </article>
+          </div>
+        </div>
+
+        <aside class="home-info-panel" aria-label="Resumo do fluxo do sistema">
+          <div class="home-symbol">
+            <img src="../css/imagens/x.png" alt="Símbolo X-Triagem" />
+          </div>
+
+          <h2>Fluxo clínico organizado</h2>
+
+          <p>
+            Cadastre pacientes, registre avaliações e acompanhe os resultados em
+            um painel simples para a equipe de saúde.
+          </p>
+
+          <div class="home-flow-list">
+            <span>01. Cadastro do paciente</span>
+            <span>02. Avaliação por checklist</span>
+            <span>03. Histórico e relatórios</span>
+          </div>
+        </aside>
+      </section>
+
+      <footer class="home-footer">
+        Projeto acadêmico PUCPR • X-Triagem
+      </footer>
+    </main>
+  </body>
 </html>
