@@ -204,6 +204,149 @@ function usuarioEhAdmin() {
   return usuarioLogado()?.papel === "admin";
 }
 
+
+// =========================
+// MODAIS PERSONALIZADOS
+// =========================
+
+function fecharModalAcao() {
+  const modal = document.querySelector(".modal_acao_fundo");
+
+  if (modal) {
+    modal.remove();
+  }
+
+  if (!document.querySelector(".modal_paciente_fundo")) {
+    document.body.classList.remove("modal_aberto");
+  }
+}
+
+function mostrarErroModal(mensagem) {
+  const erro = document.getElementById("modalAcaoErro");
+
+  if (!erro) return;
+
+  erro.textContent = mensagem;
+  erro.style.display = mensagem ? "block" : "none";
+}
+
+function abrirModalAcao({
+  titulo,
+  descricao = "",
+  conteudo = "",
+  textoConfirmar = "Salvar",
+  textoCancelar = "Cancelar",
+  perigoso = false,
+  mostrarCancelar = true,
+  onConfirmar,
+}) {
+  fecharModalAcao();
+
+  const modal = document.createElement("div");
+  modal.className = "modal_acao_fundo";
+
+  modal.innerHTML = `
+    <div class="modal_acao_card" role="dialog" aria-modal="true" aria-label="${escaparHTML(titulo)}">
+      <button class="modal_fechar" type="button" data-modal-fechar>×</button>
+
+      <div class="modal_acao_topo">
+        <p class="perfil_etiqueta">X-Triagem</p>
+        <h2>${escaparHTML(titulo)}</h2>
+        ${descricao ? `<p>${escaparHTML(descricao)}</p>` : ""}
+      </div>
+
+      <div class="modal_acao_conteudo">
+        ${conteudo}
+        <p id="modalAcaoErro" class="modal_erro" style="display:none"></p>
+      </div>
+
+      <div class="modal_acao_botoes">
+        ${mostrarCancelar ? `<button class="botao_card botao_modal_cancelar" type="button" data-modal-cancelar>${escaparHTML(textoCancelar)}</button>` : ""}
+        <button class="botao_card ${perigoso ? "botao_perigo" : ""}" type="button" data-modal-confirmar>
+          ${escaparHTML(textoConfirmar)}
+        </button>
+      </div>
+    </div>
+  `;
+
+  const fechar = () => fecharModalAcao();
+
+  modal.querySelector("[data-modal-fechar]")?.addEventListener("click", fechar);
+  modal.querySelector("[data-modal-cancelar]")?.addEventListener("click", fechar);
+
+  modal.addEventListener("click", (evento) => {
+    if (evento.target === modal) fechar();
+  });
+
+  modal.querySelector("[data-modal-confirmar]")?.addEventListener("click", async () => {
+    try {
+      mostrarErroModal("");
+      const retorno = onConfirmar ? await onConfirmar(modal) : true;
+
+      if (retorno !== false) {
+        fecharModalAcao();
+      }
+    } catch (erro) {
+      mostrarErroModal(erro.message || "Erro ao executar ação.");
+    }
+  });
+
+  document.body.appendChild(modal);
+  document.body.classList.add("modal_aberto");
+
+  const primeiroCampo = modal.querySelector("input, select, textarea, button[data-modal-confirmar]");
+  primeiroCampo?.focus();
+
+  return modal;
+}
+
+function abrirModalMensagem(titulo, mensagem, tipo = "info") {
+  abrirModalAcao({
+    titulo,
+    descricao: mensagem,
+    conteudo: tipo === "erro" ? `<div class="modal_alerta modal_alerta_erro">${escaparHTML(mensagem)}</div>` : "",
+    textoConfirmar: "OK",
+    mostrarCancelar: false,
+  });
+}
+
+function campoModalHTML({ id, label, valor = "", tipo = "text", obrigatorio = false, placeholder = "" }) {
+  return `
+    <label class="modal_campo" for="${escaparHTML(id)}">
+      <span>${escaparHTML(label)}${obrigatorio ? " *" : ""}</span>
+      <input
+        id="${escaparHTML(id)}"
+        type="${escaparHTML(tipo)}"
+        value="${escaparHTML(valor || "")}"
+        placeholder="${escaparHTML(placeholder)}"
+        ${obrigatorio ? "required" : ""}
+      />
+    </label>
+  `;
+}
+
+function selectModalHTML({ id, label, valor = "", obrigatorio = false, opcoes = [] }) {
+  const options = opcoes
+    .map((opcao) => {
+      const selecionado = String(opcao.valor) === String(valor) ? "selected" : "";
+      return `<option value="${escaparHTML(opcao.valor)}" ${selecionado}>${escaparHTML(opcao.texto)}</option>`;
+    })
+    .join("");
+
+  return `
+    <label class="modal_campo" for="${escaparHTML(id)}">
+      <span>${escaparHTML(label)}${obrigatorio ? " *" : ""}</span>
+      <select id="${escaparHTML(id)}" ${obrigatorio ? "required" : ""}>
+        ${options}
+      </select>
+    </label>
+  `;
+}
+
+function valorCampoModal(modal, seletor) {
+  return modal.querySelector(seletor)?.value.trim() || "";
+}
+
 // =========================
 // MÁSCARAS
 // =========================
@@ -321,6 +464,10 @@ async function fazerCadastro(event) {
 }
 
 function cardUsuario(usuario) {
+  const id = Number(usuario.id);
+  const usuarioAtual = usuarioLogado();
+  const ehProprioUsuario = usuarioAtual && Number(usuarioAtual.id) === id;
+
   return `
     <div class="card_api">
       <div class="card_header">${escaparHTML(usuario.username)}</div>
@@ -339,7 +486,7 @@ function cardUsuario(usuario) {
         <button
           class="botao_card"
           type="button"
-          onclick="editarUsuario(${usuario.id}, '${escaparHTML(usuario.username)}', '${escaparHTML(usuario.papel)}')"
+          onclick="editarUsuario(${id})"
         >
           Editar
         </button>
@@ -347,7 +494,7 @@ function cardUsuario(usuario) {
         <button
           class="botao_card"
           type="button"
-          onclick="alterarPerfilUsuario(${usuario.id}, '${escaparHTML(usuario.papel)}')"
+          onclick="alterarPerfilUsuario(${id})"
         >
           Alterar perfil
         </button>
@@ -355,13 +502,20 @@ function cardUsuario(usuario) {
         <button
           class="botao_card botao_perigo"
           type="button"
-          onclick="removerUsuario(${usuario.id}, '${escaparHTML(usuario.username)}')"
+          onclick="removerUsuario(${id})"
+          ${ehProprioUsuario ? "disabled title='Você não pode remover seu próprio usuário'" : ""}
         >
           Remover
         </button>
       </div>
     </div>
   `;
+}
+
+function buscarUsuarioCache(id) {
+  return (window.__usuariosCache || []).find(
+    (usuario) => Number(usuario.id) === Number(id)
+  );
 }
 
 async function carregarUsuarios() {
@@ -373,6 +527,8 @@ async function carregarUsuarios() {
       headers: authHeaders(),
     });
 
+    window.__usuariosCache = usuarios;
+
     container.innerHTML =
       usuarios.map(cardUsuario).join("") ||
       "<p>Nenhum usuário cadastrado.</p>";
@@ -383,91 +539,142 @@ async function carregarUsuarios() {
   }
 }
 
-async function editarUsuario(id, usernameAtual, papelAtual) {
-  const novoUsername = prompt("Novo nome/e-mail do usuário:", usernameAtual);
+async function editarUsuario(id) {
+  const usuario = buscarUsuarioCache(id);
 
-  if (!novoUsername || !novoUsername.trim()) {
-    alert("Nome de usuário inválido.");
+  if (!usuario) {
+    abrirModalMensagem("Usuário não encontrado", "Atualize a página e tente novamente.", "erro");
     return;
   }
 
-  const novoPerfil = prompt(
-    "Perfil do usuário: admin ou user",
-    papelAtual
-  );
+  abrirModalAcao({
+    titulo: "Editar usuário",
+    descricao: "Altere os dados do usuário sem abrir aquelas caixinhas feias do navegador.",
+    textoConfirmar: "Salvar alterações",
+    conteudo: `
+      <div class="modal_form_grid">
+        ${campoModalHTML({
+          id: "modalUsuarioUsername",
+          label: "Nome/e-mail do usuário",
+          valor: usuario.username,
+          obrigatorio: true,
+        })}
 
-  if (!["admin", "user"].includes(novoPerfil)) {
-    alert("Perfil inválido. Use admin ou user.");
-    return;
-  }
+        ${selectModalHTML({
+          id: "modalUsuarioPerfil",
+          label: "Perfil",
+          valor: usuario.papel,
+          obrigatorio: true,
+          opcoes: [
+            { valor: "user", texto: "Usuário comum" },
+            { valor: "admin", texto: "Admin / médico" },
+          ],
+        })}
+      </div>
+    `,
+    onConfirmar: async (modal) => {
+      const novoUsername = valorCampoModal(modal, "#modalUsuarioUsername");
+      const novoPerfil = valorCampoModal(modal, "#modalUsuarioPerfil");
 
-  try {
-    await apiFetch(`/usuarios/${id}`, {
-      method: "PUT",
-      headers: authHeaders(),
-      body: JSON.stringify({
-        username: novoUsername.trim(),
-        papel: novoPerfil,
-      }),
-    });
+      if (!novoUsername) {
+        mostrarErroModal("Informe o nome/e-mail do usuário.");
+        return false;
+      }
 
-    alert("Usuário editado com sucesso!");
-    carregarUsuarios();
-  } catch (erro) {
-    alert(`Erro ao editar usuário: ${erro.message}`);
-  }
+      if (!["admin", "user"].includes(novoPerfil)) {
+        mostrarErroModal("Perfil inválido. Selecione admin ou user.");
+        return false;
+      }
+
+      await apiFetch(`/usuarios/${id}`, {
+        method: "PUT",
+        headers: authHeaders(),
+        body: JSON.stringify({
+          username: novoUsername,
+          papel: novoPerfil,
+        }),
+      });
+
+      await carregarUsuarios();
+      abrirModalMensagem("Usuário editado", "As alterações foram salvas com sucesso.");
+    },
+  });
 }
 
-async function alterarPerfilUsuario(id, perfilAtual) {
+async function alterarPerfilUsuario(id) {
+  const usuario = buscarUsuarioCache(id);
+
+  if (!usuario) {
+    abrirModalMensagem("Usuário não encontrado", "Atualize a página e tente novamente.", "erro");
+    return;
+  }
+
+  const perfilAtual = usuario.papel;
   const novoPerfil = perfilAtual === "admin" ? "user" : "admin";
+  const nomePerfilAtual = perfilAtual === "admin" ? "Admin / médico" : "Usuário comum";
+  const nomeNovoPerfil = novoPerfil === "admin" ? "Admin / médico" : "Usuário comum";
 
-  const confirmar = confirm(
-    `Deseja alterar o perfil deste usuário de "${perfilAtual}" para "${novoPerfil}"?`
-  );
+  abrirModalAcao({
+    titulo: "Alterar perfil",
+    descricao: `Deseja alterar o perfil de "${usuario.username}" de "${nomePerfilAtual}" para "${nomeNovoPerfil}"?`,
+    textoConfirmar: "Alterar perfil",
+    conteudo: `
+      <div class="modal_resumo">
+        <p><strong>Usuário:</strong> ${escaparHTML(usuario.username)}</p>
+        <p><strong>Perfil atual:</strong> ${escaparHTML(nomePerfilAtual)}</p>
+        <p><strong>Novo perfil:</strong> ${escaparHTML(nomeNovoPerfil)}</p>
+      </div>
+    `,
+    onConfirmar: async () => {
+      await apiFetch(`/usuarios/${id}/perfil`, {
+        method: "PATCH",
+        headers: authHeaders(),
+        body: JSON.stringify({
+          papel: novoPerfil,
+        }),
+      });
 
-  if (!confirmar) return;
-
-  try {
-    await apiFetch(`/usuarios/${id}/perfil`, {
-      method: "PATCH",
-      headers: authHeaders(),
-      body: JSON.stringify({
-        papel: novoPerfil,
-      }),
-    });
-
-    alert("Perfil alterado com sucesso!");
-    carregarUsuarios();
-  } catch (erro) {
-    alert(`Erro ao alterar perfil: ${erro.message}`);
-  }
+      await carregarUsuarios();
+      abrirModalMensagem("Perfil alterado", "O perfil do usuário foi atualizado com sucesso.");
+    },
+  });
 }
 
-async function removerUsuario(id, username) {
+async function removerUsuario(id) {
   const usuarioAtual = usuarioLogado();
 
   if (usuarioAtual && Number(usuarioAtual.id) === Number(id)) {
-    alert("Você não pode remover o próprio usuário logado.");
+    abrirModalMensagem("Ação bloqueada", "Você não pode remover o próprio usuário logado.", "erro");
     return;
   }
 
-  const confirmar = confirm(
-    `Tem certeza que deseja remover o usuário "${username}"?`
-  );
+  const usuario = buscarUsuarioCache(id);
 
-  if (!confirmar) return;
-
-  try {
-    await apiFetch(`/usuarios/${id}`, {
-      method: "DELETE",
-      headers: authHeaders(),
-    });
-
-    alert("Usuário removido com sucesso!");
-    carregarUsuarios();
-  } catch (erro) {
-    alert(`Erro ao remover usuário: ${erro.message}`);
+  if (!usuario) {
+    abrirModalMensagem("Usuário não encontrado", "Atualize a página e tente novamente.", "erro");
+    return;
   }
+
+  abrirModalAcao({
+    titulo: "Remover usuário",
+    descricao: `Tem certeza que deseja remover o usuário "${usuario.username}"?`,
+    textoConfirmar: "Remover usuário",
+    perigoso: true,
+    conteudo: `
+      <div class="modal_alerta modal_alerta_erro">
+        Essa ação remove o usuário do sistema. Confirme apenas se tiver certeza.
+      </div>
+    `,
+    onConfirmar: async () => {
+      await apiFetch(`/usuarios/${id}`, {
+        method: "DELETE",
+        headers: authHeaders(),
+      });
+
+      await carregarUsuarios();
+      abrirModalMensagem("Usuário removido", "O usuário foi removido com sucesso.");
+    },
+  });
 }
 
 
@@ -1007,30 +1214,133 @@ function cardAvaliacaoPerfilPaciente(avaliacao) {
   `;
 }
 
-function pedirCampoPaciente(label, valorAtual, obrigatorio = false) {
-  const resposta = prompt(label, valorAtual || "");
+function abrirModalEditarPaciente(paciente) {
+  abrirModalAcao({
+    titulo: "Editar paciente",
+    descricao: "Atualize os dados do paciente em uma tela única, sem usar prompt do navegador.",
+    textoConfirmar: "Salvar paciente",
+    conteudo: `
+      <div class="modal_form_grid modal_form_grid_duas_colunas">
+        ${campoModalHTML({
+          id: "modalPacienteNome",
+          label: "Nome completo",
+          valor: paciente.nome,
+          obrigatorio: true,
+        })}
 
-  if (resposta === null) {
-    return {
-      cancelado: true,
-      valor: null,
-    };
-  }
+        ${campoModalHTML({
+          id: "modalPacienteCpf",
+          label: "CPF",
+          valor: paciente.cpf || "",
+          placeholder: "000.000.000-00",
+        })}
 
-  const valor = resposta.trim();
+        ${campoModalHTML({
+          id: "modalPacienteData",
+          label: "Data de nascimento",
+          tipo: "date",
+          valor: paciente.data_nascimento,
+          obrigatorio: true,
+        })}
 
-  if (obrigatorio && !valor) {
-    alert("Este campo é obrigatório.");
-    return {
-      cancelado: true,
-      valor: null,
-    };
-  }
+        ${selectModalHTML({
+          id: "modalPacienteSexo",
+          label: "Sexo",
+          valor: normalizarSexo(paciente.sexo),
+          obrigatorio: true,
+          opcoes: [
+            { valor: "M", texto: "Masculino" },
+            { valor: "F", texto: "Feminino" },
+          ],
+        })}
 
-  return {
-    cancelado: false,
-    valor: valor || null,
-  };
+        ${campoModalHTML({
+          id: "modalPacienteEndereco",
+          label: "Endereço",
+          valor: paciente.endereco || "",
+        })}
+
+        ${campoModalHTML({
+          id: "modalPacienteCep",
+          label: "CEP",
+          valor: paciente.cep || "",
+          placeholder: "00000-000",
+        })}
+
+        ${campoModalHTML({
+          id: "modalPacienteCidade",
+          label: "Cidade",
+          valor: paciente.cidade || "",
+        })}
+
+        ${campoModalHTML({
+          id: "modalPacienteEstado",
+          label: "Estado",
+          valor: paciente.estado || "",
+          placeholder: "PR",
+        })}
+
+        <div class="modal_form_linha_inteira">
+          ${campoModalHTML({
+            id: "modalPacienteResponsavel",
+            label: "Pais ou responsável",
+            valor: paciente.responsavel || "",
+          })}
+        </div>
+      </div>
+    `,
+    onConfirmar: async (modal) => {
+      const nome = valorCampoModal(modal, "#modalPacienteNome");
+      const cpf = valorCampoModal(modal, "#modalPacienteCpf") || null;
+      const data_nascimento = valorCampoModal(modal, "#modalPacienteData");
+      const sexo = normalizarSexo(valorCampoModal(modal, "#modalPacienteSexo"));
+      const endereco = valorCampoModal(modal, "#modalPacienteEndereco") || null;
+      const cep = valorCampoModal(modal, "#modalPacienteCep") || null;
+      const cidade = valorCampoModal(modal, "#modalPacienteCidade") || null;
+      const estado = valorCampoModal(modal, "#modalPacienteEstado") || null;
+      const responsavel = valorCampoModal(modal, "#modalPacienteResponsavel") || null;
+
+      if (!nome || !data_nascimento || !sexo) {
+        mostrarErroModal("Preencha nome, data de nascimento e sexo.");
+        return false;
+      }
+
+      if (!["M", "F"].includes(sexo)) {
+        mostrarErroModal("Sexo inválido. Selecione masculino ou feminino.");
+        return false;
+      }
+
+      await apiFetch(`/pacientes/${paciente.id}`, {
+        method: "PUT",
+        headers: authHeaders(),
+        body: JSON.stringify({
+          nome,
+          cpf,
+          data_nascimento,
+          sexo,
+          endereco,
+          cep,
+          estado,
+          cidade,
+          responsavel,
+        }),
+      });
+
+      await carregarPacientes();
+      abrirModalMensagem("Paciente editado", "Os dados do paciente foram salvos com sucesso.");
+    },
+  });
+
+  const cpfInput = document.getElementById("modalPacienteCpf");
+  const cepInput = document.getElementById("modalPacienteCep");
+
+  cpfInput?.addEventListener("input", () => {
+    cpfInput.value = aplicarMascaraCPF(cpfInput.value);
+  });
+
+  cepInput?.addEventListener("input", () => {
+    cepInput.value = aplicarMascaraCEP(cepInput.value);
+  });
 }
 
 async function editarPaciente(pacienteId) {
@@ -1039,78 +1349,9 @@ async function editarPaciente(pacienteId) {
       headers: authHeaders(),
     });
 
-    const campoNome = pedirCampoPaciente(
-      "Nome completo:",
-      paciente.nome,
-      true
-    );
-    if (campoNome.cancelado) return;
-
-    const campoCpf = pedirCampoPaciente("CPF:", paciente.cpf || "");
-    if (campoCpf.cancelado) return;
-
-    const campoData = pedirCampoPaciente(
-      "Data de nascimento no formato AAAA-MM-DD:",
-      paciente.data_nascimento,
-      true
-    );
-    if (campoData.cancelado) return;
-
-    const campoSexo = pedirCampoPaciente(
-      "Sexo: M ou F",
-      paciente.sexo,
-      true
-    );
-    if (campoSexo.cancelado) return;
-
-    const sexoNormalizado = normalizarSexo(campoSexo.valor);
-
-    if (!["M", "F"].includes(sexoNormalizado)) {
-      alert("Sexo inválido. Use M ou F.");
-      return;
-    }
-
-    const campoEndereco = pedirCampoPaciente(
-      "Endereço:",
-      paciente.endereco || ""
-    );
-    if (campoEndereco.cancelado) return;
-
-    const campoCep = pedirCampoPaciente("CEP:", paciente.cep || "");
-    if (campoCep.cancelado) return;
-
-    const campoEstado = pedirCampoPaciente("Estado:", paciente.estado || "");
-    if (campoEstado.cancelado) return;
-
-    const campoCidade = pedirCampoPaciente("Cidade:", paciente.cidade || "");
-    if (campoCidade.cancelado) return;
-
-    const campoResponsavel = pedirCampoPaciente(
-      "Pais ou responsável:",
-      paciente.responsavel || ""
-    );
-    if (campoResponsavel.cancelado) return;
-
-    await apiFetch(`/pacientes/${pacienteId}`, {
-      method: "PUT",
-      headers: authHeaders(),
-      body: JSON.stringify({
-        nome: campoNome.valor,
-        cpf: campoCpf.valor,
-        data_nascimento: campoData.valor,
-        sexo: sexoNormalizado,
-        endereco: campoEndereco.valor,
-        cep: campoCep.valor,
-        estado: campoEstado.valor,
-        cidade: campoCidade.valor,
-        responsavel: campoResponsavel.valor,
-      }),
-    });
-
-    alert("Paciente editado com sucesso!");
-    carregarPacientes();
+    abrirModalEditarPaciente(paciente);
   } catch (erro) {
-    alert(`Erro ao editar paciente: ${erro.message}`);
+    abrirModalMensagem("Erro ao buscar paciente", erro.message, "erro");
   }
 }
 
@@ -1120,22 +1361,28 @@ async function excluirPaciente(pacienteId) {
       headers: authHeaders(),
     });
 
-    const confirmar = confirm(
-      `Tem certeza que deseja excluir o paciente "${paciente.nome}"?\n\n` +
-        `Atenção: se esse paciente tiver avaliações ou histórico, essas informações também serão removidas.`
-    );
+    abrirModalAcao({
+      titulo: "Excluir paciente",
+      descricao: `Tem certeza que deseja excluir o paciente "${paciente.nome}"?`,
+      textoConfirmar: "Excluir paciente",
+      perigoso: true,
+      conteudo: `
+        <div class="modal_alerta modal_alerta_erro">
+          Atenção: se esse paciente tiver avaliações ou histórico, essas informações também serão removidas.
+        </div>
+      `,
+      onConfirmar: async () => {
+        await apiFetch(`/pacientes/${pacienteId}`, {
+          method: "DELETE",
+          headers: authHeaders(),
+        });
 
-    if (!confirmar) return;
-
-    await apiFetch(`/pacientes/${pacienteId}`, {
-      method: "DELETE",
-      headers: authHeaders(),
+        await carregarPacientes();
+        abrirModalMensagem("Paciente excluído", "O paciente foi removido com sucesso.");
+      },
     });
-
-    alert("Paciente excluído com sucesso!");
-    carregarPacientes();
   } catch (erro) {
-    alert(`Erro ao excluir paciente: ${erro.message}`);
+    abrirModalMensagem("Erro ao excluir paciente", erro.message, "erro");
   }
 }
 
@@ -2137,21 +2384,26 @@ async function publicarAviso(event) {
 }
 
 async function excluirAviso(id) {
-  const confirmar = confirm("Tem certeza que deseja excluir este aviso?");
+  abrirModalAcao({
+    titulo: "Excluir aviso",
+    descricao: "Tem certeza que deseja excluir este aviso do dashboard?",
+    textoConfirmar: "Excluir aviso",
+    perigoso: true,
+    conteudo: `
+      <div class="modal_alerta modal_alerta_erro">
+        O aviso será removido para todos os usuários.
+      </div>
+    `,
+    onConfirmar: async () => {
+      await apiFetch(`/avisos/${id}`, {
+        method: "DELETE",
+        headers: authHeaders(),
+      });
 
-  if (!confirmar) return;
-
-  try {
-    await apiFetch(`/avisos/${id}`, {
-      method: "DELETE",
-      headers: authHeaders(),
-    });
-
-    alert("Aviso excluído com sucesso!");
-    carregarAvisosDashboard();
-  } catch (erro) {
-    alert(`Erro ao excluir aviso: ${erro.message}`);
-  }
+      await carregarAvisosDashboard();
+      abrirModalMensagem("Aviso excluído", "O aviso foi removido com sucesso.");
+    },
+  });
 }
 
 // =========================

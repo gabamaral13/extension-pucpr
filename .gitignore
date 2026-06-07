@@ -3,3 +3,5 @@ backend/banco.db
 .env
 resetAdmin.js
 criarAdmin.js
+cd backend
+npm start
