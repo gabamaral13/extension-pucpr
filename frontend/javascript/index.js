@@ -59,6 +59,63 @@ function formatarData(data) {
   return escaparHTML(data);
 }
 
+function dataIsoValida(dataIso) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(dataIso || ""))) {
+    return false;
+  }
+
+  const [ano, mes, dia] = dataIso.split("-").map(Number);
+  const data = new Date(Date.UTC(ano, mes - 1, dia));
+
+  return (
+    data.getUTCFullYear() === ano &&
+    data.getUTCMonth() === mes - 1 &&
+    data.getUTCDate() === dia
+  );
+}
+
+function validarDataNascimentoCampo(campoData) {
+  if (!campoData || campoData.validity?.badInput || !campoData.value) {
+    return {
+      valido: false,
+      mensagem:
+        "Data de nascimento inválida. Digite uma data real, exemplo: 29/02/2000 ou 31/03/2000.",
+    };
+  }
+
+  if (!dataIsoValida(campoData.value)) {
+    return {
+      valido: false,
+      mensagem:
+        "Data de nascimento inválida. Confira o dia, o mês e o ano informados.",
+    };
+  }
+
+  const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0);
+
+  const dataNascimento = new Date(`${campoData.value}T00:00:00`);
+
+  if (dataNascimento > hoje) {
+    return {
+      valido: false,
+      mensagem: "A data de nascimento não pode ser maior que a data de hoje.",
+    };
+  }
+
+  return { valido: true, valor: campoData.value };
+}
+
+function configurarLimiteDataNascimento() {
+  const hoje = new Date().toISOString().slice(0, 10);
+
+  document.querySelectorAll('input[type="date"]').forEach((campo) => {
+    if (!campo.max) {
+      campo.max = hoje;
+    }
+  });
+}
+
 function formatarScore(score) {
   const numero = Number(score);
   if (Number.isNaN(numero)) return "-";
@@ -870,7 +927,9 @@ async function cadastrarPaciente(event) {
 
   const nome = document.getElementById("nome")?.value.trim();
   const cpf = document.getElementById("cpf")?.value.trim() || null;
-  const data_nascimento = document.getElementById("data")?.value;
+  const campoDataNascimento = document.getElementById("data");
+  const validacaoData = validarDataNascimentoCampo(campoDataNascimento);
+  const data_nascimento = validacaoData.valor;
   const sexo = normalizarSexo(document.getElementById("sexo")?.value);
 
   const endereco = document.getElementById("endereco")?.value.trim() || null;
@@ -881,8 +940,18 @@ async function cadastrarPaciente(event) {
     document.getElementById("responsavel")?.value.trim() || null;
   const foto = window.__fotoPacienteBase64 || null;
 
-  if (!nome || !data_nascimento || !sexo) {
-    mostrarToast("Preencha nome, data de nascimento e sexo.", "erro");
+  if (!nome) {
+    mostrarToast("Preencha o nome do paciente.", "erro");
+    return;
+  }
+
+  if (!validacaoData.valido) {
+    mostrarToast(validacaoData.mensagem, "erro");
+    return;
+  }
+
+  if (!sexo) {
+    mostrarToast("Selecione o sexo do paciente.", "erro");
     return;
   }
 
@@ -909,10 +978,11 @@ async function cadastrarPaciente(event) {
       }),
     });
 
-    redirecionarComFeedback(
-      "/html/paginas usuario/pacientes_usuario.html",
-      "Paciente cadastrado com sucesso!"
-    );
+    const destino = usuarioEhAdmin()
+      ? "/html/paginas medico/pacientes_medico.html"
+      : "/html/paginas usuario/pacientes_usuario.html";
+
+    redirecionarComFeedback(destino, "Paciente cadastrado com sucesso!");
   } catch (erro) {
     mostrarToast(`Erro ao cadastrar paciente: ${erro.message}`, "erro");
   }
@@ -1372,7 +1442,9 @@ function abrirModalEditarPaciente(paciente) {
     onConfirmar: async (modal) => {
       const nome = valorCampoModal(modal, "#modalPacienteNome");
       const cpf = valorCampoModal(modal, "#modalPacienteCpf") || null;
-      const data_nascimento = valorCampoModal(modal, "#modalPacienteData");
+      const campoDataNascimento = modal.querySelector("#modalPacienteData");
+      const validacaoData = validarDataNascimentoCampo(campoDataNascimento);
+      const data_nascimento = validacaoData.valor;
       const sexo = normalizarSexo(valorCampoModal(modal, "#modalPacienteSexo"));
       const endereco = valorCampoModal(modal, "#modalPacienteEndereco") || null;
       const cep = valorCampoModal(modal, "#modalPacienteCep") || null;
@@ -1380,8 +1452,18 @@ function abrirModalEditarPaciente(paciente) {
       const estado = valorCampoModal(modal, "#modalPacienteEstado") || null;
       const responsavel = valorCampoModal(modal, "#modalPacienteResponsavel") || null;
 
-      if (!nome || !data_nascimento || !sexo) {
-        mostrarErroModal("Preencha nome, data de nascimento e sexo.");
+      if (!nome) {
+        mostrarErroModal("Preencha o nome do paciente.");
+        return false;
+      }
+
+      if (!validacaoData.valido) {
+        mostrarErroModal(validacaoData.mensagem);
+        return false;
+      }
+
+      if (!sexo) {
+        mostrarErroModal("Selecione o sexo do paciente.");
         return false;
       }
 
@@ -2781,6 +2863,7 @@ document.addEventListener("DOMContentLoaded", () => {
   protegerPagina();
   atualizarBoasVindas();
   ativarMascaras();
+  configurarLimiteDataNascimento();
   exibirNotificacaoPendente();
 
   const pagina = paginaAtual();
@@ -2795,7 +2878,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const botaoCadastrarPaciente = document.querySelector(".botao_cadastrar");
 
-  if (pagina === "cadastropaciente_usuario.html") {
+  if (
+    pagina === "cadastropaciente_usuario.html" ||
+    pagina === "cadastropaciente_medico.html"
+  ) {
     configurarUploadFotoPaciente();
 
     if (botaoCadastrarPaciente) {

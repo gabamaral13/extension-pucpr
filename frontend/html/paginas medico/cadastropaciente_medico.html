@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Cadastrar Paciente - X-Triagem</title>
+
+    <link rel="stylesheet" href="../../css/style.css" />
+    <link rel="icon" href="../../css/imagens/x.png" />
+
+    <script src="../../javascript/index.js" defer></script>
+  </head>
+
+  <body class="app-page medico-page">
+    <div class="corpo">
+      <div class="container_">
+        <img class="logo" src="../../css/imagens/x.png" alt="Logo X-Triagem" />
+        <h1 class="titulo">Bem-vindo, Admin</h1>
+      </div>
+
+      <div class="corpo_">
+        <div class="navegador">
+          <div class="dash">
+            <h3>Navegador</h3>
+          </div>
+
+          <a href="./dashboard_medico.html">
+            <button class="botoes_areas" type="button">Dashboard</button>
+          </a>
+          <br />
+
+          <a href="./pacientes_medico.html">
+            <button class="botoes_areas" type="button">Pacientes</button>
+          </a>
+          <br />
+
+          <a href="./avaliacao_medico.html">
+            <button class="botoes_areas" type="button">Avaliações</button>
+          </a>
+          <br />
+
+          <a href="./historico_medico.html">
+            <button class="botoes_areas" type="button">Histórico</button>
+          </a>
+          <br />
+
+          <a href="./relatorios_medico.html">
+            <button class="botoes_areas" type="button">Relatórios</button>
+          </a>
+          <br />
+
+          <a href="./usuarios_medico.html">
+            <button class="botoes_areas" type="button">Usuários</button>
+          </a>
+          <br />
+
+          <div class="user_"></div>
+        </div>
+
+        <div class="cadastro_pacientes">
+          <h3 class="titu1">Informações do Paciente</h3>
+
+          <div class="geral">
+            <div class="dados">
+              <div class="dados_pessoais">
+                <h5>Dados pessoais</h5>
+
+                <input
+                  id="nome"
+                  type="text"
+                  placeholder="Nome Completo"
+                  required
+                />
+                <br />
+
+                <input id="cpf" type="text" placeholder="CPF" />
+                <br />
+
+                <div class="dados_">
+                  <input
+                    id="data"
+                    type="date"
+                    placeholder="Data de Nascimento"
+                    required
+                  />
+
+                  <select id="sexo" required>
+                    <option value="">Sexo</option>
+                    <option value="M">Masculino</option>
+                    <option value="F">Feminino</option>
+                  </select>
+                </div>
+              </div>
+
+              <hr />
+
+              <div class="endereco_paciente">
+                <h5>Endereço do Paciente</h5>
+
+                <input id="endereco" type="text" placeholder="Endereço" />
+                <br />
+
+                <input id="cidade" type="text" placeholder="Cidade" />
+                <br />
+
+                <div class="pais">
+                  <input id="cep" type="text" placeholder="CEP" />
+
+                  <input id="estado" type="text" placeholder="Estado" />
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <hr class="vertical" />
+            </div>
+
+            <div class="info">
+              <h5>Foto e responsável</h5>
+
+              <div class="foto_paciente_box">
+                <label class="foto_upload_area" for="fotoPaciente">
+                  <div id="previewFotoPaciente" class="foto_preview">
+                    <span>+</span>
+                    <p>Adicionar foto do paciente</p>
+                    <small>PNG, JPG ou WEBP</small>
+                  </div>
+                </label>
+
+                <input id="fotoPaciente" type="file" accept="image/*" hidden />
+
+                <button
+                  id="removerFotoPaciente"
+                  class="botao_foto_remover"
+                  type="button"
+                >
+                  Remover foto
+                </button>
+              </div>
+
+              <div class="infor_paciente">
+                <input
+                  id="responsavel"
+                  type="text"
+                  placeholder="Pais ou responsável"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <button class="botao_cadastrar" type="button">
+              Cadastrar Novo Paciente
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

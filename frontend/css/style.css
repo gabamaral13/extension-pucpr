@@ -1846,7 +1846,9 @@ body.app-page {
 .foto_preview.com_foto img {
   width: 100%;
   height: 245px;
-  object-fit: cover;
+  object-fit: contain;
+  display: block;
+  background: rgba(5, 9, 55, 0.72);
 }
 
 .botao_foto_remover {
