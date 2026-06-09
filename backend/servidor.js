@@ -18,12 +18,31 @@ const relatorioRotas = require("./rotas/relatorioRotas");
 const avisoRotas = require("./rotas/avisoRotas");
 
 // Middlewares
-app.use(cors());
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+  })
+);
+
+app.use((req, res, next) => {
+  // Evita que algum navegador use arquivos antigos em cache durante testes pela LAN
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
+  next();
+});
+
 app.use(express.json({ limit: "8mb" }));
 app.use(express.urlencoded({ extended: true, limit: "8mb" }));
 
 // Frontend
-app.use(express.static(path.join(__dirname, "../frontend")));
+app.use(
+  express.static(path.join(__dirname, "../frontend"), {
+    etag: false,
+    lastModified: false,
+  })
+);
 
 // ===============================
 // ROTAS DE USUÁRIO DIRETAS

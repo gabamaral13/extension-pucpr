@@ -3,7 +3,28 @@
 // Arquivo: frontend/javascript/index.js
 // ==========================================================
 
-const API_URL = window.location.origin;
+function descobrirApiUrl() {
+  const protocolo = window.location.protocol;
+  const host = window.location.hostname;
+  const portaAtual = window.location.port;
+  const portaBackend = "3000";
+
+  // Jeito certo na LAN: abrir o site pelo próprio Node/Express
+  // Exemplo: http://192.168.x.x:3000/html/index.html
+  if (portaAtual === portaBackend) {
+    return window.location.origin;
+  }
+
+  // Ajuda caso alguém abra pelo Live Server/porta 5500 no mesmo IP
+  if (host && protocolo.startsWith("http")) {
+    return `${protocolo}//${host}:${portaBackend}`;
+  }
+
+  // Ajuda caso alguém abra o HTML direto pelo computador do servidor
+  return `http://localhost:${portaBackend}`;
+}
+
+const API_URL = descobrirApiUrl();
 
 // =========================
 // FUNÇÕES BASE
