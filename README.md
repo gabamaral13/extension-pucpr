@@ -827,32 +827,32 @@ Eles podem ser usados para inserir:
 
 ## 🧪 Status do projeto
 
-✅ Backend estruturado
-✅ Banco de dados SQLite configurado
-✅ Login com JWT funcionando
-✅ Controle de acesso por perfil
-✅ Integração entre frontend e backend
-✅ Cadastro de pacientes
-✅ Cadastro de foto do paciente
-✅ Listagem e busca de pacientes
-✅ Visualização completa dos dados do paciente
-✅ Edição de pacientes em modal
-✅ Exclusão de pacientes
-✅ Cadastro e listagem de usuários
-✅ Edição de usuários em modal
-✅ Remoção de usuários
-✅ Avaliações integradas
-✅ Cálculo automático de score
-✅ Exibição de limite, sensibilidade e AUC
-✅ Histórico de avaliações por paciente
-✅ Registro dos sintomas marcados
-✅ Registro de quem cadastrou o paciente
-✅ Registro de quem realizou a avaliação
-✅ Relatórios integrados
-✅ Impressão de relatórios e históricos
-✅ Comunicados internos no dashboard
-✅ Acesso pela rede local/LAN configurado
-✅ Teste externo temporário via LocalTunnel disponível
+✅ Backend estruturado.
+✅ Banco de dados SQLite configurado.
+✅ Login com JWT funcionando.
+✅ Controle de acesso por perfil.
+✅ Integração entre frontend e backend.
+✅ Cadastro de pacientes.
+✅ Cadastro de foto do paciente.
+✅ Listagem e busca de pacientes.
+✅ Visualização completa dos dados do paciente.
+✅ Edição de pacientes em modal.
+✅ Exclusão de pacientes.
+✅ Cadastro e listagem de usuários.
+✅ Edição de usuários em modal.
+✅ Remoção de usuários.
+✅ Avaliações integradas.
+✅ Cálculo automático de score.
+✅ Exibição de limite, sensibilidade e AUC.
+✅ Histórico de avaliações por paciente.
+✅ Registro dos sintomas marcados.
+✅ Registro de quem cadastrou o paciente.
+✅ Registro de quem realizou a avaliação.
+✅ Relatórios integrados.
+✅ Impressão de relatórios e históricos.
+✅ Comunicados internos no dashboard.
+✅ Acesso pela rede local/LAN configurado.
+✅ Teste externo temporário via LocalTunnel disponível.
 
 ---
 
